@@ -12,6 +12,7 @@ import {
   Smartphone,
   ChevronRight,
 } from 'lucide-react';
+import { DemoButton } from '@/components/demo/DemoButton';
 
 const HERO_STATS = [
   { value: '5,000+', label: 'Businesses' },
@@ -165,6 +166,7 @@ export default function LandingPage() {
                 <Sparkles className="h-5 w-5 text-spotlight-gold" />
                 List Your Business
               </Link>
+              <DemoButton />
             </div>
 
             {/* Stats bar */}
