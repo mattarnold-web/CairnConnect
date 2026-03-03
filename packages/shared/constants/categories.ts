@@ -1,0 +1,15 @@
+export const BUSINESS_CATEGORIES = [
+  { value: 'bike_shop', label: 'Bike Shop', icon: '🚲' },
+  { value: 'gear_rental', label: 'Gear Rental', icon: '🎒' },
+  { value: 'guide_service', label: 'Guide Service', icon: '🧭' },
+  { value: 'outfitter', label: 'Outfitter', icon: '🏕️' },
+  { value: 'outdoor_gear_shop', label: 'Outdoor Gear Shop', icon: '🛒' },
+  { value: 'bike_shuttle', label: 'Bike Shuttle', icon: '🚐' },
+  { value: 'mountain_hut', label: 'Mountain Hut', icon: '🏔️' },
+  { value: 'kayak_sup', label: 'Kayak & SUP', icon: '🛶' },
+  { value: 'surf_school', label: 'Surf School', icon: '🏄' },
+  { value: 'adventure_hostel', label: 'Adventure Hostel', icon: '🏠' },
+  { value: 'camping', label: 'Camping', icon: '⛺' },
+  { value: 'trailhead_cafe', label: 'Trailhead Cafe', icon: '☕' },
+  { value: 'outdoor_club', label: 'Outdoor Club', icon: '🤝' },
+] as const;

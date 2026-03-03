@@ -1,0 +1,199 @@
+/**
+ * Supabase database types.
+ *
+ * These are generated from the database schema defined in
+ * packages/database/migrations/. When the schema changes,
+ * regenerate with:
+ *
+ *   npx supabase gen types typescript --project-id YOUR_PROJECT_ID > apps/web/lib/database-types.ts
+ *
+ * The types below are a manual starting point that mirrors the
+ * migration files. Once a live Supabase project is connected,
+ * replace this file with auto-generated types.
+ */
+
+export interface Database {
+  public: {
+    Tables: {
+      users: {
+        Row: {
+          id: string;
+          email: string;
+          username: string | null;
+          display_name: string | null;
+          avatar_url: string | null;
+          bio: string | null;
+          location_name: string | null;
+          activity_preferences: string[];
+          preferred_skill_level: string | null;
+          skill_levels: Record<string, string> | null;
+          is_pro_subscriber: boolean;
+          preferred_units: 'imperial' | 'metric';
+          preferred_language: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['users']['Row'], 'created_at' | 'updated_at'> & {
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['users']['Insert']>;
+      };
+      businesses: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          category: string;
+          subcategories: string[];
+          activity_types: string[];
+          address: string | null;
+          city: string | null;
+          state_province: string | null;
+          country: string;
+          phone: string | null;
+          email: string | null;
+          website_url: string | null;
+          booking_url: string | null;
+          instagram_handle: string | null;
+          facebook_url: string | null;
+          tripadvisor_url: string | null;
+          yelp_url: string | null;
+          google_maps_url: string | null;
+          youtube_url: string | null;
+          strava_segment_url: string | null;
+          whatsapp: string | null;
+          hours: Record<string, string> | null;
+          photos: string[];
+          cover_photo_url: string | null;
+          rating: number;
+          review_count: number;
+          is_spotlight: boolean;
+          spotlight_tier: 'founding' | 'standard' | 'premium' | null;
+          special_offer: string | null;
+          is_claimed: boolean;
+          tags: string[];
+          currency: string;
+          price_range: { min: number; max: number; unit: string } | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['businesses']['Row'], 'id' | 'created_at' | 'updated_at' | 'slug'> & {
+          id?: string;
+          slug?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['businesses']['Insert']>;
+      };
+      trails: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          activity_types: string[];
+          difficulty: 'green' | 'blue' | 'black' | 'double_black' | 'proline';
+          difficulty_label: string | null;
+          technical_rating: string | null;
+          distance_meters: number;
+          elevation_gain_meters: number;
+          elevation_loss_meters: number;
+          max_elevation_meters: number | null;
+          min_elevation_meters: number | null;
+          estimated_duration_minutes: number | null;
+          trail_type: 'loop' | 'out_and_back' | 'point_to_point' | 'network';
+          surface_type: string[];
+          lat: number;
+          lng: number;
+          city: string | null;
+          state_province: string | null;
+          country: string;
+          current_condition: 'open' | 'caution' | 'closed' | 'unknown';
+          requires_permit: boolean;
+          rating: number;
+          review_count: number;
+          ride_count: number;
+          photos: string[];
+          cover_photo_url: string | null;
+          best_seasons: string[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['trails']['Row'], 'id' | 'created_at' | 'updated_at' | 'slug'> & {
+          id?: string;
+          slug?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['trails']['Insert']>;
+      };
+      reviews: {
+        Row: {
+          id: string;
+          author_id: string;
+          entity_type: 'business' | 'trail';
+          entity_id: string;
+          rating: number;
+          title: string | null;
+          body: string | null;
+          photos: string[];
+          owner_response: string | null;
+          is_verified: boolean;
+          helpful_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['reviews']['Row'], 'id' | 'created_at' | 'updated_at'> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['reviews']['Insert']>;
+      };
+      user_activities: {
+        Row: {
+          id: string;
+          user_id: string;
+          source: string;
+          external_activity_id: string | null;
+          activity_type: string;
+          title: string;
+          description: string | null;
+          distance_meters: number;
+          duration_seconds: number;
+          elevation_gain_meters: number;
+          elevation_loss_meters: number;
+          max_elevation_meters: number | null;
+          avg_speed_ms: number | null;
+          max_speed_ms: number | null;
+          calories: number | null;
+          started_at: string;
+          ended_at: string | null;
+          device_name: string | null;
+          is_public: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['user_activities']['Row'], 'id' | 'created_at' | 'updated_at'> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['user_activities']['Insert']>;
+      };
+    };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: {
+      difficulty_level: 'green' | 'blue' | 'black' | 'double_black' | 'proline';
+      trail_type: 'loop' | 'out_and_back' | 'point_to_point' | 'network';
+      condition_status: 'open' | 'caution' | 'closed' | 'unknown';
+      entity_type: 'business' | 'trail';
+      spotlight_tier: 'founding' | 'standard' | 'premium';
+      unit_preference: 'imperial' | 'metric';
+    };
+  };
+}
