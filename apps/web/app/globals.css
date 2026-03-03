@@ -127,3 +127,37 @@ a {
 .animate-slide-up {
   animation: slide-up 0.25s ease-out;
 }
+
+/* Safe area for mobile bottom nav (notch devices) */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Mobile touch targets */
+@media (max-width: 640px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Override for inline text links and small chips */
+  .text-xs, .text-\[10px\], .text-\[9px\] {
+    min-height: auto;
+    min-width: auto;
+  }
+}
+
+/* Prevent layout shift from scrollbar */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Form select styling for dark mode */
+select option {
+  background-color: #122338;
+  color: #F1F5F9;
+}

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Map, Mountain, Search, ChevronRight, Layers } from 'lucide-react';
+import Link from 'next/link';
+import { Map, Mountain, Search, ChevronRight, Layers, MapPin } from 'lucide-react';
 import { clsx } from 'clsx';
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -16,18 +17,10 @@ import {
   MOCK_REGION_HIGHLIGHTS,
 } from '@/lib/mock-data';
 
-// ---------------------------------------------------------------------------
-// Filter activity configs
-// ---------------------------------------------------------------------------
-
 const FILTER_ACTIVITIES: { slug: string | null; label: string }[] = [
   { slug: null, label: 'All' },
   ...ACTIVITIES.map((a) => ({ slug: a.slug, label: a.label })),
 ];
-
-// ---------------------------------------------------------------------------
-// Fake map pins for the placeholder map
-// ---------------------------------------------------------------------------
 
 const MAP_PINS = [
   { top: '18%', left: '22%', emoji: '\u{1F6B2}', label: 'Poison Spider', spotlight: false },
@@ -38,54 +31,36 @@ const MAP_PINS = [
   { top: '42%', left: '15%', emoji: '\u{1F3D5}\u{FE0F}', label: 'BLM Camp', spotlight: false },
 ];
 
-// ---------------------------------------------------------------------------
-// Page component
-// ---------------------------------------------------------------------------
-
 export default function ExplorePage() {
   const [activeTab, setActiveTab] = useState<'businesses' | 'trails'>('businesses');
   const [searchText, setSearchText] = useState('');
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
-
-  // -- Filtered data --------------------------------------------------------
+  const [mapStyle, setMapStyle] = useState<'standard' | 'topo' | 'satellite'>('standard');
 
   const filteredBusinesses = useMemo(() => {
     return MOCK_BUSINESSES.filter((b) => {
-      if (searchText && !b.name.toLowerCase().includes(searchText.toLowerCase())) {
-        return false;
-      }
-      if (selectedActivity && !b.activity_types.includes(selectedActivity)) {
-        return false;
-      }
+      if (searchText && !b.name.toLowerCase().includes(searchText.toLowerCase())) return false;
+      if (selectedActivity && !b.activity_types.includes(selectedActivity)) return false;
       return true;
     });
   }, [searchText, selectedActivity]);
 
   const filteredTrails = useMemo(() => {
     return MOCK_TRAILS.filter((t) => {
-      if (searchText && !t.name.toLowerCase().includes(searchText.toLowerCase())) {
-        return false;
-      }
-      if (selectedActivity && !t.activity_types.includes(selectedActivity)) {
-        return false;
-      }
+      if (searchText && !t.name.toLowerCase().includes(searchText.toLowerCase())) return false;
+      if (selectedActivity && !t.activity_types.includes(selectedActivity)) return false;
       return true;
     });
   }, [searchText, selectedActivity]);
-
-  // -----------------------------------------------------------------------
 
   return (
     <div className="min-h-screen bg-cairn-bg">
       <Navbar />
 
       <div className="pt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-6">
-          {/* ---------------------------------------------------------------- */}
-          {/* Left column: scrollable content                                   */}
-          {/* ---------------------------------------------------------------- */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left column: scrollable content */}
           <div className="flex-1 min-w-0 pb-24">
-            {/* Search bar */}
             <div className="py-4">
               <SearchBar
                 placeholder="Search businesses, trails, activities..."
@@ -94,7 +69,6 @@ export default function ExplorePage() {
               />
             </div>
 
-            {/* Filter chips row */}
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-4">
               {FILTER_ACTIVITIES.map((act) => (
                 <FilterChip
@@ -107,7 +81,6 @@ export default function ExplorePage() {
               ))}
             </div>
 
-            {/* Tab switcher */}
             <div className="flex items-center gap-2 py-4">
               <button
                 onClick={() => setActiveTab('businesses')}
@@ -135,7 +108,6 @@ export default function ExplorePage() {
               </button>
             </div>
 
-            {/* Content area */}
             {activeTab === 'businesses' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredBusinesses.length > 0 ? (
@@ -145,14 +117,9 @@ export default function ExplorePage() {
                 ) : (
                   <div className="col-span-full text-center py-16">
                     <Search className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-400 text-sm">
-                      No businesses match your filters.
-                    </p>
+                    <p className="text-slate-400 text-sm">No businesses match your filters.</p>
                     <button
-                      onClick={() => {
-                        setSearchText('');
-                        setSelectedActivity(null);
-                      }}
+                      onClick={() => { setSearchText(''); setSelectedActivity(null); }}
                       className="mt-2 text-canopy text-sm hover:underline"
                     >
                       Clear filters
@@ -169,14 +136,9 @@ export default function ExplorePage() {
                 ) : (
                   <div className="text-center py-16">
                     <Search className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-400 text-sm">
-                      No trails match your filters.
-                    </p>
+                    <p className="text-slate-400 text-sm">No trails match your filters.</p>
                     <button
-                      onClick={() => {
-                        setSearchText('');
-                        setSelectedActivity(null);
-                      }}
+                      onClick={() => { setSearchText(''); setSelectedActivity(null); }}
                       className="mt-2 text-canopy text-sm hover:underline"
                     >
                       Clear filters
@@ -187,43 +149,102 @@ export default function ExplorePage() {
             )}
           </div>
 
-          {/* ---------------------------------------------------------------- */}
-          {/* Right column: fake map (hidden on mobile, visible on lg+)        */}
-          {/* ---------------------------------------------------------------- */}
+          {/* Right column: Map with topo toggle */}
           <div className="hidden lg:block w-[500px] shrink-0">
             <div className="sticky top-20">
               <div className="rounded-2xl border border-cairn-border bg-cairn-card overflow-hidden shadow-2xl shadow-black/20">
-                {/* Map area */}
-                <div className="relative h-[calc(100vh-7rem)] bg-gradient-to-br from-cairn-elevated via-[#0d2240] to-cairn-bg">
-                  {/* Grid lines for map feel */}
-                  <div className="absolute inset-0 opacity-10">
-                    {Array.from({ length: 20 }).map((_, i) => (
-                      <div
-                        key={`h${i}`}
-                        className="absolute left-0 right-0 border-t border-slate-500"
-                        style={{ top: `${i * 5}%` }}
-                      />
-                    ))}
-                    {Array.from({ length: 20 }).map((_, i) => (
-                      <div
-                        key={`v${i}`}
-                        className="absolute top-0 bottom-0 border-l border-slate-500"
-                        style={{ left: `${i * 5}%` }}
-                      />
-                    ))}
-                  </div>
+                <div
+                  className={clsx(
+                    'relative h-[calc(100vh-7rem)] transition-colors duration-500',
+                    mapStyle === 'topo'
+                      ? 'bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460]'
+                      : mapStyle === 'satellite'
+                      ? 'bg-gradient-to-br from-[#1a3a1a] via-[#0d2d1e] to-[#0a1f14]'
+                      : 'bg-gradient-to-br from-cairn-elevated via-[#0d2240] to-cairn-bg'
+                  )}
+                >
+                  {/* Standard grid lines OR topo contour lines */}
+                  {mapStyle === 'topo' ? (
+                    <svg className="absolute inset-0 w-full h-full opacity-25" viewBox="0 0 500 700" preserveAspectRatio="none">
+                      {/* Topographic contour lines */}
+                      <path d="M0 600 Q125 570 250 590 Q375 610 500 580" fill="none" stroke="#8B5CF6" strokeWidth="1" />
+                      <path d="M0 530 Q100 490 250 510 Q400 530 500 495" fill="none" stroke="#8B5CF6" strokeWidth="1" opacity="0.8" />
+                      <path d="M0 460 Q125 420 250 440 Q375 460 500 420" fill="none" stroke="#8B5CF6" strokeWidth="1" opacity="0.7" />
+                      <path d="M20 390 Q150 340 280 360 Q410 380 490 340" fill="none" stroke="#8B5CF6" strokeWidth="1" opacity="0.6" />
+                      <path d="M40 320 Q175 270 310 290 Q430 310 480 275" fill="none" stroke="#8B5CF6" strokeWidth="1" opacity="0.5" />
+                      <path d="M60 260 Q190 210 330 230 Q430 245 470 215" fill="none" stroke="#8B5CF6" strokeWidth="1" opacity="0.4" />
+                      <path d="M100 200 Q220 150 350 170 Q420 185 460 160" fill="none" stroke="#8B5CF6" strokeWidth="1" opacity="0.3" />
+                      <path d="M140 150 Q240 100 360 120 Q410 132 440 110" fill="none" stroke="#8B5CF6" strokeWidth="1" opacity="0.25" />
+                      {/* Ridge line */}
+                      <path d="M150 130 Q250 70 380 95" fill="none" stroke="#F4A261" strokeWidth="1.5" strokeDasharray="6 3" opacity="0.5" />
+                      {/* Elevation labels */}
+                      <text x="10" y="605" fill="#8B5CF6" fontSize="8" opacity="0.5">4,200 ft</text>
+                      <text x="10" y="465" fill="#8B5CF6" fontSize="8" opacity="0.5">5,000 ft</text>
+                      <text x="10" y="325" fill="#8B5CF6" fontSize="8" opacity="0.5">5,800 ft</text>
+                      <text x="10" y="205" fill="#8B5CF6" fontSize="8" opacity="0.5">6,600 ft</text>
+                    </svg>
+                  ) : (
+                    <div className="absolute inset-0 opacity-10">
+                      {Array.from({ length: 20 }).map((_, i) => (
+                        <div key={`h${i}`} className="absolute left-0 right-0 border-t border-slate-500" style={{ top: `${i * 5}%` }} />
+                      ))}
+                      {Array.from({ length: 20 }).map((_, i) => (
+                        <div key={`v${i}`} className="absolute top-0 bottom-0 border-l border-slate-500" style={{ left: `${i * 5}%` }} />
+                      ))}
+                    </div>
+                  )}
 
-                  {/* Map controls overlay */}
+                  {/* Map style controls */}
                   <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-                    <button className="h-8 w-8 rounded-lg glass border border-cairn-border flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors">
+                    <button
+                      onClick={() => setMapStyle('standard')}
+                      className={clsx(
+                        'h-8 w-8 rounded-lg border flex items-center justify-center transition-colors',
+                        mapStyle === 'standard'
+                          ? 'bg-canopy/20 border-canopy/40 text-canopy'
+                          : 'glass border-cairn-border text-slate-400 hover:text-slate-200'
+                      )}
+                      title="Standard Map"
+                    >
                       <Map className="h-4 w-4" />
                     </button>
-                    <button className="h-8 w-8 rounded-lg glass border border-cairn-border flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors">
+                    <button
+                      onClick={() => setMapStyle('topo')}
+                      className={clsx(
+                        'h-8 w-8 rounded-lg border flex items-center justify-center transition-colors',
+                        mapStyle === 'topo'
+                          ? 'bg-violet-500/20 border-violet-500/40 text-violet-400'
+                          : 'glass border-cairn-border text-slate-400 hover:text-slate-200'
+                      )}
+                      title="Topographic Map"
+                    >
                       <Layers className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setMapStyle('satellite')}
+                      className={clsx(
+                        'h-8 w-8 rounded-lg border flex items-center justify-center transition-colors',
+                        mapStyle === 'satellite'
+                          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                          : 'glass border-cairn-border text-slate-400 hover:text-slate-200'
+                      )}
+                      title="Satellite View"
+                    >
+                      <MapPin className="h-4 w-4" />
                     </button>
                   </div>
 
-                  {/* Fake pins */}
+                  {/* Map style label */}
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className={clsx(
+                      'text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md bg-cairn-bg/60 backdrop-blur-sm',
+                      mapStyle === 'topo' ? 'text-violet-400' : mapStyle === 'satellite' ? 'text-emerald-400' : 'text-slate-400'
+                    )}>
+                      {mapStyle === 'topo' ? 'Topo View' : mapStyle === 'satellite' ? 'Satellite' : 'Standard'}
+                    </span>
+                  </div>
+
+                  {/* Pins */}
                   {MAP_PINS.map((pin) => (
                     <div
                       key={pin.label}
@@ -252,7 +273,7 @@ export default function ExplorePage() {
                     </div>
                   ))}
 
-                  {/* Region highlights card at bottom */}
+                  {/* Region highlights */}
                   <div className="absolute bottom-4 left-4 right-4 glass rounded-xl border border-cairn-border p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-display text-sm font-semibold text-slate-200">
@@ -287,6 +308,17 @@ export default function ExplorePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile map toggle (shown below content on mobile) */}
+      <div className="lg:hidden fixed bottom-16 left-1/2 -translate-x-1/2 z-40">
+        <Link
+          href="/explore"
+          className="flex items-center gap-2 rounded-full bg-canopy px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-canopy/30"
+        >
+          <Map className="h-4 w-4" />
+          View Map
+        </Link>
       </div>
     </div>
   );
