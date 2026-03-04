@@ -18,7 +18,7 @@ import { clsx } from 'clsx';
 import { Navbar } from '@/components/layout/Navbar';
 import { CameraCapture } from '@/components/activity/CameraCapture';
 import { PhotoGallery } from '@/components/activity/PhotoGallery';
-import { ActivityIcon, ACTIVITIES } from '@/components/ui/ActivityIcon';
+import { ActivityIcon, PRIMARY_ACTIVITIES, MORE_ACTIVITIES, ACTIVITIES } from '@/components/ui/ActivityIcon';
 import { useActivityContext } from '@/lib/activity-context';
 import { useFormat } from '@/lib/use-format';
 import { saveRecordedActivity } from '@/lib/actions/activities';
@@ -41,6 +41,7 @@ export default function RecordPage() {
   const [gpsStatus, setGpsStatus] = useState<'off' | 'acquiring' | 'active' | 'error'>('off');
   const [elapsed, setElapsed] = useState(0);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [showMoreActivities, setShowMoreActivities] = useState(false);
 
   const watchIdRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -216,7 +217,7 @@ export default function RecordPage() {
           <div className="mb-8">
             <p className="text-sm text-slate-400 mb-3">Choose activity type</p>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {ACTIVITIES.map((type) => (
+              {PRIMARY_ACTIVITIES.map((type) => (
                 <button
                   key={type.slug}
                   onClick={() => setSelectedType(type.slug)}
@@ -232,6 +233,34 @@ export default function RecordPage() {
                 </button>
               ))}
             </div>
+
+            {/* More activities toggle */}
+            <button
+              onClick={() => setShowMoreActivities(!showMoreActivities)}
+              className="mt-3 text-xs font-medium text-slate-500 hover:text-canopy transition-colors"
+            >
+              {showMoreActivities ? '− Show less' : `+ More activities (${MORE_ACTIVITIES.length})`}
+            </button>
+
+            {showMoreActivities && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-3">
+                {MORE_ACTIVITIES.map((type) => (
+                  <button
+                    key={type.slug}
+                    onClick={() => setSelectedType(type.slug)}
+                    className={clsx(
+                      'flex flex-col items-center gap-1.5 rounded-xl border px-3 py-3 text-xs font-medium transition-colors',
+                      selectedType === type.slug
+                        ? 'bg-canopy/15 border-canopy/40 text-canopy'
+                        : 'bg-cairn-card border-cairn-border text-slate-400 hover:bg-cairn-card-hover hover:text-slate-200',
+                    )}
+                  >
+                    <ActivityIcon activity={type.slug} size="sm" />
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

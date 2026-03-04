@@ -11,6 +11,14 @@ import {
   Tent,
   Droplets,
   Target,
+  Snowflake,
+  CloudSnow,
+  Fish,
+  Compass,
+  Wind,
+  TreePine,
+  Anchor,
+  Sunrise,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -96,6 +104,70 @@ export const ACTIVITY_CONFIG: Record<string, ActivityConfig> = {
     color: 'text-teal-400',
     ring: 'ring-teal-500/25',
   },
+  skiing: {
+    slug: 'skiing',
+    icon: Snowflake,
+    label: 'Skiing',
+    bg: 'bg-sky-500/15',
+    color: 'text-sky-400',
+    ring: 'ring-sky-500/25',
+  },
+  snowboarding: {
+    slug: 'snowboarding',
+    icon: CloudSnow,
+    label: 'Snowboarding',
+    bg: 'bg-zinc-500/15',
+    color: 'text-zinc-400',
+    ring: 'ring-zinc-500/25',
+  },
+  fishing: {
+    slug: 'fishing',
+    icon: Fish,
+    label: 'Fishing',
+    bg: 'bg-orange-500/15',
+    color: 'text-orange-400',
+    ring: 'ring-orange-500/25',
+  },
+  backpacking: {
+    slug: 'backpacking',
+    icon: Compass,
+    label: 'Backpacking',
+    bg: 'bg-yellow-500/15',
+    color: 'text-yellow-400',
+    ring: 'ring-yellow-500/25',
+  },
+  surfing: {
+    slug: 'surfing',
+    icon: Wind,
+    label: 'Surfing',
+    bg: 'bg-fuchsia-500/15',
+    color: 'text-fuchsia-400',
+    ring: 'ring-fuchsia-500/25',
+  },
+  snowshoeing: {
+    slug: 'snowshoeing',
+    icon: TreePine,
+    label: 'Snowshoeing',
+    bg: 'bg-green-500/15',
+    color: 'text-green-400',
+    ring: 'ring-green-500/25',
+  },
+  sailing: {
+    slug: 'sailing',
+    icon: Anchor,
+    label: 'Sailing',
+    bg: 'bg-stone-500/15',
+    color: 'text-stone-400',
+    ring: 'ring-stone-500/25',
+  },
+  yoga: {
+    slug: 'yoga',
+    icon: Sunrise,
+    label: 'Outdoor Yoga',
+    bg: 'bg-pink-500/15',
+    color: 'text-pink-400',
+    ring: 'ring-pink-500/25',
+  },
 };
 
 const SIZES = {
@@ -106,8 +178,8 @@ const SIZES = {
   xl: { container: 'h-14 w-14 rounded-xl', icon: 'h-7 w-7' },
 };
 
-/** Ordered activity list for pickers and selectors */
-export const ACTIVITIES = [
+/** Primary activities shown by default */
+export const PRIMARY_ACTIVITIES = [
   ACTIVITY_CONFIG.mtb,
   ACTIVITY_CONFIG.hiking,
   ACTIVITY_CONFIG.trail_running,
@@ -119,14 +191,34 @@ export const ACTIVITIES = [
   ACTIVITY_CONFIG.standup_paddle,
 ];
 
+/** Additional activities shown in "More" section */
+export const MORE_ACTIVITIES = [
+  ACTIVITY_CONFIG.skiing,
+  ACTIVITY_CONFIG.snowboarding,
+  ACTIVITY_CONFIG.fishing,
+  ACTIVITY_CONFIG.backpacking,
+  ACTIVITY_CONFIG.surfing,
+  ACTIVITY_CONFIG.snowshoeing,
+  ACTIVITY_CONFIG.sailing,
+  ACTIVITY_CONFIG.yoga,
+];
+
+/** All activities combined */
+export const ACTIVITIES = [...PRIMARY_ACTIVITIES, ...MORE_ACTIVITIES];
+
 /** Land-based activities */
-export const LAND_ACTIVITIES = ACTIVITIES.filter((a) =>
+export const LAND_ACTIVITIES = PRIMARY_ACTIVITIES.filter((a) =>
   ['mtb', 'hiking', 'trail_running', 'climbing', 'road_cycling', 'camping'].includes(a.slug),
 );
 
 /** Water-based activities */
-export const WATER_ACTIVITIES = ACTIVITIES.filter((a) =>
+export const WATER_ACTIVITIES = PRIMARY_ACTIVITIES.filter((a) =>
   ['kayaking', 'whitewater', 'standup_paddle'].includes(a.slug),
+);
+
+/** Winter/snow activities */
+export const WINTER_ACTIVITIES = MORE_ACTIVITIES.filter((a) =>
+  ['skiing', 'snowboarding', 'snowshoeing'].includes(a.slug),
 );
 
 export function getActivityLabel(slug: string): string {

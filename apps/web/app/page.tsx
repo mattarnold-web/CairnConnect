@@ -17,6 +17,7 @@ import {
   Lock,
   FileText,
 } from 'lucide-react';
+import { DemoButton } from '@/components/demo/DemoButton';
 
 export const metadata: Metadata = {
   title: 'Cairn Connect — Find Your Trail. Find Your People.',
@@ -198,6 +199,7 @@ export default function LandingPage() {
                 <Sparkles className="h-5 w-5 text-spotlight-gold" />
                 List Your Business
               </Link>
+              <DemoButton />
             </div>
 
             <div className="flex items-center justify-center gap-6 sm:gap-12 pt-8 flex-wrap">
