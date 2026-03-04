@@ -1,14 +1,67 @@
 'use client';
 
 import Link from 'next/link';
-import { Mountain, Mail, Lock, ArrowLeft, Chrome } from 'lucide-react';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Mountain, Mail, Lock, ArrowLeft, Loader2 } from 'lucide-react';
+import { Suspense, useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/lib/auth-context';
 
-export default function LoginPage() {
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { signInWithEmail, signUp, signInWithGoogle } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState<string | null>(
+    searchParams.get('error') === 'auth_failed' ? 'Authentication failed. Please try again.' : null,
+  );
+  const [loading, setLoading] = useState(false);
+
+  const redirectTo = searchParams.get('redirectTo') || '/explore';
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const result = isSignUp
+        ? await signUp(email, password)
+        : await signInWithEmail(email, password);
+
+      if (result.error) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      }
+
+      if (isSignUp) {
+        setError(null);
+        // Show confirmation message for email verification
+        setLoading(false);
+        alert('Check your email for a confirmation link!');
+        return;
+      }
+
+      router.push(redirectTo);
+      router.refresh();
+    } catch {
+      setError('An unexpected error occurred. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    try {
+      await signInWithGoogle();
+    } catch {
+      setError('Failed to start Google sign-in.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-cairn-bg flex">
@@ -74,9 +127,19 @@ export default function LoginPage() {
             : 'Sign in to your Cairn Connect account'}
         </p>
 
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
+
         {/* Social auth buttons */}
         <div className="space-y-3 mb-6">
-          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-cairn-border bg-cairn-card h-12 text-sm font-medium text-slate-300 hover:bg-cairn-card-hover transition-colors">
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-3 rounded-xl border border-cairn-border bg-cairn-card h-12 text-sm font-medium text-slate-300 hover:bg-cairn-card-hover transition-colors"
+          >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
@@ -97,7 +160,10 @@ export default function LoginPage() {
             </svg>
             Continue with Google
           </button>
-          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-cairn-border bg-cairn-card h-12 text-sm font-medium text-slate-300 hover:bg-cairn-card-hover transition-colors">
+          <button
+            type="button"
+            className="w-full flex items-center justify-center gap-3 rounded-xl border border-cairn-border bg-cairn-card h-12 text-sm font-medium text-slate-300 hover:bg-cairn-card-hover transition-colors"
+          >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
             </svg>
@@ -113,13 +179,7 @@ export default function LoginPage() {
         </div>
 
         {/* Email form */}
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            alert('Auth integration coming soon! This is a preview.');
-          }}
-        >
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1.5">
               Email address
@@ -131,7 +191,9 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full h-12 rounded-xl border border-cairn-border bg-cairn-card pl-10 pr-4 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-canopy transition-colors"
+                required
+                disabled={loading}
+                className="w-full h-12 rounded-xl border border-cairn-border bg-cairn-card pl-10 pr-4 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-canopy transition-colors disabled:opacity-50"
               />
             </div>
           </div>
@@ -146,8 +208,11 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="w-full h-12 rounded-xl border border-cairn-border bg-cairn-card pl-10 pr-4 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-canopy transition-colors"
+                placeholder={isSignUp ? 'Create a password (min 6 chars)' : 'Enter your password'}
+                required
+                minLength={6}
+                disabled={loading}
+                className="w-full h-12 rounded-xl border border-cairn-border bg-cairn-card pl-10 pr-4 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-canopy transition-colors disabled:opacity-50"
               />
             </div>
           </div>
@@ -163,15 +228,25 @@ export default function LoginPage() {
             </div>
           )}
 
-          <Button type="submit" size="lg" className="w-full">
-            {isSignUp ? 'Create Account' : 'Sign In'}
+          <Button type="submit" size="lg" className="w-full" disabled={loading}>
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {isSignUp ? 'Creating Account...' : 'Signing In...'}
+              </span>
+            ) : (
+              isSignUp ? 'Create Account' : 'Sign In'
+            )}
           </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-500">
           {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button
-            onClick={() => setIsSignUp(!isSignUp)}
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setError(null);
+            }}
             className="text-canopy hover:underline font-medium"
           >
             {isSignUp ? 'Sign in' : 'Sign up'}
@@ -179,5 +254,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-cairn-bg" />}>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition, useCallback } from 'react';
 import {
   Settings,
   Globe,
@@ -12,10 +12,12 @@ import {
   X,
   Check,
   Shield,
+  Loader2,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Navbar } from '@/components/layout/Navbar';
 import { usePreferences, type EquipmentItem } from '@/lib/preferences-context';
+import { updateProfile, updatePreferences } from '@/lib/actions/profile';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -62,6 +64,7 @@ export default function SettingsPage() {
   const [newEquipCategory, setNewEquipCategory] = useState<EquipmentItem['category']>('bike');
   const [showAddEquip, setShowAddEquip] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   function handleAddEquipment() {
     if (!newEquipName.trim()) return;
@@ -81,6 +84,35 @@ export default function SettingsPage() {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
+
+  // Persist profile changes to the server
+  const syncProfile = useCallback(
+    (field: string, value: string | null) => {
+      startTransition(async () => {
+        const input: Record<string, string | null> = {};
+        if (field === 'displayName') input.displayName = value;
+        if (field === 'bio') input.bio = value;
+        if (field === 'avatarUrl') input.avatarUrl = value;
+        await updateProfile(input);
+        showSavedToast();
+      });
+    },
+    [],
+  );
+
+  // Persist preference changes to the server
+  const syncPreferences = useCallback(
+    (field: string, value: unknown) => {
+      startTransition(async () => {
+        const input: Record<string, unknown> = {};
+        if (field === 'preferredUnits') input.preferredUnits = value;
+        if (field === 'preferredLanguage') input.preferredLanguage = value;
+        await updatePreferences(input as any);
+        showSavedToast();
+      });
+    },
+    [],
+  );
 
   return (
     <div className="min-h-screen bg-cairn-bg pb-24">
@@ -118,7 +150,7 @@ export default function SettingsPage() {
                     const url = prompt('Enter image URL for profile picture (optional):');
                     if (url !== null) {
                       dispatch({ type: 'SET_PROFILE_PICTURE', url: url || null });
-                      showSavedToast();
+                      syncProfile('avatarUrl', url || null);
                     }
                   }}
                 >
@@ -134,7 +166,7 @@ export default function SettingsPage() {
                     onChange={(e) => {
                       dispatch({ type: 'SET_DISPLAY_NAME', name: e.target.value });
                     }}
-                    onBlur={showSavedToast}
+                    onBlur={(e) => syncProfile('displayName', e.target.value)}
                     placeholder="Your trail name"
                     className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none"
                   />
@@ -146,7 +178,7 @@ export default function SettingsPage() {
                     onChange={(e) => {
                       dispatch({ type: 'SET_BIO', bio: e.target.value });
                     }}
-                    onBlur={showSavedToast}
+                    onBlur={(e) => syncProfile('bio', e.target.value)}
                     placeholder="Tell others about your outdoor interests..."
                     rows={2}
                     className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none resize-none"
@@ -168,7 +200,7 @@ export default function SettingsPage() {
               value={preferences.language}
               onChange={(e) => {
                 dispatch({ type: 'SET_LANGUAGE', language: e.target.value });
-                showSavedToast();
+                syncPreferences('preferredLanguage', e.target.value);
               }}
               className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2.5 text-sm text-slate-100 focus:border-canopy focus:outline-none appearance-none cursor-pointer"
             >
@@ -215,7 +247,7 @@ export default function SettingsPage() {
               <button
                 onClick={() => {
                   dispatch({ type: 'SET_UNITS', units: 'imperial' });
-                  showSavedToast();
+                  syncPreferences('preferredUnits', 'imperial');
                 }}
                 className={clsx(
                   'flex-1 rounded-xl border py-3 text-sm font-medium transition-colors',
@@ -229,7 +261,7 @@ export default function SettingsPage() {
               <button
                 onClick={() => {
                   dispatch({ type: 'SET_UNITS', units: 'metric' });
-                  showSavedToast();
+                  syncPreferences('preferredUnits', 'metric');
                 }}
                 className={clsx(
                   'flex-1 rounded-xl border py-3 text-sm font-medium transition-colors',

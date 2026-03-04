@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Map, Mountain, Users, User, Sparkles, CalendarDays, Compass, Play, Settings } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Map, Mountain, Users, User, Sparkles, CalendarDays, Compass, Play, Settings, LogOut } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useState } from 'react';
 import { usePreferences } from '@/lib/preferences-context';
+import { useAuth } from '@/lib/auth-context';
 
 const NAV_ITEMS = [
   { href: '/explore', label: 'Explore', icon: Map },
@@ -27,7 +29,10 @@ const MOBILE_NAV_ITEMS = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { preferences, dispatch } = usePreferences();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const isMetric = preferences.units === 'metric';
 
   return (
@@ -114,13 +119,71 @@ export function Navbar() {
               <Sparkles className="h-3.5 w-3.5" />
               Spotlight
             </Link>
-            <Link
-              href="/auth/login"
-              className="flex items-center gap-2 rounded-xl bg-cairn-card border border-cairn-border px-3.5 py-2 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
-            >
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Sign In</span>
-            </Link>
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 rounded-xl bg-cairn-card border border-cairn-border px-3.5 py-2 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                >
+                  {user.user_metadata?.avatar_url ? (
+                    <img
+                      src={user.user_metadata.avatar_url}
+                      alt=""
+                      className="h-5 w-5 rounded-full"
+                    />
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
+                  <span className="hidden sm:inline max-w-[100px] truncate">
+                    {user.user_metadata?.display_name || user.email?.split('@')[0] || 'Account'}
+                  </span>
+                </button>
+                {showUserMenu && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+                    <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-cairn-card border border-cairn-border shadow-xl z-50 py-1">
+                      <Link
+                        href="/profile"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                      >
+                        <User className="h-4 w-4" />
+                        Profile
+                      </Link>
+                      <Link
+                        href="/settings"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                      >
+                        <Settings className="h-4 w-4" />
+                        Settings
+                      </Link>
+                      <div className="h-px bg-cairn-border my-1" />
+                      <button
+                        onClick={async () => {
+                          setShowUserMenu(false);
+                          await signOut();
+                          router.push('/');
+                          router.refresh();
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-cairn-card-hover transition-colors w-full text-left"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="flex items-center gap-2 rounded-xl bg-cairn-card border border-cairn-border px-3.5 py-2 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+              >
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign In</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
