@@ -33,11 +33,41 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['users']['Row'], 'created_at' | 'updated_at'> & {
+        Insert: {
+          id: string;
+          email: string;
+          username?: string | null;
+          display_name?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
+          location_name?: string | null;
+          activity_preferences?: string[];
+          preferred_skill_level?: string | null;
+          skill_levels?: Record<string, string> | null;
+          is_pro_subscriber?: boolean;
+          preferred_units?: 'imperial' | 'metric';
+          preferred_language?: string;
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Database['public']['Tables']['users']['Insert']>;
+        Update: {
+          id?: string;
+          email?: string;
+          username?: string | null;
+          display_name?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
+          location_name?: string | null;
+          activity_preferences?: string[];
+          preferred_skill_level?: string | null;
+          skill_levels?: Record<string, string> | null;
+          is_pro_subscriber?: boolean;
+          preferred_units?: 'imperial' | 'metric';
+          preferred_language?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       businesses: {
         Row: {
@@ -80,13 +110,87 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['businesses']['Row'], 'id' | 'created_at' | 'updated_at' | 'slug'> & {
+        Insert: {
           id?: string;
+          name: string;
           slug?: string;
+          description?: string | null;
+          category: string;
+          subcategories?: string[];
+          activity_types?: string[];
+          address?: string | null;
+          city?: string | null;
+          state_province?: string | null;
+          country: string;
+          phone?: string | null;
+          email?: string | null;
+          website_url?: string | null;
+          booking_url?: string | null;
+          instagram_handle?: string | null;
+          facebook_url?: string | null;
+          tripadvisor_url?: string | null;
+          yelp_url?: string | null;
+          google_maps_url?: string | null;
+          youtube_url?: string | null;
+          strava_segment_url?: string | null;
+          whatsapp?: string | null;
+          hours?: Record<string, string> | null;
+          photos?: string[];
+          cover_photo_url?: string | null;
+          rating?: number;
+          review_count?: number;
+          is_spotlight?: boolean;
+          spotlight_tier?: 'founding' | 'standard' | 'premium' | null;
+          special_offer?: string | null;
+          is_claimed?: boolean;
+          tags?: string[];
+          currency?: string;
+          price_range?: { min: number; max: number; unit: string } | null;
+          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Database['public']['Tables']['businesses']['Insert']>;
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          description?: string | null;
+          category?: string;
+          subcategories?: string[];
+          activity_types?: string[];
+          address?: string | null;
+          city?: string | null;
+          state_province?: string | null;
+          country?: string;
+          phone?: string | null;
+          email?: string | null;
+          website_url?: string | null;
+          booking_url?: string | null;
+          instagram_handle?: string | null;
+          facebook_url?: string | null;
+          tripadvisor_url?: string | null;
+          yelp_url?: string | null;
+          google_maps_url?: string | null;
+          youtube_url?: string | null;
+          strava_segment_url?: string | null;
+          whatsapp?: string | null;
+          hours?: Record<string, string> | null;
+          photos?: string[];
+          cover_photo_url?: string | null;
+          rating?: number;
+          review_count?: number;
+          is_spotlight?: boolean;
+          spotlight_tier?: 'founding' | 'standard' | 'premium' | null;
+          special_offer?: string | null;
+          is_claimed?: boolean;
+          tags?: string[];
+          currency?: string;
+          price_range?: { min: number; max: number; unit: string } | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       trails: {
         Row: {
@@ -122,13 +226,73 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['trails']['Row'], 'id' | 'created_at' | 'updated_at' | 'slug'> & {
+        Insert: {
           id?: string;
+          name: string;
           slug?: string;
+          description?: string | null;
+          activity_types?: string[];
+          difficulty: 'green' | 'blue' | 'black' | 'double_black' | 'proline';
+          difficulty_label?: string | null;
+          technical_rating?: string | null;
+          distance_meters: number;
+          elevation_gain_meters: number;
+          elevation_loss_meters: number;
+          max_elevation_meters?: number | null;
+          min_elevation_meters?: number | null;
+          estimated_duration_minutes?: number | null;
+          trail_type: 'loop' | 'out_and_back' | 'point_to_point' | 'network';
+          surface_type?: string[];
+          lat: number;
+          lng: number;
+          city?: string | null;
+          state_province?: string | null;
+          country: string;
+          current_condition?: 'open' | 'caution' | 'closed' | 'unknown';
+          requires_permit?: boolean;
+          rating?: number;
+          review_count?: number;
+          ride_count?: number;
+          photos?: string[];
+          cover_photo_url?: string | null;
+          best_seasons?: string[];
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Database['public']['Tables']['trails']['Insert']>;
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          description?: string | null;
+          activity_types?: string[];
+          difficulty?: 'green' | 'blue' | 'black' | 'double_black' | 'proline';
+          difficulty_label?: string | null;
+          technical_rating?: string | null;
+          distance_meters?: number;
+          elevation_gain_meters?: number;
+          elevation_loss_meters?: number;
+          max_elevation_meters?: number | null;
+          min_elevation_meters?: number | null;
+          estimated_duration_minutes?: number | null;
+          trail_type?: 'loop' | 'out_and_back' | 'point_to_point' | 'network';
+          surface_type?: string[];
+          lat?: number;
+          lng?: number;
+          city?: string | null;
+          state_province?: string | null;
+          country?: string;
+          current_condition?: 'open' | 'caution' | 'closed' | 'unknown';
+          requires_permit?: boolean;
+          rating?: number;
+          review_count?: number;
+          ride_count?: number;
+          photos?: string[];
+          cover_photo_url?: string | null;
+          best_seasons?: string[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       reviews: {
         Row: {
@@ -146,12 +310,37 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['reviews']['Row'], 'id' | 'created_at' | 'updated_at'> & {
+        Insert: {
           id?: string;
+          author_id: string;
+          entity_type: 'business' | 'trail';
+          entity_id: string;
+          rating: number;
+          title?: string | null;
+          body?: string | null;
+          photos?: string[];
+          owner_response?: string | null;
+          is_verified?: boolean;
+          helpful_count?: number;
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Database['public']['Tables']['reviews']['Insert']>;
+        Update: {
+          id?: string;
+          author_id?: string;
+          entity_type?: 'business' | 'trail';
+          entity_id?: string;
+          rating?: number;
+          title?: string | null;
+          body?: string | null;
+          photos?: string[];
+          owner_response?: string | null;
+          is_verified?: boolean;
+          helpful_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       user_activities: {
         Row: {
@@ -177,16 +366,361 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['user_activities']['Row'], 'id' | 'created_at' | 'updated_at'> & {
+        Insert: {
           id?: string;
+          user_id: string;
+          source: string;
+          external_activity_id?: string | null;
+          activity_type: string;
+          title: string;
+          description?: string | null;
+          distance_meters: number;
+          duration_seconds: number;
+          elevation_gain_meters: number;
+          elevation_loss_meters: number;
+          max_elevation_meters?: number | null;
+          avg_speed_ms?: number | null;
+          max_speed_ms?: number | null;
+          calories?: number | null;
+          started_at: string;
+          ended_at?: string | null;
+          device_name?: string | null;
+          is_public?: boolean;
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Database['public']['Tables']['user_activities']['Insert']>;
+        Update: {
+          id?: string;
+          user_id?: string;
+          source?: string;
+          external_activity_id?: string | null;
+          activity_type?: string;
+          title?: string;
+          description?: string | null;
+          distance_meters?: number;
+          duration_seconds?: number;
+          elevation_gain_meters?: number;
+          elevation_loss_meters?: number;
+          max_elevation_meters?: number | null;
+          avg_speed_ms?: number | null;
+          max_speed_ms?: number | null;
+          calories?: number | null;
+          started_at?: string;
+          ended_at?: string | null;
+          device_name?: string | null;
+          is_public?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      trail_conditions: {
+        Row: {
+          id: string;
+          trail_id: string;
+          reporter_id: string;
+          condition: 'open' | 'caution' | 'closed';
+          severity: 'minor' | 'moderate' | 'severe' | null;
+          hazard_type: string | null;
+          description: string | null;
+          photos: string[];
+          upvotes: number;
+          is_verified: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          trail_id: string;
+          reporter_id: string;
+          condition: 'open' | 'caution' | 'closed';
+          severity?: 'minor' | 'moderate' | 'severe' | null;
+          hazard_type?: string | null;
+          description?: string | null;
+          photos?: string[];
+          upvotes?: number;
+          is_verified?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          trail_id?: string;
+          reporter_id?: string;
+          condition?: 'open' | 'caution' | 'closed';
+          severity?: 'minor' | 'moderate' | 'severe' | null;
+          hazard_type?: string | null;
+          description?: string | null;
+          photos?: string[];
+          upvotes?: number;
+          is_verified?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      activity_posts: {
+        Row: {
+          id: string;
+          author_id: string;
+          post_type: 'im_going' | 'open_permit' | 'lfg';
+          activity_type: string;
+          title: string;
+          description: string | null;
+          location_name: string | null;
+          trail_id: string | null;
+          activity_date: string;
+          activity_end_date: string | null;
+          skill_level: 'beginner' | 'intermediate' | 'advanced' | 'expert' | null;
+          max_participants: number | null;
+          current_participants: number;
+          permit_required: boolean;
+          permit_type: string | null;
+          cost_share: string | null;
+          gear_required: string[];
+          contact_method: 'in_app' | 'email' | 'phone';
+          contact_info: string | null;
+          status: 'active' | 'full' | 'cancelled' | 'completed';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          author_id: string;
+          post_type: 'im_going' | 'open_permit' | 'lfg';
+          activity_type: string;
+          title: string;
+          description?: string | null;
+          location_name?: string | null;
+          trail_id?: string | null;
+          activity_date: string;
+          activity_end_date?: string | null;
+          skill_level?: 'beginner' | 'intermediate' | 'advanced' | 'expert' | null;
+          max_participants?: number | null;
+          current_participants?: number;
+          permit_required?: boolean;
+          permit_type?: string | null;
+          cost_share?: string | null;
+          gear_required?: string[];
+          contact_method?: 'in_app' | 'email' | 'phone';
+          contact_info?: string | null;
+          status?: 'active' | 'full' | 'cancelled' | 'completed';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          author_id?: string;
+          post_type?: 'im_going' | 'open_permit' | 'lfg';
+          activity_type?: string;
+          title?: string;
+          description?: string | null;
+          location_name?: string | null;
+          trail_id?: string | null;
+          activity_date?: string;
+          activity_end_date?: string | null;
+          skill_level?: 'beginner' | 'intermediate' | 'advanced' | 'expert' | null;
+          max_participants?: number | null;
+          current_participants?: number;
+          permit_required?: boolean;
+          permit_type?: string | null;
+          cost_share?: string | null;
+          gear_required?: string[];
+          contact_method?: 'in_app' | 'email' | 'phone';
+          contact_info?: string | null;
+          status?: 'active' | 'full' | 'cancelled' | 'completed';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      user_saved_items: {
+        Row: {
+          id: string;
+          user_id: string;
+          entity_type: 'business' | 'trail' | 'event' | 'club' | 'activity_post';
+          entity_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          entity_type: 'business' | 'trail' | 'event' | 'club' | 'activity_post';
+          entity_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          entity_type?: 'business' | 'trail' | 'event' | 'club' | 'activity_post';
+          entity_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      trips: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          description: string | null;
+          destination: string | null;
+          start_date: string | null;
+          end_date: string | null;
+          trail_ids: string[];
+          business_ids: string[];
+          is_public: boolean;
+          share_code: string | null;
+          cover_photo_url: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title: string;
+          description?: string | null;
+          destination?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          trail_ids?: string[];
+          business_ids?: string[];
+          is_public?: boolean;
+          share_code?: string | null;
+          cover_photo_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          description?: string | null;
+          destination?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          trail_ids?: string[];
+          business_ids?: string[];
+          is_public?: boolean;
+          share_code?: string | null;
+          cover_photo_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      spotlight_subscriptions: {
+        Row: {
+          id: string;
+          business_id: string;
+          stripe_subscription_id: string;
+          stripe_customer_id: string;
+          status: 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
+          tier: 'founding' | 'standard' | 'premium';
+          current_period_start: string;
+          current_period_end: string;
+          cancel_at_period_end: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          business_id: string;
+          stripe_subscription_id: string;
+          stripe_customer_id: string;
+          status: 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
+          tier: 'founding' | 'standard' | 'premium';
+          current_period_start: string;
+          current_period_end: string;
+          cancel_at_period_end?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          business_id?: string;
+          stripe_subscription_id?: string;
+          stripe_customer_id?: string;
+          status?: 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
+          tier?: 'founding' | 'standard' | 'premium';
+          current_period_start?: string;
+          current_period_end?: string;
+          cancel_at_period_end?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      business_analytics: {
+        Row: {
+          id: string;
+          business_id: string;
+          date: string;
+          views: number;
+          website_clicks: number;
+          direction_requests: number;
+          call_clicks: number;
+          booking_clicks: number;
+          search_impressions: number;
+        };
+        Insert: {
+          id?: string;
+          business_id: string;
+          date: string;
+          views?: number;
+          website_clicks?: number;
+          direction_requests?: number;
+          call_clicks?: number;
+          booking_clicks?: number;
+          search_impressions?: number;
+        };
+        Update: {
+          id?: string;
+          business_id?: string;
+          date?: string;
+          views?: number;
+          website_clicks?: number;
+          direction_requests?: number;
+          call_clicks?: number;
+          booking_clicks?: number;
+          search_impressions?: number;
+        };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      businesses_near_point: {
+        Args: { p_lat: number; p_lng: number; p_radius_m: number };
+        Returns: Database['public']['Tables']['businesses']['Row'][];
+      };
+      businesses_near_trail: {
+        Args: { p_trail_id: string; p_radius_m: number };
+        Returns: (Database['public']['Tables']['businesses']['Row'] & { dist_m: number })[];
+      };
+      get_activity_posts_near: {
+        Args: {
+          p_lat: number;
+          p_lng: number;
+          p_radius_km: number;
+          p_activity_type?: string;
+          p_skill_level?: string;
+          p_post_type?: string;
+          p_days_ahead?: number;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: (Database['public']['Tables']['activity_posts']['Row'] & {
+          author_display_name: string | null;
+          author_avatar_url: string | null;
+          dist_km: number;
+        })[];
+      };
+      increment_business_stat: {
+        Args: { p_business_id: string; p_stat_type: string };
+        Returns: void;
+      };
+    };
     Enums: {
       difficulty_level: 'green' | 'blue' | 'black' | 'double_black' | 'proline';
       trail_type: 'loop' | 'out_and_back' | 'point_to_point' | 'network';
@@ -194,6 +728,22 @@ export interface Database {
       entity_type: 'business' | 'trail';
       spotlight_tier: 'founding' | 'standard' | 'premium';
       unit_preference: 'imperial' | 'metric';
+      post_type: 'im_going' | 'open_permit' | 'lfg';
+      skill_level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+      condition_severity: 'minor' | 'moderate' | 'severe';
+      subscription_status: 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
     };
   };
 }
+
+// Convenience type aliases
+export type DbBusiness = Database['public']['Tables']['businesses']['Row'];
+export type DbTrail = Database['public']['Tables']['trails']['Row'];
+export type DbReview = Database['public']['Tables']['reviews']['Row'];
+export type DbUser = Database['public']['Tables']['users']['Row'];
+export type DbUserActivity = Database['public']['Tables']['user_activities']['Row'];
+export type DbTrailCondition = Database['public']['Tables']['trail_conditions']['Row'];
+export type DbActivityPost = Database['public']['Tables']['activity_posts']['Row'];
+export type DbTrip = Database['public']['Tables']['trips']['Row'];
+export type DbSavedItem = Database['public']['Tables']['user_saved_items']['Row'];
+export type DbAnalytics = Database['public']['Tables']['business_analytics']['Row'];

@@ -21,6 +21,7 @@ import { PhotoGallery } from '@/components/activity/PhotoGallery';
 import { ActivityIcon, ACTIVITIES } from '@/components/ui/ActivityIcon';
 import { useActivityContext } from '@/lib/activity-context';
 import { useFormat } from '@/lib/use-format';
+import { saveRecordedActivity } from '@/lib/actions/activities';
 import type { GpsPoint } from '@/lib/activity-types';
 import type { CapturedPhoto } from '@/lib/photo-types';
 
@@ -153,8 +154,30 @@ export default function RecordPage() {
   }
 
   function handleStop() {
+    // Capture activity data before stopping context
+    const act = activeActivity;
     dispatch({ type: 'STOP_RECORDING' });
     stopGps();
+
+    // Persist to server in the background
+    if (act) {
+      saveRecordedActivity({
+        source: 'cairn_connect',
+        activityType: act.activityType,
+        title: act.title,
+        description: act.notes || undefined,
+        distanceMeters: act.distanceMeters,
+        durationSeconds: elapsed,
+        elevationGainMeters: act.elevationGainMeters,
+        elevationLossMeters: act.elevationLossMeters,
+        maxElevationMeters: act.maxElevationMeters ?? undefined,
+        startedAt: act.startedAt,
+        endedAt: new Date().toISOString(),
+        isPublic: true,
+      }).catch(() => {
+        // Silently fail — activity is saved locally in context
+      });
+    }
   }
 
   // Current speed from last 2 GPS points

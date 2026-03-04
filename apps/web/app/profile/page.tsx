@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import {
   Trash2,
   Download,
@@ -20,6 +20,7 @@ import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { useActivityContext } from '@/lib/activity-context';
 import { useFormat } from '@/lib/use-format';
 import { downloadGpx } from '@/lib/gpx-export';
+import { deleteRecordedActivity } from '@/lib/actions/activities';
 import type { RecordedActivity } from '@/lib/activity-types';
 
 function formatDate(iso: string): string {
@@ -49,7 +50,12 @@ export default function ProfilePage() {
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
 
   function handleDelete(id: string) {
+    // Remove from local context immediately (optimistic)
     dispatch({ type: 'DELETE_ACTIVITY', id });
+    // Also delete from server if persisted
+    deleteRecordedActivity(id).catch(() => {
+      // Silently fail — local context is already updated
+    });
   }
 
   return (

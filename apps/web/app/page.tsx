@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   Map,
@@ -16,6 +17,12 @@ import {
   Lock,
   FileText,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Cairn Connect — Find Your Trail. Find Your People.',
+  description:
+    'Discover outdoor businesses, explore trails with real-time conditions, and connect with adventure partners — all in one platform.',
+};
 
 const HERO_STATS = [
   { value: '5,000+', label: 'Businesses' },
