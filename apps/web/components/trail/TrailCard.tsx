@@ -86,7 +86,7 @@ export function TrailCard({ trail, compact }: TrailCardProps) {
         </div>
 
         {/* Stats row */}
-        <div className="mt-3 flex items-center gap-4 text-xs text-slate-400">
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
           <span className="inline-flex items-center gap-1">
             <Ruler className="h-3 w-3" />
             {fmt.distance(trail.distance_meters)}

@@ -143,7 +143,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Bar chart */}
-          <div className="flex items-end gap-[3px] h-40">
+          <div className="flex items-end gap-[2px] sm:gap-[3px] h-32 sm:h-40 overflow-x-auto">
             {CHART_DATA.map((d) => (
               <div key={d.day} className="flex-1 flex flex-col items-stretch gap-[1px] h-full justify-end">
                 {/* Views bar */}

@@ -306,10 +306,10 @@ export default function ClimbingPage() {
                   className="w-full text-left rounded-2xl border border-cairn-border bg-cairn-card hover:bg-cairn-card-hover transition-colors overflow-hidden"
                 >
                   <div className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-3 min-w-0">
                         <span
-                          className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-bold"
+                          className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-bold shrink-0"
                           style={{
                             backgroundColor: `${getRouteTypeColor(route.type)}20`,
                             color: getRouteTypeColor(route.type),
@@ -317,16 +317,16 @@ export default function ClimbingPage() {
                         >
                           {route.grade}
                         </span>
-                        <h3 className="font-display text-base font-semibold text-slate-100">
+                        <h3 className="font-display text-base font-semibold text-slate-100 truncate">
                           {route.name}
                         </h3>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 shrink-0">
                         <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
                         <span className="text-xs text-slate-300">{route.rating}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-slate-500">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
                       <span className="capitalize">{route.type.replace(/_/g, ' ')}</span>
                       <span>{route.cragName}</span>
                       <span className="flex items-center gap-1">

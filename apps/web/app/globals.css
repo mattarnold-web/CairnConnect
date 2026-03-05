@@ -137,23 +137,21 @@ a {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Mobile touch targets */
+/* Mobile touch targets — only apply to standalone nav/action buttons, not inline elements */
 @media (max-width: 640px) {
-  button, a {
+  nav button, nav a,
+  [role="button"],
+  button.rounded-xl, button.rounded-full,
+  a.rounded-xl, a.rounded-full {
     min-height: 44px;
-    min-width: 44px;
-  }
-
-  /* Override for inline text links and small chips */
-  .text-xs, .text-\[10px\], .text-\[9px\] {
-    min-height: auto;
-    min-width: auto;
   }
 }
 
-/* Prevent layout shift from scrollbar */
-html {
-  scrollbar-gutter: stable;
+/* Prevent layout shift from scrollbar (desktop only — mobile has overlay scrollbars) */
+@media (min-width: 641px) {
+  html {
+    scrollbar-gutter: stable;
+  }
 }
 
 /* Form select styling for dark mode */

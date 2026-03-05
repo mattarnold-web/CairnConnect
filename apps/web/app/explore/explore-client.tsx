@@ -223,7 +223,7 @@ export function ExploreClient({ businesses, trails, regionHighlights }: ExploreC
       </div>
 
       {/* Mobile map toggle */}
-      <div className="lg:hidden fixed bottom-16 left-1/2 -translate-x-1/2 z-40">
+      <div className="lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 pb-safe">
         <Link
           href="/explore"
           className="flex items-center gap-2 rounded-full bg-canopy px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-canopy/30"

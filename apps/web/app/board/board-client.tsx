@@ -309,7 +309,7 @@ function CreatePostModal({
           </div>
 
           {/* Location & Date row */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-slate-500 mb-1.5">Location</label>
               <input
@@ -333,7 +333,7 @@ function CreatePostModal({
           </div>
 
           {/* Skill & Participants row */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-slate-500 mb-1.5">Skill Level</label>
               <select
