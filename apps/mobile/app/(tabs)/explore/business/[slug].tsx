@@ -13,6 +13,7 @@ import {
   Clock,
   DollarSign,
   ExternalLink,
+  Instagram,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { SpotlightBadge } from '@/components/ui/SpotlightBadge';
@@ -259,24 +260,17 @@ export default function BusinessDetailScreen() {
             </Card>
           )}
 
-          {/* Action buttons */}
-          <View className="flex-row gap-3 mb-4">
-            {business.phone && (
-              <Pressable
-                onPress={() => Linking.openURL(`tel:${business.phone}`)}
-                className="flex-1 bg-cairn-card border border-cairn-border rounded-xl py-3.5 items-center active:bg-cairn-card-hover"
-              >
-                <Phone size={20} color="#10B981" />
-                <Text className="text-slate-300 text-xs mt-1.5 font-medium">Call</Text>
-              </Pressable>
-            )}
+          {/* Action buttons — matching mockup with Website, Directions, Call, Instagram */}
+          <View className="flex-row gap-2 mb-4">
             {business.website_url && (
               <Pressable
                 onPress={() => Linking.openURL(business.website_url!)}
-                className="flex-1 bg-cairn-card border border-cairn-border rounded-xl py-3.5 items-center active:bg-cairn-card-hover"
+                className="flex-1 bg-cairn-card border border-cairn-border rounded-xl py-3 items-center active:bg-cairn-card-hover"
               >
-                <Globe size={20} color="#10B981" />
-                <Text className="text-slate-300 text-xs mt-1.5 font-medium">Website</Text>
+                <View className="w-10 h-10 rounded-full bg-canopy/15 items-center justify-center mb-1">
+                  <Globe size={18} color="#10B981" />
+                </View>
+                <Text className="text-slate-300 text-[10px] font-medium">Website</Text>
               </Pressable>
             )}
             <Pressable
@@ -286,11 +280,59 @@ export default function BusinessDetailScreen() {
                     `https://maps.google.com/?q=${encodeURIComponent(business.name)}`,
                 )
               }
-              className="flex-1 bg-cairn-card border border-cairn-border rounded-xl py-3.5 items-center active:bg-cairn-card-hover"
+              className="flex-1 bg-cairn-card border border-cairn-border rounded-xl py-3 items-center active:bg-cairn-card-hover"
             >
-              <Navigation size={20} color="#10B981" />
-              <Text className="text-slate-300 text-xs mt-1.5 font-medium">Directions</Text>
+              <View className="w-10 h-10 rounded-full bg-canopy/15 items-center justify-center mb-1">
+                <Navigation size={18} color="#10B981" />
+              </View>
+              <Text className="text-slate-300 text-[10px] font-medium">Directions</Text>
             </Pressable>
+            {business.phone && (
+              <Pressable
+                onPress={() => Linking.openURL(`tel:${business.phone}`)}
+                className="flex-1 bg-cairn-card border border-cairn-border rounded-xl py-3 items-center active:bg-cairn-card-hover"
+              >
+                <View className="w-10 h-10 rounded-full bg-canopy/15 items-center justify-center mb-1">
+                  <Phone size={18} color="#10B981" />
+                </View>
+                <Text className="text-slate-300 text-[10px] font-medium">Call</Text>
+              </Pressable>
+            )}
+            {business.instagram_handle && (
+              <Pressable
+                onPress={() =>
+                  Linking.openURL(
+                    `https://instagram.com/${business.instagram_handle!.replace('@', '')}`,
+                  )
+                }
+                className="flex-1 bg-cairn-card border border-cairn-border rounded-xl py-3 items-center active:bg-cairn-card-hover"
+              >
+                <View className="w-10 h-10 rounded-full bg-canopy/15 items-center justify-center mb-1">
+                  <Instagram size={18} color="#10B981" />
+                </View>
+                <Text className="text-slate-300 text-[10px] font-medium">Instagram</Text>
+              </Pressable>
+            )}
+          </View>
+
+          {/* Photos section — placeholder gallery matching mockup */}
+          <View className="mb-4">
+            <Text className="text-slate-100 font-semibold text-base mb-2">Photos</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-2">
+              {(business.photos && business.photos.length > 0
+                ? business.photos.slice(0, 5)
+                : ['placeholder1', 'placeholder2', 'placeholder3', 'placeholder4']
+              ).map((photo, idx) => (
+                <View
+                  key={idx}
+                  className="w-24 h-24 rounded-xl bg-cairn-elevated mr-2 items-center justify-center overflow-hidden"
+                >
+                  <Text style={{ fontSize: 28, opacity: 0.3 }}>
+                    {categoryInfo?.icon ?? '\u{1F4F7}'}
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
           </View>
 
           {/* Business info card */}

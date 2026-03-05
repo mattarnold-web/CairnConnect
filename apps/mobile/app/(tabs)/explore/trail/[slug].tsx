@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, Share, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, Share, ActivityIndicator, Dimensions, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import {
@@ -15,7 +15,12 @@ import {
   Play,
   ChevronRight,
   AlertTriangle,
+  Navigation,
+  Bookmark,
+  User,
+  Image as ImageIcon,
 } from 'lucide-react-native';
+import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { DifficultyBadge, ConditionBadge } from '@/components/ui/Badge';
 import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { Card } from '@/components/ui/Card';
@@ -47,6 +52,102 @@ const DIFFICULTY_COLOR_MAP: Record<string, string[]> = {
   double_black: ['#0F172A', '#020617'],
   proline: ['#7F1D1D', '#450A0A'],
 };
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+/** Generate a plausible elevation profile curve from trail metadata */
+function generateElevationProfile(
+  gain: number,
+  loss: number,
+  minElev: number | null,
+  maxElev: number | null,
+  points: number = 40,
+): number[] {
+  const base = minElev ?? 1800;
+  const peak = maxElev ?? base + gain;
+  const data: number[] = [];
+  for (let i = 0; i < points; i++) {
+    const t = i / (points - 1);
+    // Smooth bell-like curve peaking at ~40% of the trail
+    const envelope = Math.sin(t * Math.PI) * 0.8 + Math.sin(t * Math.PI * 0.4) * 0.2;
+    const noise = Math.sin(t * 17) * 0.03 + Math.sin(t * 31) * 0.02;
+    data.push(base + (peak - base) * (envelope + noise));
+  }
+  return data;
+}
+
+/** SVG-based elevation profile chart matching the mockup style */
+function ElevationProfile({ trail }: { trail: Trail }) {
+  const chartWidth = SCREEN_WIDTH - 32; // px-4 padding
+  const chartHeight = 140;
+  const padding = { top: 10, bottom: 20, left: 0, right: 0 };
+  const innerW = chartWidth - padding.left - padding.right;
+  const innerH = chartHeight - padding.top - padding.bottom;
+
+  const data = generateElevationProfile(
+    trail.elevation_gain_meters,
+    trail.elevation_loss_meters,
+    trail.min_elevation_meters,
+    trail.max_elevation_meters,
+  );
+
+  const minVal = Math.min(...data);
+  const maxVal = Math.max(...data);
+  const range = maxVal - minVal || 1;
+
+  const points = data.map((val, i) => {
+    const x = padding.left + (i / (data.length - 1)) * innerW;
+    const y = padding.top + innerH - ((val - minVal) / range) * innerH;
+    return { x, y };
+  });
+
+  const linePath =
+    `M ${points[0].x} ${points[0].y} ` +
+    points
+      .slice(1)
+      .map((p, i) => {
+        const prev = points[i];
+        const cx = (prev.x + p.x) / 2;
+        return `C ${cx} ${prev.y}, ${cx} ${p.y}, ${p.x} ${p.y}`;
+      })
+      .join(' ');
+
+  const fillPath =
+    linePath +
+    ` L ${points[points.length - 1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z`;
+
+  return (
+    <View className="mb-4">
+      <Svg width={chartWidth} height={chartHeight}>
+        <Defs>
+          <SvgLinearGradient id="elevFill" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#10B981" stopOpacity="0.3" />
+            <Stop offset="1" stopColor="#10B981" stopOpacity="0.02" />
+          </SvgLinearGradient>
+        </Defs>
+        <Path d={fillPath} fill="url(#elevFill)" />
+        <Path d={linePath} stroke="#10B981" strokeWidth={2} fill="none" />
+        {/* Peak marker dot */}
+        {(() => {
+          const peakIdx = data.indexOf(maxVal);
+          const p = points[peakIdx];
+          return (
+            <Path
+              d={`M ${p.x - 3} ${p.y} a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0`}
+              fill="#10B981"
+            />
+          );
+        })()}
+      </Svg>
+    </View>
+  );
+}
+
+/** Mock recent activity items for the trail */
+const MOCK_RECENT_ACTIVITY = [
+  { id: '1', user: 'User A', action: 'started this trail', time: '2h ago' },
+  { id: '2', user: 'User B', action: 'shared photos from this trail', time: '5h ago' },
+];
 
 export default function TrailDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -254,56 +355,72 @@ export default function TrailDetailScreen() {
             </View>
           </View>
 
-          {/* Stats grid */}
-          <Card className="mb-4">
-            <View className="flex-row flex-wrap">
-              {/* Distance */}
-              <View className="w-1/2 items-center pb-3">
-                <View className="flex-row items-center mb-1">
-                  <Ruler size={14} color="#10B981" />
-                  <Text className="text-slate-500 text-xs ml-1">Distance</Text>
-                </View>
-                <Text className="text-slate-100 font-bold text-lg">
-                  {fmt.distance(trail.distance_meters)}
-                </Text>
-              </View>
+          {/* Elevation Profile Chart */}
+          <ElevationProfile trail={trail} />
 
-              {/* Elevation */}
-              <View className="w-1/2 items-center pb-3">
-                <View className="flex-row items-center mb-1">
-                  <TrendingUp size={14} color="#10B981" />
-                  <Text className="text-slate-500 text-xs ml-1">Elevation Gain</Text>
-                </View>
-                <Text className="text-slate-100 font-bold text-lg">
-                  {fmt.elevation(trail.elevation_gain_meters)}
-                </Text>
-              </View>
+          {/* Stats row — 3 columns matching mockup */}
+          <View className="flex-row gap-3 mb-4">
+            <Card className="flex-1 items-center py-3">
+              <Ruler size={16} color="#10B981" />
+              <Text className="text-slate-100 font-bold text-base mt-1">
+                {fmt.distance(trail.distance_meters)}
+              </Text>
+              <Text className="text-slate-500 text-[10px] mt-0.5">Distance</Text>
+            </Card>
+            <Card className="flex-1 items-center py-3">
+              <TrendingUp size={16} color="#10B981" />
+              <Text className="text-slate-100 font-bold text-base mt-1">
+                {fmt.elevation(trail.elevation_gain_meters)}
+              </Text>
+              <Text className="text-slate-500 text-[10px] mt-0.5">Elevation Gain</Text>
+            </Card>
+            <Card className="flex-1 items-center py-3">
+              <Mountain size={16} color="#10B981" />
+              <Text className="text-slate-100 font-bold text-sm mt-1 capitalize">
+                {trail.difficulty === 'green'
+                  ? 'Easy'
+                  : trail.difficulty === 'blue'
+                    ? 'Moderate'
+                    : trail.difficulty === 'black'
+                      ? 'Hard'
+                      : trail.difficulty === 'double_black'
+                        ? 'Expert'
+                        : trail.difficulty}
+              </Text>
+              <Text className="text-slate-500 text-[10px] mt-0.5">Difficulty</Text>
+            </Card>
+          </View>
 
-              {/* Duration */}
-              <View className="w-1/2 items-center pt-3 border-t border-cairn-border/50">
-                <View className="flex-row items-center mb-1">
-                  <Clock size={14} color="#10B981" />
-                  <Text className="text-slate-500 text-xs ml-1">Est. Duration</Text>
-                </View>
-                <Text className="text-slate-100 font-bold text-lg">
-                  {(trail as any).estimated_duration_minutes
-                    ? formatDurationMinutes((trail as any).estimated_duration_minutes)
-                    : '--'}
-                </Text>
-              </View>
-
-              {/* Trail type */}
-              <View className="w-1/2 items-center pt-3 border-t border-cairn-border/50">
-                <View className="flex-row items-center mb-1">
-                  <Mountain size={14} color="#10B981" />
-                  <Text className="text-slate-500 text-xs ml-1">Type</Text>
-                </View>
-                <Text className="text-slate-100 font-bold text-sm capitalize">
-                  {trail.trail_type.replace(/_/g, ' ')}
-                </Text>
-              </View>
+          {/* Start Navigation button — prominent green CTA matching mockup */}
+          <Pressable
+            onPress={() => {
+              const url = `https://maps.google.com/?q=${trail.lat},${trail.lng}`;
+              Linking.openURL(url);
+            }}
+            className="bg-canopy rounded-xl py-4 mb-4 items-center"
+          >
+            <View className="flex-row items-center">
+              <Navigation size={18} color="white" />
+              <Text className="text-white font-bold text-base ml-2">
+                Start Navigation
+              </Text>
             </View>
-          </Card>
+          </Pressable>
+
+          {/* Save Trail / Share — two side-by-side outline buttons */}
+          <View className="flex-row gap-3 mb-4">
+            <Pressable className="flex-1 flex-row items-center justify-center bg-cairn-card border border-cairn-border rounded-xl py-3">
+              <Bookmark size={16} color="#10B981" />
+              <Text className="text-canopy font-semibold text-sm ml-2">Save Trail</Text>
+            </Pressable>
+            <Pressable
+              onPress={handleShare}
+              className="flex-1 flex-row items-center justify-center bg-cairn-card border border-cairn-border rounded-xl py-3"
+            >
+              <Share2 size={16} color="#10B981" />
+              <Text className="text-canopy font-semibold text-sm ml-2">Share</Text>
+            </Pressable>
+          </View>
 
           {/* Condition details */}
           {trail.current_condition === 'caution' && (
@@ -391,24 +508,32 @@ export default function TrailDetailScreen() {
             </Card>
           )}
 
-          {/* Start Recording button */}
-          <Pressable
-            onPress={handleStartRecording}
-            className="bg-cairn-card border border-canopy/40 rounded-xl p-4 mb-4 flex-row items-center"
-          >
-            <View className="w-10 h-10 rounded-full bg-canopy/20 items-center justify-center mr-3">
-              <Play size={18} color="#10B981" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-slate-100 font-semibold text-sm">
-                Start Recording
-              </Text>
-              <Text className="text-slate-500 text-xs mt-0.5">
-                Track your activity on this trail
-              </Text>
-            </View>
-            <ChevronRight size={18} color="#64748b" />
-          </Pressable>
+          {/* Recent Activity section matching mockup */}
+          <View className="mb-4">
+            <Text className="text-slate-100 font-semibold text-base mb-3">
+              Recent Activity
+            </Text>
+            {MOCK_RECENT_ACTIVITY.map((item) => (
+              <View
+                key={item.id}
+                className="flex-row items-center py-2.5 border-b border-cairn-border/30"
+              >
+                <View className="w-8 h-8 rounded-full bg-cairn-elevated items-center justify-center mr-3">
+                  {item.action.includes('photo') ? (
+                    <ImageIcon size={14} color="#94a3b8" />
+                  ) : (
+                    <User size={14} color="#94a3b8" />
+                  )}
+                </View>
+                <View className="flex-1">
+                  <Text className="text-slate-300 text-sm">
+                    <Text className="font-semibold">{item.user}</Text> {item.action}
+                  </Text>
+                </View>
+                <Text className="text-slate-600 text-xs">{item.time}</Text>
+              </View>
+            ))}
+          </View>
 
           {/* Nearby businesses */}
           {nearbyBusinesses.length > 0 && (
@@ -514,30 +639,23 @@ export default function TrailDetailScreen() {
         </View>
       </ScrollView>
 
-      {/* Bottom floating action buttons */}
+      {/* Bottom floating action bar */}
       <View className="absolute bottom-0 left-0 right-0 bg-cairn-bg/95 border-t border-cairn-border px-4 pt-3 pb-8">
         <View className="flex-row gap-3">
-          <Button
+          <Pressable
             onPress={handleStartRecording}
-            variant="secondary"
-            size="lg"
-            className="flex-1"
+            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl py-3.5 items-center flex-row justify-center"
           >
-            <View className="flex-row items-center justify-center">
-              <Play size={16} color="#10B981" />
-              <Text className="text-canopy font-semibold text-sm ml-2">
-                Record
-              </Text>
-            </View>
-          </Button>
-          <Button onPress={handleAddToTrip} size="lg" className="flex-[2]">
-            <View className="flex-row items-center justify-center">
-              <Plus size={18} color="white" />
-              <Text className="text-white font-semibold text-base ml-2">
-                Add to Trip
-              </Text>
-            </View>
-          </Button>
+            <Play size={16} color="#10B981" />
+            <Text className="text-canopy font-semibold text-sm ml-2">Record</Text>
+          </Pressable>
+          <Pressable
+            onPress={handleAddToTrip}
+            className="flex-[2] bg-canopy rounded-xl py-3.5 items-center flex-row justify-center"
+          >
+            <Plus size={16} color="white" />
+            <Text className="text-white font-bold text-sm ml-2">Add to Trip</Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>

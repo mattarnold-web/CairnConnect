@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Map, MessageSquare, CircleDot, Route, User } from 'lucide-react-native';
+import { Compass, Mountain, Users, MessageSquare, User } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -26,13 +26,13 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color, size }) => <Map size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="board"
         options={{
-          title: 'Board',
+          title: 'Activity Board',
           tabBarIcon: ({ color, size }) => (
             <MessageSquare size={size} color={color} />
           ),
@@ -41,17 +41,17 @@ export default function TabLayout() {
       <Tabs.Screen
         name="record"
         options={{
-          title: 'Record',
+          title: 'Trails',
           tabBarIcon: ({ color, size }) => (
-            <CircleDot size={size} color={color} />
+            <Mountain size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="trip"
         options={{
-          title: 'Trip',
-          tabBarIcon: ({ color, size }) => <Route size={size} color={color} />,
+          title: 'Community',
+          tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
         }}
       />
       <Tabs.Screen

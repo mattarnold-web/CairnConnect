@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, FlatList, Pressable, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Plus, Users } from 'lucide-react-native';
+import { Plus, Users, Mountain, Ticket } from 'lucide-react-native';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { FilterChip } from '@/components/ui/FilterChip';
 import { ActivityBoardCard } from '@/components/activity/ActivityBoardCard';
@@ -13,9 +13,9 @@ import type { ActivityPost } from '@cairn/shared';
 
 const POST_TYPES = [
   { slug: null, label: 'All', emoji: '\u{1F30D}' },
-  { slug: 'im_going', label: "I'm Going", emoji: '\u{1F7E2}' },
-  { slug: 'open_permit', label: 'Open Permit', emoji: '\u{1F3AB}' },
-  { slug: 'lfg', label: 'LFG', emoji: '\u{1F7E3}' },
+  { slug: 'lfg', label: 'Looking for Group', emoji: '\u{1F7E2}' },
+  { slug: 'im_going', label: 'Join Me', emoji: '\u{1F6B6}' },
+  { slug: 'open_permit', label: 'Open Permits', emoji: '\u{1F3AB}' },
 ];
 
 const ACTIVITY_FILTERS = [
@@ -256,6 +256,7 @@ export default function BoardScreen() {
             <ActivityBoardCard
               post={item}
               onPress={() => router.push(`/(tabs)/board/${item.id}`)}
+              onMessage={() => router.push(`/(tabs)/board/${item.id}`)}
             />
           </View>
         )}
@@ -270,10 +271,10 @@ export default function BoardScreen() {
         }
       />
 
-      {/* FAB */}
+      {/* FAB - Create Post */}
       <Pressable
         onPress={() => router.push('/(tabs)/board/create')}
-        className="absolute bottom-24 right-6 h-14 w-14 rounded-full bg-canopy items-center justify-center shadow-lg"
+        className="absolute bottom-24 right-6 h-14 w-14 rounded-full bg-canopy items-center justify-center shadow-lg active:bg-canopy-dark"
         style={{
           shadowColor: '#10B981',
           shadowOffset: { width: 0, height: 4 },
@@ -282,7 +283,7 @@ export default function BoardScreen() {
           elevation: 8,
         }}
       >
-        <Plus size={24} color="white" />
+        <Plus size={28} color="white" strokeWidth={2.5} />
       </Pressable>
     </SafeAreaView>
   );

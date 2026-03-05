@@ -24,6 +24,8 @@ import {
   MapPin,
   Image as ImageIcon,
   Award,
+  User,
+  Check,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -38,6 +40,15 @@ import { fetchUserActivities } from '@/lib/api';
 import { formatDuration } from '@cairn/shared';
 import type { UserActivity } from '@cairn/shared';
 import type { RecordedActivity } from '@/lib/activity-types';
+
+// ---------------------------------------------------------------------------
+// Connected devices mock data
+// ---------------------------------------------------------------------------
+const CONNECTED_DEVICES = [
+  { name: 'Strava', color: '#FC4C02' },
+  { name: 'Garmin', color: '#007CC3' },
+  { name: 'Apple Health', color: '#FF2D55' },
+];
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
@@ -141,6 +152,12 @@ export default function ProfileScreen() {
   }
   const topType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
 
+  // Unique trails count (mock approximation from activity titles)
+  const uniqueTrails = new Set([
+    ...completedActivities.map((a) => a.title),
+    ...serverActivities.map((a) => a.title ?? ''),
+  ]).size;
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     if (user?.id) {
@@ -193,6 +210,16 @@ export default function ProfileScreen() {
 
   const isBusinessOwner = !!user;
 
+  // Progress bar helper: fraction 0-1, renders a small bar
+  const ProgressBar = ({ progress }: { progress: number }) => (
+    <View className="h-1.5 w-full rounded-full bg-cairn-border mt-2">
+      <View
+        className="h-1.5 rounded-full bg-canopy"
+        style={{ width: `${Math.min(progress * 100, 100)}%` }}
+      />
+    </View>
+  );
+
   return (
     <SafeAreaView className="flex-1 bg-cairn-bg" edges={['top']}>
       <FlatList
@@ -209,21 +236,28 @@ export default function ProfileScreen() {
         }
         ListHeaderComponent={
           <View>
-            {/* Profile header */}
-            <View className="flex-row items-center justify-between mb-4">
-              <View className="flex-row items-center flex-1">
-                <View className="h-14 w-14 rounded-full bg-canopy/20 items-center justify-center mr-3">
-                  <Mountain size={24} color="#10B981" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-slate-100 font-bold text-lg">
-                    {user?.email ?? 'Outdoor Explorer'}
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    {totalActivityCount} activities recorded
-                  </Text>
+            {/* ============================================================ */}
+            {/* User header with avatar, name, and Pro badge                 */}
+            {/* ============================================================ */}
+            <View className="items-center mb-5">
+              <View className="h-20 w-20 rounded-full bg-cairn-card border-2 border-cairn-border items-center justify-center mb-3">
+                <User size={32} color="#94a3b8" />
+              </View>
+              <View className="flex-row items-center gap-2">
+                <Text className="text-slate-100 font-bold text-xl">
+                  {user?.email?.split('@')[0] ?? 'Outdoor Explorer'}
+                </Text>
+                <View className="rounded-full bg-canopy px-3 py-0.5">
+                  <Text className="text-white text-xs font-bold">Pro</Text>
                 </View>
               </View>
+              <Text className="text-slate-500 text-xs mt-1">
+                {user?.email ?? 'explorer@cairnconnect.app'}
+              </Text>
+            </View>
+
+            {/* Settings gear - top right */}
+            <View className="absolute top-0 right-0">
               <Pressable
                 onPress={() => router.push('/(tabs)/profile/settings')}
                 className="p-2"
@@ -232,31 +266,32 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
 
-            {/* Quick action buttons */}
+            {/* ============================================================ */}
+            {/* User Stats - two cards side by side                          */}
+            {/* ============================================================ */}
+            <Text className="text-slate-100 font-semibold text-base mb-3">
+              User Stats
+            </Text>
             <View className="flex-row gap-3 mb-4">
-              {isBusinessOwner && (
-                <Pressable
-                  onPress={() => router.push('/(tabs)/profile/dashboard')}
-                  className="flex-1 flex-row items-center justify-center bg-cairn-card border border-cairn-border rounded-xl py-2.5 active:bg-cairn-card-hover"
-                >
-                  <BarChart3 size={14} color="#10B981" />
-                  <Text className="text-slate-300 text-xs font-medium ml-2">
-                    Dashboard
-                  </Text>
-                </Pressable>
-              )}
-              <Pressable
-                onPress={() => router.push('/(tabs)/profile/settings')}
-                className="flex-1 flex-row items-center justify-center bg-cairn-card border border-cairn-border rounded-xl py-2.5 active:bg-cairn-card-hover"
-              >
-                <Settings size={14} color="#64748b" />
-                <Text className="text-slate-300 text-xs font-medium ml-2">
-                  Settings
+              <Card className="flex-1">
+                <Text className="text-slate-500 text-xs mb-1">Activities Completed</Text>
+                <Text className="text-slate-100 font-bold text-2xl">
+                  {totalActivityCount}
                 </Text>
-              </Pressable>
+                <ProgressBar progress={Math.min(totalActivityCount / 50, 1)} />
+              </Card>
+              <Card className="flex-1">
+                <Text className="text-slate-500 text-xs mb-1">Trails Hiked</Text>
+                <Text className="text-slate-100 font-bold text-2xl">
+                  {uniqueTrails}
+                </Text>
+                <ProgressBar progress={Math.min(uniqueTrails / 30, 1)} />
+              </Card>
             </View>
 
-            {/* Stats overview - enhanced with 4 cards */}
+            {/* ============================================================ */}
+            {/* Stats overview - distance, elevation, time, photos           */}
+            {/* ============================================================ */}
             <View className="flex-row gap-2 mb-3">
               <Card className="flex-1">
                 <View className="flex-row items-center gap-1 mb-1">
@@ -299,7 +334,49 @@ export default function ProfileScreen() {
               </Card>
             </View>
 
-            {/* Achievement highlights */}
+            {/* ============================================================ */}
+            {/* Connected Devices section                                    */}
+            {/* ============================================================ */}
+            <Text className="text-slate-100 font-semibold text-base mb-3">
+              Connected Devices
+            </Text>
+            <Pressable onPress={() => router.push('/(tabs)/profile/dashboard')}>
+              <Card className="mb-4">
+                {CONNECTED_DEVICES.map((device, idx) => (
+                  <View
+                    key={device.name}
+                    className={`flex-row items-center justify-between ${idx < CONNECTED_DEVICES.length - 1 ? 'mb-3' : ''}`}
+                  >
+                    <View className="flex-row items-center">
+                      <View
+                        className="h-8 w-8 rounded-full items-center justify-center mr-3"
+                        style={{ backgroundColor: device.color }}
+                      >
+                        <Text className="text-white font-bold text-sm">
+                          {device.name.charAt(0)}
+                        </Text>
+                      </View>
+                      <Text className="text-slate-200 text-sm font-medium">
+                        {device.name}
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center gap-1.5">
+                      <View className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 flex-row items-center gap-1">
+                        <Check size={10} color="#10B981" />
+                        <Text className="text-emerald-400 text-xs font-semibold">
+                          Synced
+                        </Text>
+                      </View>
+                      <ChevronRight size={14} color="#64748b" />
+                    </View>
+                  </View>
+                ))}
+              </Card>
+            </Pressable>
+
+            {/* ============================================================ */}
+            {/* Achievement highlights                                       */}
+            {/* ============================================================ */}
             {(longestActivity || topType) && (
               <Card className="mb-4">
                 <View className="flex-row items-center gap-1 mb-2">
@@ -322,21 +399,34 @@ export default function ProfileScreen() {
               </Card>
             )}
 
+            {/* ============================================================ */}
+            {/* Pro Annual upsell card                                       */}
+            {/* ============================================================ */}
+            <View className="rounded-2xl border border-canopy/30 bg-canopy/5 p-4 mb-4">
+              <View className="flex-row items-center justify-between mb-2">
+                <Text className="text-canopy font-bold text-base">
+                  Pro Annual
+                </Text>
+                <Text className="text-canopy font-bold text-base">
+                  $80/yr
+                </Text>
+              </View>
+              <Text className="text-slate-400 text-xs mb-3">
+                Unlock offline maps, advanced stats, and exclusive discounts.
+              </Text>
+              <Button variant="primary" size="md">
+                <Text className="text-white font-semibold text-sm">
+                  Manage Subscription
+                </Text>
+              </Button>
+            </View>
+
             {/* Loading indicator for server activities */}
             {loadingServer && (
               <View className="mb-4">
                 <SkeletonCard />
               </View>
             )}
-
-            {/* Strava connect */}
-            <Button variant="secondary" size="md" className="mb-6">
-              <View className="flex-row items-center">
-                <Text className="text-slate-300 text-sm font-medium">
-                  Connect Strava
-                </Text>
-              </View>
-            </Button>
 
             {/* Auth button */}
             {!user && (
