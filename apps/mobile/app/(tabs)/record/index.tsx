@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   TextInput,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -314,7 +315,7 @@ export default function RecordScreen() {
           </Text>
         </View>
 
-        <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+        <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 16 }} showsVerticalScrollIndicator={false}>
           {ACTIVITY_CATEGORIES.map((cat) => {
             const activities = ACTIVITY_TYPES.filter(
               (a) => a.category === cat.slug,
@@ -380,7 +381,7 @@ export default function RecordScreen() {
 
     return (
       <SafeAreaView className="flex-1 bg-cairn-bg" edges={['top']}>
-        <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
+        <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16 }} showsVerticalScrollIndicator={false}>
           <Text className="text-slate-100 font-bold text-2xl mb-1">
             Activity Complete
           </Text>
@@ -400,7 +401,7 @@ export default function RecordScreen() {
               onChangeText={setSummaryTitle}
               placeholder="Name your activity..."
               placeholderTextColor="#475569"
-              className="text-slate-100 text-base bg-cairn-elevated border border-cairn-border rounded-xl px-3 py-2.5"
+              style={recordStyles.summaryTitleInput}
             />
           </Card>
 
@@ -707,6 +708,19 @@ export default function RecordScreen() {
     </SafeAreaView>
   );
 }
+
+const recordStyles = StyleSheet.create({
+  summaryTitleInput: {
+    color: '#f1f5f9',
+    fontSize: 16,
+    backgroundColor: '#1A2D45',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+});
 
 // ─── Mini Trail View (simplified polyline on dark background) ───
 

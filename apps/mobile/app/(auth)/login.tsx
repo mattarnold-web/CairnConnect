@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, Alert, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Mountain, Mail, Lock, X } from 'lucide-react-native';
@@ -34,12 +34,12 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cairn-bg">
+    <SafeAreaView className="flex-1 bg-cairn-bg" edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        <ScrollView className="flex-1 px-6" keyboardShouldPersistTaps="handled">
+        <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 24 }} keyboardShouldPersistTaps="handled">
           {/* Close button */}
           <Pressable
             onPress={() => router.back()}
@@ -105,7 +105,7 @@ export default function LoginScreen() {
                 onChangeText={setEmail}
                 placeholder="you@example.com"
                 placeholderTextColor="#475569"
-                className="flex-1 ml-2 text-sm text-slate-100"
+                style={loginStyles.inputInline}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 textContentType="emailAddress"
@@ -125,7 +125,7 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
                 placeholder="Enter your password"
                 placeholderTextColor="#475569"
-                className="flex-1 ml-2 text-sm text-slate-100"
+                style={loginStyles.inputInline}
                 secureTextEntry
                 textContentType="password"
                 autoComplete="password"
@@ -158,3 +158,12 @@ export default function LoginScreen() {
     </SafeAreaView>
   );
 }
+
+const loginStyles = StyleSheet.create({
+  inputInline: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#f1f5f9',
+  },
+});

@@ -9,6 +9,7 @@ import {
   Switch,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -205,9 +206,12 @@ export default function CreatePostScreen() {
             onChangeText={setTitle}
             placeholder="e.g., Morning ride at Slickrock"
             placeholderTextColor="#475569"
-            className={`bg-cairn-card border rounded-xl h-12 px-4 text-sm text-slate-100 mb-4 ${
-              errors.title ? 'border-red-500' : 'border-cairn-border'
-            }`}
+            style={[
+              createStyles.input,
+              createStyles.inputFull,
+              { marginBottom: 16 },
+              errors.title ? createStyles.inputError : createStyles.inputBorder,
+            ]}
           />
 
           {/* Description */}
@@ -221,7 +225,7 @@ export default function CreatePostScreen() {
             placeholderTextColor="#475569"
             multiline
             numberOfLines={4}
-            className="bg-cairn-card border border-cairn-border rounded-xl p-4 text-sm text-slate-100 mb-4 min-h-[100px]"
+            style={[createStyles.inputMultiline, createStyles.inputBorder]}
             textAlignVertical="top"
           />
 
@@ -236,7 +240,7 @@ export default function CreatePostScreen() {
               onChangeText={setActivityDate}
               placeholder="YYYY-MM-DD"
               placeholderTextColor="#475569"
-              className="flex-1 ml-2 text-sm text-slate-100"
+              style={createStyles.inputInline}
               keyboardType="numbers-and-punctuation"
             />
           </View>
@@ -260,7 +264,7 @@ export default function CreatePostScreen() {
                 onChangeText={setLocationName}
                 placeholder="e.g., Moab, UT"
                 placeholderTextColor="#475569"
-                className="flex-1 ml-2 text-sm text-slate-100"
+                style={createStyles.inputInline}
               />
             </View>
             <Pressable
@@ -301,7 +305,7 @@ export default function CreatePostScreen() {
               placeholder="4"
               placeholderTextColor="#475569"
               keyboardType="number-pad"
-              className="flex-1 ml-2 text-sm text-slate-100"
+              style={createStyles.inputInline}
             />
           </View>
 
@@ -325,7 +329,7 @@ export default function CreatePostScreen() {
               onChangeText={setCustomGear}
               placeholder="Add custom gear item..."
               placeholderTextColor="#475569"
-              className="flex-1 bg-cairn-card border border-cairn-border rounded-xl h-10 px-3 text-sm text-slate-100"
+              style={[createStyles.input, createStyles.inputSmall, createStyles.inputBorder, { flex: 1 }]}
               onSubmitEditing={addCustomGear}
               returnKeyType="done"
             />
@@ -370,7 +374,7 @@ export default function CreatePostScreen() {
               placeholder="0.00"
               placeholderTextColor="#475569"
               keyboardType="decimal-pad"
-              className="flex-1 ml-2 text-sm text-slate-100"
+              style={createStyles.inputInline}
             />
             <Text className="text-slate-500 text-xs">per person</Text>
           </View>
@@ -409,9 +413,10 @@ export default function CreatePostScreen() {
                     onChangeText={setPermitType}
                     placeholder="e.g., Cataract Canyon River Permit"
                     placeholderTextColor="#475569"
-                    className={`bg-cairn-bg border rounded-xl h-10 px-3 text-sm text-slate-100 ${
-                      errors.permitType ? 'border-red-500' : 'border-cairn-border'
-                    }`}
+                    style={[
+                      createStyles.inputPermit,
+                      errors.permitType ? createStyles.inputError : createStyles.inputBorder,
+                    ]}
                   />
                 </View>
                 <View>
@@ -422,7 +427,7 @@ export default function CreatePostScreen() {
                     placeholder="2"
                     placeholderTextColor="#475569"
                     keyboardType="number-pad"
-                    className="bg-cairn-bg border border-cairn-border rounded-xl h-10 px-3 text-sm text-slate-100"
+                    style={[createStyles.inputPermit, createStyles.inputBorder]}
                   />
                 </View>
               </View>
@@ -440,3 +445,51 @@ export default function CreatePostScreen() {
     </SafeAreaView>
   );
 }
+
+const createStyles = StyleSheet.create({
+  input: {
+    backgroundColor: '#112240',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 14,
+    color: '#f1f5f9',
+  },
+  inputFull: {
+    height: 48,
+  },
+  inputSmall: {
+    height: 40,
+    paddingHorizontal: 12,
+  },
+  inputMultiline: {
+    backgroundColor: '#112240',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 14,
+    color: '#f1f5f9',
+    minHeight: 100,
+    marginBottom: 16,
+  },
+  inputInline: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#f1f5f9',
+  },
+  inputPermit: {
+    backgroundColor: '#0B1A2B',
+    borderRadius: 12,
+    height: 40,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    color: '#f1f5f9',
+  },
+  inputBorder: {
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+  },
+  inputError: {
+    borderWidth: 1,
+    borderColor: '#ef4444',
+  },
+});

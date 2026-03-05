@@ -162,7 +162,8 @@ export default function ActivityDetailScreen() {
       </View>
 
       <ScrollView
-        className="flex-1 px-4"
+        className="flex-1"
+        contentContainerStyle={{ paddingHorizontal: 16 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Duration hero */}

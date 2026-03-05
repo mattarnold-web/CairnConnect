@@ -108,7 +108,7 @@ export default function BusinessDetailScreen() {
 
   if (!business) {
     return (
-      <SafeAreaView className="flex-1 bg-cairn-bg items-center justify-center">
+      <SafeAreaView className="flex-1 bg-cairn-bg items-center justify-center" edges={['top']}>
         <Text className="text-slate-400">Business not found</Text>
       </SafeAreaView>
     );
