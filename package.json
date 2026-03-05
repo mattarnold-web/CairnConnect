@@ -3,12 +3,15 @@
   "private": true,
   "scripts": {
     "dev:web": "pnpm --filter web dev",
+    "dev:mobile": "pnpm --filter mobile start",
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "type-check": "turbo type-check"
+    "type-check": "turbo type-check",
+    "seed": "npx tsx scripts/seed-database.ts"
   },
   "devDependencies": {
+    "pg": "^8.20.0",
     "turbo": "^2.0.0",
     "typescript": "^5.5.0"
   }

@@ -9,3 +9,4 @@ export * from './constants/anchorCities';
 export * from './utils/distance';
 export * from './utils/format';
 export * from './utils/validation';
+export * from './constants/colors';
