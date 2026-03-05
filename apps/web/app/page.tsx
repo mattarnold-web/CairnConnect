@@ -18,6 +18,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { DemoButton } from '@/components/demo/DemoButton';
+import { CairnLogo } from '@/components/ui/CairnLogo';
 
 export const metadata: Metadata = {
   title: 'Cairn Connect — Find Your Trail. Find Your People.',
@@ -166,7 +167,7 @@ export default function LandingPage() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-20">
           <div className="text-center space-y-8 max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 rounded-full bg-canopy/10 border border-canopy/20 px-4 py-1.5 text-sm text-canopy">
-              <Mountain className="h-4 w-4" />
+              <CairnLogo className="h-4 w-4" />
               The Outdoor Activity Platform
             </div>
 
@@ -595,7 +596,7 @@ export default function LandingPage() {
             <div className="col-span-2 md:col-span-1 space-y-3">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-canopy to-canopy-dark flex items-center justify-center">
-                  <Mountain className="h-4 w-4 text-white" />
+                  <CairnLogo className="h-4 w-4 text-white" />
                 </div>
                 <span className="font-display text-lg font-bold">Cairn Connect</span>
               </div>

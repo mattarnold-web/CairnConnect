@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Mountain, Mail, Lock, ArrowLeft, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Loader2 } from 'lucide-react';
+import { CairnLogo } from '@/components/ui/CairnLogo';
 import { Suspense, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/auth-context';
@@ -72,7 +73,7 @@ function LoginForm() {
         <div className="relative flex flex-col justify-center px-16 space-y-8">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-canopy to-canopy-dark flex items-center justify-center shadow-lg shadow-canopy/20">
-              <Mountain className="h-7 w-7 text-white" />
+              <CairnLogo className="h-7 w-7 text-white" />
             </div>
             <div>
               <span className="font-display text-2xl font-bold text-slate-100">
@@ -111,7 +112,7 @@ function LoginForm() {
 
         <div className="lg:hidden flex items-center gap-2 mb-8">
           <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-canopy to-canopy-dark flex items-center justify-center">
-            <Mountain className="h-5 w-5 text-white" />
+            <CairnLogo className="h-5 w-5 text-white" />
           </div>
           <span className="font-display text-lg font-bold text-slate-100">
             Cairn Connect

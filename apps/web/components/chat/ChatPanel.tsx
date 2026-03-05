@@ -6,10 +6,10 @@ import {
   X,
   Send,
   Trash2,
-  Mountain,
   ArrowRight,
   GripVertical,
 } from 'lucide-react';
+import { CairnLogo } from '@/components/ui/CairnLogo';
 import { useRouter } from 'next/navigation';
 import { useChat } from '@/lib/use-chat';
 import type { PlatformAction } from '@/lib/chat-types';
@@ -201,7 +201,7 @@ export function ChatPanel() {
           <div className="flex items-center justify-between px-4 py-3 border-b border-cairn-border bg-cairn-elevated/50">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-canopy/15 flex items-center justify-center">
-                <Mountain className="h-4 w-4 text-canopy" />
+                <CairnLogo className="h-4 w-4 text-canopy" />
               </div>
               <div>
                 <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>

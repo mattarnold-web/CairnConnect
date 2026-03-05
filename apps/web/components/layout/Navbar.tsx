@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Map, Mountain, Users, User, Sparkles, CalendarDays, Compass, Play, Settings, LogOut, Shield, Trophy, Search, Ticket } from 'lucide-react';
+import { CairnLogo } from '@/components/ui/CairnLogo';
 import { clsx } from 'clsx';
 import { useState } from 'react';
 import { usePreferences } from '@/lib/preferences-context';
@@ -43,7 +44,7 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-canopy to-canopy-dark flex items-center justify-center shadow-lg shadow-canopy/20">
-              <Mountain className="h-5 w-5 text-white" />
+              <CairnLogo className="h-5 w-5 text-white" />
             </div>
             <div className="hidden sm:flex flex-col">
               <span className="font-display text-lg font-bold text-slate-100 leading-tight group-hover:text-canopy transition-colors">
