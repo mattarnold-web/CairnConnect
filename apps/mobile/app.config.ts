@@ -2,6 +2,7 @@ import { ExpoConfig, ConfigContext } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
+  owner: 'marnold1218',
   name: 'Cairn Connect',
   slug: 'cairn-connect',
   version: '1.0.0',
@@ -18,6 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
     bundleIdentifier: 'com.cairnconnect.app',
     infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
       NSLocationWhenInUseUsageDescription:
         'Cairn Connect uses your location to show nearby trails and businesses, and to record your outdoor activities.',
       NSLocationAlwaysAndWhenInUseUsageDescription:
@@ -62,9 +64,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     'expo-notifications',
   ],
+  updates: {
+    url: 'https://u.expo.dev/51e09a5a-06f0-4b35-877d-493cd4ed6d1e',
+  },
+  runtimeVersion: {
+    policy: 'appVersion' as const,
+  },
   extra: {
     eas: {
-      projectId: 'your-eas-project-id',
+      projectId: '51e09a5a-06f0-4b35-877d-493cd4ed6d1e',
     },
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
