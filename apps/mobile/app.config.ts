@@ -64,6 +64,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     'expo-notifications',
   ],
+  updates: {
+    url: 'https://u.expo.dev/51e09a5a-06f0-4b35-877d-493cd4ed6d1e',
+  },
+  runtimeVersion: {
+    policy: 'appVersion' as const,
+  },
   extra: {
     eas: {
       projectId: '51e09a5a-06f0-4b35-877d-493cd4ed6d1e',
