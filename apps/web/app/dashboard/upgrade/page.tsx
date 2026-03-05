@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Sparkles,
@@ -9,9 +10,12 @@ import {
   Star,
   Users,
   BarChart3,
+  Loader2,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
+import { getStripe } from '@/lib/stripe-client';
+import { createSupabaseBrowser } from '@/lib/supabase';
 
 // ---------------------------------------------------------------------------
 // Pricing tiers
@@ -34,6 +38,8 @@ const PRICING_TIERS = [
       'Email support',
     ],
     cta: 'Claim Founding Spot',
+    envKey: 'NEXT_PUBLIC_STRIPE_SPOTLIGHT_FOUNDING_PRICE_ID',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SPOTLIGHT_FOUNDING_PRICE_ID,
   },
   {
     name: 'Standard',
@@ -50,6 +56,8 @@ const PRICING_TIERS = [
       'Quarterly performance reports',
     ],
     cta: 'Get Standard',
+    envKey: 'NEXT_PUBLIC_STRIPE_SPOTLIGHT_STANDARD_PRICE_ID',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SPOTLIGHT_STANDARD_PRICE_ID,
   },
   {
     name: 'Premium',
@@ -67,8 +75,17 @@ const PRICING_TIERS = [
       'API access for integrations',
     ],
     cta: 'Get Premium',
+    envKey: 'NEXT_PUBLIC_STRIPE_SPOTLIGHT_PREMIUM_PRICE_ID',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SPOTLIGHT_PREMIUM_PRICE_ID,
   },
 ];
+
+// Tier name mapping for server-side price IDs (these aren't exposed to client)
+const TIER_SERVER_KEYS: Record<string, string> = {
+  Founding: 'STRIPE_SPOTLIGHT_FOUNDING_PRICE_ID',
+  Standard: 'STRIPE_SPOTLIGHT_STANDARD_PRICE_ID',
+  Premium: 'STRIPE_SPOTLIGHT_PREMIUM_PRICE_ID',
+};
 
 // ---------------------------------------------------------------------------
 // FAQ
@@ -102,6 +119,103 @@ const FAQ_ITEMS = [
 // ---------------------------------------------------------------------------
 
 export default function UpgradePage() {
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check if user already has a subscription
+  useEffect(() => {
+    async function checkSubscription() {
+      try {
+        const supabase = createSupabaseBrowser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('subscription_tier, subscription_status')
+          .eq('id', user.id)
+          .single();
+
+        if (
+          profile?.subscription_tier &&
+          profile.subscription_tier !== 'free' &&
+          profile.subscription_status === 'active'
+        ) {
+          setHasSubscription(true);
+        }
+      } catch {
+        // Not logged in or no profile — ignore
+      }
+    }
+    checkSubscription();
+  }, []);
+
+  async function handleCheckout(tierName: string) {
+    setError(null);
+    setLoadingTier(tierName);
+
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priceId: tierName,
+          mode: 'subscription',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      const stripe = await getStripe();
+      if (!stripe) {
+        throw new Error('Stripe failed to load');
+      }
+
+      const { error: stripeError } = await stripe.redirectToCheckout({
+        sessionId: data.sessionId,
+      });
+
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setLoadingTier(null);
+    }
+  }
+
+  async function handleManageSubscription() {
+    setError(null);
+    setPortalLoading(true);
+
+    try {
+      const res = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to open billing portal');
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setPortalLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-cairn-bg">
       <Navbar />
@@ -122,6 +236,32 @@ export default function UpgradePage() {
             enthusiasts engage with your business.
           </p>
         </div>
+
+        {/* Error banner */}
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400 text-center">
+            {error}
+          </div>
+        )}
+
+        {/* Manage Subscription link for existing subscribers */}
+        {hasSubscription && (
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 rounded-xl border border-canopy/20 bg-canopy/10 px-4 py-3">
+              <Check className="h-4 w-4 text-canopy" />
+              <span className="text-sm text-slate-300">
+                You have an active subscription.
+              </span>
+              <button
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                className="text-sm font-semibold text-canopy hover:text-canopy-dark transition-colors underline underline-offset-2 disabled:opacity-50"
+              >
+                {portalLoading ? 'Loading...' : 'Manage Subscription'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Pricing cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
@@ -173,8 +313,17 @@ export default function UpgradePage() {
                 variant={tier.highlighted ? 'spotlight' : 'secondary'}
                 size="lg"
                 className="w-full"
+                disabled={loadingTier !== null}
+                onClick={() => handleCheckout(tier.name)}
               >
-                {tier.cta}
+                {loadingTier === tier.name ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  tier.cta
+                )}
               </Button>
             </div>
           ))}

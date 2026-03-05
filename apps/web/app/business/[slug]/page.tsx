@@ -14,9 +14,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const business = await getBusinessBySlug(params.slug);
   if (!business) return { title: 'Business Not Found' };
 
+  const biz = business as any;
+  const title = `${business.name} | Cairn Connect`;
+  const description =
+    business.description ??
+    `Discover ${business.name}${biz.category ? ` — ${biz.category}` : ''} on Cairn Connect.`;
+
   return {
-    title: `${business.name} | Cairn Connect`,
-    description: business.description ?? `Discover ${business.name} on Cairn Connect.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(biz.cover_photo_url ? { images: [{ url: biz.cover_photo_url }] } : {}),
+    },
   };
 }
 

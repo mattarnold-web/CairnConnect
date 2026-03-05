@@ -13,14 +13,18 @@ export function registerServiceWorker(): void {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          console.log('Service Worker registered with scope:', registration.scope);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Service Worker registered with scope:', registration.scope);
+          }
         })
         .catch((error) => {
           console.error('Service Worker registration failed:', error);
         });
     });
   } else {
-    console.log('Service Workers are not supported in this browser.');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Service Workers are not supported in this browser.');
+    }
   }
 }
 
@@ -84,10 +88,12 @@ export function useInstallPrompt(): InstallPromptResult {
 
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-      } else {
-        console.log('User dismissed the install prompt');
+      if (process.env.NODE_ENV === 'development') {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
       }
       setDeferredPrompt(null);
       setCanInstall(false);

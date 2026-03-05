@@ -1,5 +1,18 @@
 import { ExpoConfig, ConfigContext } from 'expo/config';
 
+// ---------------------------------------------------------------------------
+// App Store Assets Checklist:
+//   - App icon: 1024x1024 PNG (no transparency, no rounded corners)
+//     Place at ./assets/icon.png
+//   - Adaptive icon (Android): 1024x1024 foreground PNG with safe zone
+//     Place at ./assets/adaptive-icon.png
+//   - Splash screen: 1284x2778 PNG recommended
+//     Place at ./assets/splash-icon.png
+//   - iOS screenshots: 6.7" (1290x2796), 6.5" (1284x2778), 5.5" (1242x2208)
+//   - Android screenshots: phone (1080x1920+), 7" tablet, 10" tablet
+//   - Feature graphic (Android): 1024x500 PNG/JPG
+// ---------------------------------------------------------------------------
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'Cairn Connect',
@@ -17,6 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.cairnconnect.app',
+    buildNumber: '1',
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
         'Cairn Connect uses your location to show nearby trails and businesses, and to record your outdoor activities.',
@@ -34,6 +48,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#0B1A2B',
     },
     package: 'com.cairnconnect.app',
+    versionCode: 1,
     permissions: [
       'ACCESS_FINE_LOCATION',
       'ACCESS_COARSE_LOCATION',
@@ -64,7 +79,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ],
   extra: {
     eas: {
-      projectId: 'your-eas-project-id',
+      // TODO: Replace with your EAS project ID from `eas init`
+      projectId: '',
     },
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,

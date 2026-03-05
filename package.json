@@ -8,12 +8,17 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
-    "seed": "npx tsx scripts/seed-database.ts"
+    "seed": "npx tsx scripts/seed-database.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "packageManager": "pnpm@10.30.3",
   "devDependencies": {
     "pg": "^8.20.0",
     "turbo": "^2.0.0",
     "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
   }
 }

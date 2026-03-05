@@ -13,9 +13,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const trail = await getTrailBySlug(params.slug);
   if (!trail) return { title: 'Trail Not Found' };
 
+  const title = `${trail.name} | Cairn Connect`;
+  const description =
+    trail.description ?? `Explore ${trail.name} on Cairn Connect.`;
+
   return {
-    title: `${trail.name} | Cairn Connect`,
-    description: trail.description ?? `Explore ${trail.name} on Cairn Connect.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(trail.cover_photo_url ? { images: [{ url: trail.cover_photo_url }] } : {}),
+    },
   };
 }
 
