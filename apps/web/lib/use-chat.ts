@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import type { ChatMessage } from './chat-types';
+import type { ChatMessage, PlatformAction } from './chat-types';
 
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -61,6 +61,24 @@ export function useChat() {
           return;
         }
 
+        const contentType = res.headers.get('Content-Type') || '';
+
+        // JSON response = text + actions
+        if (contentType.includes('application/json')) {
+          const data = await res.json();
+          const actions: PlatformAction[] = data.actions || [];
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantMessage.id
+                ? { ...m, content: data.text || '', actions }
+                : m,
+            ),
+          );
+          setIsStreaming(false);
+          return;
+        }
+
+        // Streaming text response
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let accumulated = '';

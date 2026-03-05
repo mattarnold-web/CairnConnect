@@ -20,6 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               <OfflineBanner />
               {children}
               <InstallPrompt />
+              <ChatPanel />
             </ActivityProvider>
           </TripProvider>
         </PreferencesProvider>
