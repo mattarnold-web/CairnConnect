@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   Share,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -277,7 +278,7 @@ export default function TripScreen() {
         ))}
       </View>
 
-      <ScrollView className="flex-1 px-4" keyboardShouldPersistTaps="handled">
+      <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 16 }} keyboardShouldPersistTaps="handled">
         {/* ============================================================ */}
         {/* Step 1: Region */}
         {/* ============================================================ */}
@@ -415,7 +416,7 @@ export default function TripScreen() {
                   onChangeText={(name) => dispatch({ type: 'SET_TRIP_NAME', name })}
                   placeholder={`My ${state.region?.name ?? ''} Trip`}
                   placeholderTextColor="#475569"
-                  className="bg-cairn-card border border-cairn-border rounded-xl h-10 px-3 text-sm text-slate-100"
+                  style={tripStyles.inputSmall}
                 />
               </View>
               <View className="w-32">
@@ -427,7 +428,7 @@ export default function TripScreen() {
                   }}
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor="#475569"
-                  className="bg-cairn-card border border-cairn-border rounded-xl h-10 px-3 text-sm text-slate-100"
+                  style={tripStyles.inputSmall}
                   keyboardType="numbers-and-punctuation"
                 />
               </View>
@@ -494,7 +495,7 @@ export default function TripScreen() {
                         }
                         placeholder="Label this day (optional)..."
                         placeholderTextColor="#475569"
-                        className="bg-cairn-bg border border-cairn-border rounded-lg h-8 px-3 text-xs text-slate-300 mb-3"
+                        style={tripStyles.dayLabelInput}
                       />
 
                       {/* Time slot sections */}
@@ -636,7 +637,7 @@ export default function TripScreen() {
                               onChangeText={setCustomActivityTitle}
                               placeholder="e.g., Lunch at Red Rock Bakery"
                               placeholderTextColor="#475569"
-                              className="flex-1 bg-cairn-bg border border-cairn-border rounded-lg h-9 px-3 text-xs text-slate-100"
+                              style={tripStyles.customActivityInput}
                               onSubmitEditing={() => addCustomActivity(day.id)}
                               returnKeyType="done"
                             />
@@ -734,7 +735,7 @@ export default function TripScreen() {
               onChangeText={(name) => dispatch({ type: 'SET_TRIP_NAME', name })}
               placeholder={`My ${state.region?.name ?? ''} Trip`}
               placeholderTextColor="#475569"
-              className="bg-cairn-card border border-cairn-border rounded-xl h-12 px-4 text-base text-slate-100 font-semibold mb-4"
+              style={tripStyles.summaryTitleInput}
             />
 
             {/* Destination */}
@@ -1142,3 +1143,50 @@ export default function TripScreen() {
     </SafeAreaView>
   );
 }
+
+const tripStyles = StyleSheet.create({
+  inputSmall: {
+    backgroundColor: '#112240',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 12,
+    height: 40,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    color: '#f1f5f9',
+  },
+  dayLabelInput: {
+    backgroundColor: '#0B1A2B',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 8,
+    height: 32,
+    paddingHorizontal: 12,
+    fontSize: 12,
+    color: '#cbd5e1',
+    marginBottom: 12,
+  },
+  customActivityInput: {
+    flex: 1,
+    backgroundColor: '#0B1A2B',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 8,
+    height: 36,
+    paddingHorizontal: 12,
+    fontSize: 12,
+    color: '#f1f5f9',
+  },
+  summaryTitleInput: {
+    backgroundColor: '#112240',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 12,
+    height: 48,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: '#f1f5f9',
+    fontWeight: '600',
+    marginBottom: 16,
+  },
+});

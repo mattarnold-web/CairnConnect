@@ -116,7 +116,7 @@ export default function TrailDetailScreen() {
 
   if (!trail) {
     return (
-      <SafeAreaView className="flex-1 bg-cairn-bg items-center justify-center">
+      <SafeAreaView className="flex-1 bg-cairn-bg items-center justify-center" edges={['top']}>
         <Text className="text-slate-400">Trail not found</Text>
       </SafeAreaView>
     );

@@ -84,7 +84,7 @@ export default function PostDetailScreen() {
 
   if (!post) {
     return (
-      <SafeAreaView className="flex-1 bg-cairn-bg items-center justify-center">
+      <SafeAreaView className="flex-1 bg-cairn-bg items-center justify-center" edges={['top']}>
         <Text className="text-slate-400 text-base mb-2">Post not found</Text>
         <Pressable onPress={() => router.back()}>
           <Text className="text-canopy text-sm font-medium">Go back</Text>

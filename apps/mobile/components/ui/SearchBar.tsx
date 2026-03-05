@@ -1,4 +1,4 @@
-import { View, TextInput } from 'react-native';
+import { View, TextInput, StyleSheet } from 'react-native';
 import { Search } from 'lucide-react-native';
 import { clsx } from 'clsx';
 
@@ -28,10 +28,19 @@ export function SearchBar({
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor="#475569"
-        className="flex-1 ml-2 text-sm text-slate-100"
+        style={styles.input}
         autoCapitalize="none"
         autoCorrect={false}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  input: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#f1f5f9',
+  },
+});

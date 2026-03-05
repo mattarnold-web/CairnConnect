@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { View, Text, Pressable, Linking, TextInput } from 'react-native';
+import { View, Text, Pressable, Linking, TextInput, StyleSheet } from 'react-native';
 import { Bed, Calendar, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react-native';
 import { clsx } from 'clsx';
 import {
@@ -106,7 +106,7 @@ export function AccommodationLinks({
                   onChangeText={setCheckin}
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor="#475569"
-                  className="bg-cairn-card border border-cairn-border rounded-lg px-3 py-2 text-sm text-slate-100"
+                  style={accommodationStyles.dateInput}
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
@@ -121,7 +121,7 @@ export function AccommodationLinks({
                   onChangeText={setCheckout}
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor="#475569"
-                  className="bg-cairn-card border border-cairn-border rounded-lg px-3 py-2 text-sm text-slate-100"
+                  style={accommodationStyles.dateInput}
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
@@ -171,3 +171,16 @@ export function AccommodationLinks({
     </View>
   );
 }
+
+const accommodationStyles = StyleSheet.create({
+  dateInput: {
+    backgroundColor: '#112240',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 14,
+    color: '#f1f5f9',
+  },
+});

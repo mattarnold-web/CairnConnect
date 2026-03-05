@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, Alert, Linking, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Pressable, Alert, Linking, ActivityIndicator, StyleSheet } from 'react-native';
 import * as SMS from 'expo-sms';
 import { Phone, MessageCircle, UserPlus, X, Shield } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
@@ -143,7 +143,7 @@ export function EmergencyContact({ onContactChange }: EmergencyContactProps) {
             onChangeText={setName}
             placeholder="Contact name"
             placeholderTextColor="#475569"
-            className="bg-cairn-bg border border-cairn-border rounded-xl px-3 py-2.5 text-slate-100 text-sm"
+            style={emergencyStyles.input}
           />
         </View>
 
@@ -155,7 +155,7 @@ export function EmergencyContact({ onContactChange }: EmergencyContactProps) {
             placeholder="+1 (555) 123-4567"
             placeholderTextColor="#475569"
             keyboardType="phone-pad"
-            className="bg-cairn-bg border border-cairn-border rounded-xl px-3 py-2.5 text-slate-100 text-sm"
+            style={emergencyStyles.input}
           />
         </View>
 
@@ -229,3 +229,16 @@ export function EmergencyContact({ onContactChange }: EmergencyContactProps) {
     </Card>
   );
 }
+
+const emergencyStyles = StyleSheet.create({
+  input: {
+    backgroundColor: '#0B1A2B',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: '#f1f5f9',
+    fontSize: 14,
+  },
+});
