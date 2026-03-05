@@ -3,7 +3,7 @@ import { ExpoConfig, ConfigContext } from 'expo/config';
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   owner: 'marnold1218',
-  name: 'Cairn Connect',
+  name: 'Cairn Go',
   slug: 'cairn-connect',
   version: '1.0.0',
   orientation: 'portrait',
