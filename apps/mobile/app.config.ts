@@ -63,6 +63,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-notifications',
+    'expo-image',
   ],
   updates: {
     url: 'https://u.expo.dev/51e09a5a-06f0-4b35-877d-493cd4ed6d1e',
