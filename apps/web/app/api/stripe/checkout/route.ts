@@ -3,17 +3,33 @@ import { cookies } from 'next/headers';
 import { stripe, PRICE_IDS } from '@/lib/stripe';
 import { createSupabaseServer, createSupabaseAdmin } from '@/lib/supabase';
 
-// All valid price IDs that can be checked out
+// Map friendly tier names to Stripe price IDs
+const TIER_TO_PRICE: Record<string, string> = {
+  founding: PRICE_IDS.SPOTLIGHT_FOUNDING,
+  standard: PRICE_IDS.SPOTLIGHT_STANDARD,
+  premium: PRICE_IDS.SPOTLIGHT_PREMIUM,
+  pro_monthly: PRICE_IDS.PRO_MONTHLY,
+  pro_annual: PRICE_IDS.PRO_ANNUAL,
+};
+
 const ALLOWED_PRICE_IDS = new Set(Object.values(PRICE_IDS));
 
 export async function POST(request: NextRequest) {
   try {
-    const { priceId, mode = 'subscription', successUrl, cancelUrl } =
+    const { priceId: rawPriceId, tier, mode = 'subscription', successUrl, cancelUrl } =
       await request.json();
+
+    // Resolve the price ID — accept either a tier name or a raw price ID
+    let priceId: string | undefined;
+    if (tier) {
+      priceId = TIER_TO_PRICE[tier.toLowerCase()];
+    } else {
+      priceId = rawPriceId;
+    }
 
     if (!priceId || !ALLOWED_PRICE_IDS.has(priceId)) {
       return NextResponse.json(
-        { error: 'Invalid or missing priceId' },
+        { error: 'Invalid or missing tier / priceId' },
         { status: 400 },
       );
     }

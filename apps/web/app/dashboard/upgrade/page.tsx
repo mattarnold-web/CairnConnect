@@ -4,12 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Sparkles,
-  Shield,
   Check,
   ChevronDown,
-  Star,
-  Users,
-  BarChart3,
   Loader2,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
@@ -38,8 +34,7 @@ const PRICING_TIERS = [
       'Email support',
     ],
     cta: 'Claim Founding Spot',
-    envKey: 'NEXT_PUBLIC_STRIPE_SPOTLIGHT_FOUNDING_PRICE_ID',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_SPOTLIGHT_FOUNDING_PRICE_ID,
+    tier: 'founding',
   },
   {
     name: 'Standard',
@@ -56,8 +51,7 @@ const PRICING_TIERS = [
       'Quarterly performance reports',
     ],
     cta: 'Get Standard',
-    envKey: 'NEXT_PUBLIC_STRIPE_SPOTLIGHT_STANDARD_PRICE_ID',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_SPOTLIGHT_STANDARD_PRICE_ID,
+    tier: 'standard',
   },
   {
     name: 'Premium',
@@ -75,17 +69,9 @@ const PRICING_TIERS = [
       'API access for integrations',
     ],
     cta: 'Get Premium',
-    envKey: 'NEXT_PUBLIC_STRIPE_SPOTLIGHT_PREMIUM_PRICE_ID',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_SPOTLIGHT_PREMIUM_PRICE_ID,
+    tier: 'premium',
   },
 ];
-
-// Tier name mapping for server-side price IDs (these aren't exposed to client)
-const TIER_SERVER_KEYS: Record<string, string> = {
-  Founding: 'STRIPE_SPOTLIGHT_FOUNDING_PRICE_ID',
-  Standard: 'STRIPE_SPOTLIGHT_STANDARD_PRICE_ID',
-  Premium: 'STRIPE_SPOTLIGHT_PREMIUM_PRICE_ID',
-};
 
 // ---------------------------------------------------------------------------
 // FAQ
@@ -163,7 +149,7 @@ export default function UpgradePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          priceId: tierName,
+          tier: tierName,
           mode: 'subscription',
         }),
       });
@@ -314,9 +300,9 @@ export default function UpgradePage() {
                 size="lg"
                 className="w-full"
                 disabled={loadingTier !== null}
-                onClick={() => handleCheckout(tier.name)}
+                onClick={() => handleCheckout(tier.tier)}
               >
-                {loadingTier === tier.name ? (
+                {loadingTier === tier.tier ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Processing...
