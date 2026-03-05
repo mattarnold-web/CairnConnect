@@ -30,7 +30,7 @@ import type { MockReview } from './mock-data';
 // ---------------------------------------------------------------------------
 
 /** Set to `false` once your database is seeded with real data. */
-const USE_MOCK_FALLBACK = true;
+const USE_MOCK_FALLBACK = false;
 
 // ---------------------------------------------------------------------------
 // Types
