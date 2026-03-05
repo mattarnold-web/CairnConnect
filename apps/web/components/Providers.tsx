@@ -1,5 +1,6 @@
 'use client';
 
+import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '@/lib/auth-context';
 import { PreferencesProvider } from '@/lib/preferences-context';
 import { TripProvider } from '@/lib/trip-context';
@@ -11,16 +12,18 @@ import { DemoBanner } from '@/components/demo/DemoBanner';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <PreferencesProvider>
-        <TripProvider>
-          <ActivityProvider>
-            <OfflineBanner />
-            {children}
-            <InstallPrompt />
-          </ActivityProvider>
-        </TripProvider>
-      </PreferencesProvider>
-    </AuthProvider>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+      <AuthProvider>
+        <PreferencesProvider>
+          <TripProvider>
+            <ActivityProvider>
+              <OfflineBanner />
+              {children}
+              <InstallPrompt />
+            </ActivityProvider>
+          </TripProvider>
+        </PreferencesProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

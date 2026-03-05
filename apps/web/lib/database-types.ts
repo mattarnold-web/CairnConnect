@@ -736,6 +736,302 @@ export interface Database {
         Relationships: [];
       };
     };
+      challenges: {
+        Row: {
+          id: string;
+          title: string;
+          description: string | null;
+          type: 'distance' | 'elevation' | 'activities' | 'trails';
+          target_value: number;
+          unit: string;
+          start_date: string;
+          end_date: string;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          description?: string | null;
+          type: 'distance' | 'elevation' | 'activities' | 'trails';
+          target_value: number;
+          unit: string;
+          start_date: string;
+          end_date: string;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          description?: string | null;
+          type?: 'distance' | 'elevation' | 'activities' | 'trails';
+          target_value?: number;
+          unit?: string;
+          start_date?: string;
+          end_date?: string;
+          is_active?: boolean;
+        };
+        Relationships: [];
+      };
+      challenge_participants: {
+        Row: {
+          id: string;
+          challenge_id: string;
+          user_id: string;
+          progress_value: number;
+          joined_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          challenge_id: string;
+          user_id: string;
+          progress_value?: number;
+          joined_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          challenge_id?: string;
+          user_id?: string;
+          progress_value?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      user_badges: {
+        Row: {
+          id: string;
+          user_id: string;
+          badge_type: string;
+          badge_name: string;
+          earned_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          badge_type: string;
+          badge_name: string;
+          earned_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          badge_type?: string;
+          badge_name?: string;
+          earned_at?: string;
+        };
+        Relationships: [];
+      };
+      permits: {
+        Row: {
+          id: string;
+          user_id: string;
+          trail_id: string | null;
+          location_name: string;
+          permit_date: string;
+          start_time: string | null;
+          end_time: string | null;
+          max_participants: number;
+          current_participants: number;
+          participant_ids: string[];
+          status: 'confirmed' | 'pending' | 'cancelled' | 'expired';
+          share_code: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          trail_id?: string | null;
+          location_name: string;
+          permit_date: string;
+          start_time?: string | null;
+          end_time?: string | null;
+          max_participants?: number;
+          current_participants?: number;
+          participant_ids?: string[];
+          status?: 'confirmed' | 'pending' | 'cancelled' | 'expired';
+          share_code?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          trail_id?: string | null;
+          location_name?: string;
+          permit_date?: string;
+          start_time?: string | null;
+          end_time?: string | null;
+          max_participants?: number;
+          current_participants?: number;
+          participant_ids?: string[];
+          status?: 'confirmed' | 'pending' | 'cancelled' | 'expired';
+          share_code?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      emergency_contacts: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          phone: string;
+          relationship: string | null;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          phone: string;
+          relationship?: string | null;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          phone?: string;
+          relationship?: string | null;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
+      notification_preferences: {
+        Row: {
+          id: string;
+          user_id: string;
+          activity_board_messages: boolean;
+          activity_board_replies: boolean;
+          permit_seats: boolean;
+          trip_reminders: boolean;
+          trail_conditions: boolean;
+          weather_warnings: boolean;
+          trail_closures: boolean;
+          new_followers: boolean;
+          achievements: boolean;
+          weekly_recap: boolean;
+          business_inquiries: boolean;
+          do_not_disturb: boolean;
+          dnd_start_time: string;
+          dnd_end_time: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          activity_board_messages?: boolean;
+          activity_board_replies?: boolean;
+          permit_seats?: boolean;
+          trip_reminders?: boolean;
+          trail_conditions?: boolean;
+          weather_warnings?: boolean;
+          trail_closures?: boolean;
+          new_followers?: boolean;
+          achievements?: boolean;
+          weekly_recap?: boolean;
+          business_inquiries?: boolean;
+          do_not_disturb?: boolean;
+          dnd_start_time?: string;
+          dnd_end_time?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          activity_board_messages?: boolean;
+          activity_board_replies?: boolean;
+          permit_seats?: boolean;
+          trip_reminders?: boolean;
+          trail_conditions?: boolean;
+          weather_warnings?: boolean;
+          trail_closures?: boolean;
+          new_followers?: boolean;
+          achievements?: boolean;
+          weekly_recap?: boolean;
+          business_inquiries?: boolean;
+          do_not_disturb?: boolean;
+          dnd_start_time?: string;
+          dnd_end_time?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      bookings: {
+        Row: {
+          id: string;
+          user_id: string;
+          business_id: string;
+          experience_title: string;
+          booking_date: string;
+          participants: number;
+          total_price: number;
+          currency: string;
+          status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
+          external_booking_url: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          business_id: string;
+          experience_title: string;
+          booking_date: string;
+          participants?: number;
+          total_price: number;
+          currency?: string;
+          status?: 'confirmed' | 'pending' | 'cancelled' | 'completed';
+          external_booking_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          business_id?: string;
+          experience_title?: string;
+          booking_date?: string;
+          participants?: number;
+          total_price?: number;
+          currency?: string;
+          status?: 'confirmed' | 'pending' | 'cancelled' | 'completed';
+          external_booking_url?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      review_votes: {
+        Row: {
+          id: string;
+          review_id: string;
+          user_id: string;
+          vote_type: 'helpful';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          review_id: string;
+          user_id: string;
+          vote_type?: 'helpful';
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          review_id?: string;
+          user_id?: string;
+          vote_type?: 'helpful';
+        };
+        Relationships: [];
+      };
     Views: Record<string, never>;
     Functions: {
       businesses_near_point: {
@@ -795,3 +1091,11 @@ export type DbActivityPost = Database['public']['Tables']['activity_posts']['Row
 export type DbTrip = Database['public']['Tables']['trips']['Row'];
 export type DbSavedItem = Database['public']['Tables']['user_saved_items']['Row'];
 export type DbAnalytics = Database['public']['Tables']['business_analytics']['Row'];
+export type DbChallenge = Database['public']['Tables']['challenges']['Row'];
+export type DbChallengeParticipant = Database['public']['Tables']['challenge_participants']['Row'];
+export type DbUserBadge = Database['public']['Tables']['user_badges']['Row'];
+export type DbPermit = Database['public']['Tables']['permits']['Row'];
+export type DbEmergencyContact = Database['public']['Tables']['emergency_contacts']['Row'];
+export type DbNotificationPreferences = Database['public']['Tables']['notification_preferences']['Row'];
+export type DbBooking = Database['public']['Tables']['bookings']['Row'];
+export type DbReviewVote = Database['public']['Tables']['review_votes']['Row'];

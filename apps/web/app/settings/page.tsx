@@ -13,11 +13,13 @@ import {
   Check,
   Shield,
   Loader2,
+  Palette,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Navbar } from '@/components/layout/Navbar';
 import { usePreferences, type EquipmentItem } from '@/lib/preferences-context';
 import { updateProfile, updatePreferences } from '@/lib/actions/profile';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -122,6 +124,18 @@ export default function SettingsPage() {
           <Settings className="h-6 w-6 text-canopy" />
           <h1 className="font-display text-2xl font-bold text-slate-100">Settings</h1>
         </div>
+
+        {/* Appearance Section */}
+        <section className="mb-8">
+          <h2 className="font-display text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+            <Palette className="h-5 w-5 text-canopy" />
+            Appearance
+          </h2>
+          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5">
+            <label className="block text-xs text-[var(--text-tertiary)] mb-3">Theme</label>
+            <ThemeToggle />
+          </div>
+        </section>
 
         {/* Profile Section */}
         <section className="mb-8">

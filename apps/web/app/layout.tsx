@@ -42,13 +42,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className="font-body bg-cairn-bg text-slate-100 antialiased">
+      <body className="font-body bg-[var(--cairn-bg)] text-[var(--text-primary)] antialiased">
         <Providers>{children}</Providers>
         <script
           dangerouslySetInnerHTML={{

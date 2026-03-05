@@ -2,20 +2,21 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Map, Mountain, Users, User, Sparkles, CalendarDays, Compass, Play, Settings, LogOut } from 'lucide-react';
+import { Map, Mountain, Users, User, Sparkles, CalendarDays, Compass, Play, Settings, LogOut, Shield, Trophy, Search, Ticket } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useState } from 'react';
 import { usePreferences } from '@/lib/preferences-context';
 import { useAuth } from '@/lib/auth-context';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const NAV_ITEMS = [
   { href: '/explore', label: 'Explore', icon: Map },
+  { href: '/search', label: 'Search', icon: Search },
   { href: '/climbing', label: 'Climbing', icon: Mountain },
   { href: '/board', label: 'Board', icon: Users },
   { href: '/trip', label: 'Trip', icon: CalendarDays },
   { href: '/recommend', label: 'Find Trail', icon: Compass },
   { href: '/record', label: 'Record', icon: Play },
-  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 const MOBILE_NAV_ITEMS = [
@@ -104,6 +105,10 @@ export function Navbar() {
                 km
               </span>
             </button>
+            {/* Theme toggle */}
+            <div className="hidden sm:block">
+              <ThemeToggle compact />
+            </div>
             {/* Settings */}
             <Link
               href="/settings"
@@ -145,15 +150,47 @@ export function Navbar() {
                       <Link
                         href="/profile"
                         onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-cairn-card-hover transition-colors"
                       >
                         <User className="h-4 w-4" />
                         Profile
                       </Link>
                       <Link
+                        href="/subscription"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-cairn-card-hover transition-colors"
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        Subscription
+                      </Link>
+                      <Link
+                        href="/permits"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-cairn-card-hover transition-colors"
+                      >
+                        <Ticket className="h-4 w-4" />
+                        My Permits
+                      </Link>
+                      <Link
+                        href="/safety"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-cairn-card-hover transition-colors"
+                      >
+                        <Shield className="h-4 w-4" />
+                        Safety Center
+                      </Link>
+                      <Link
+                        href="/challenges"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-cairn-card-hover transition-colors"
+                      >
+                        <Trophy className="h-4 w-4" />
+                        Challenges
+                      </Link>
+                      <Link
                         href="/settings"
                         onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-cairn-card-hover transition-colors"
                       >
                         <Settings className="h-4 w-4" />
                         Settings

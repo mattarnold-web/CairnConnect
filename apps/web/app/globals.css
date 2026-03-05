@@ -2,18 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Light theme (default) ─── */
 :root {
+  --cairn-bg: #F8FAFB;
+  --cairn-card: #FFFFFF;
+  --cairn-card-hover: #F1F5F9;
+  --cairn-elevated: #E2E8F0;
+  --cairn-border: #CBD5E1;
+  --cairn-glass: rgba(255, 255, 255, 0.85);
+  --canopy: #10B981;
+  --canopy-dark: #059669;
+  --spotlight-gold: #F4A261;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --gradient-from: rgba(248, 250, 251, 0.95);
+  --gradient-mid: rgba(248, 250, 251, 0.5);
+}
+
+/* ─── Dark theme ─── */
+.dark {
   --cairn-bg: #0B1A2B;
   --cairn-card: #122338;
   --cairn-card-hover: #1A3350;
   --cairn-elevated: #1E3A5F;
   --cairn-border: #1E3A5F;
+  --cairn-glass: rgba(18, 35, 56, 0.85);
   --canopy: #10B981;
   --canopy-dark: #059669;
   --spotlight-gold: #F4A261;
   --text-primary: #F1F5F9;
   --text-secondary: #94A3B8;
   --text-tertiary: #64748B;
+  --gradient-from: rgba(11, 26, 43, 0.95);
+  --gradient-mid: rgba(11, 26, 43, 0.5);
 }
 
 * {
@@ -56,7 +78,7 @@ a {
 
 /* Glassmorphism utility */
 .glass {
-  background: rgba(18, 35, 56, 0.85);
+  background: var(--cairn-glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -96,8 +118,8 @@ a {
 .gradient-overlay {
   background: linear-gradient(
     to top,
-    rgba(11, 26, 43, 0.95) 0%,
-    rgba(11, 26, 43, 0.5) 50%,
+    var(--gradient-from) 0%,
+    var(--gradient-mid) 50%,
     transparent 100%
   );
 }
@@ -154,8 +176,35 @@ a {
   }
 }
 
-/* Form select styling for dark mode */
-select option {
+/* Form select styling */
+.dark select option {
   background-color: #122338;
   color: #F1F5F9;
+}
+
+select option {
+  background-color: #FFFFFF;
+  color: #0F172A;
+}
+
+/* Toggle switch utility */
+.toggle-switch {
+  @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors;
+}
+
+.toggle-switch::after {
+  content: '';
+  @apply absolute left-0.5 h-5 w-5 rounded-full bg-white transition-transform shadow-sm;
+}
+
+.toggle-switch[data-checked="true"] {
+  @apply bg-canopy;
+}
+
+.toggle-switch[data-checked="true"]::after {
+  transform: translateX(20px);
+}
+
+.toggle-switch[data-checked="false"] {
+  @apply bg-cairn-elevated;
 }
