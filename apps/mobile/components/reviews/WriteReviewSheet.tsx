@@ -11,7 +11,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import { X, Send } from 'lucide-react-native';
+import { X, Send, Camera, Image as ImageIcon } from 'lucide-react-native';
 import { StarRating } from './StarRating';
 import { Button } from '@/components/ui/Button';
 import { createReview } from '@/lib/api';
@@ -37,6 +37,7 @@ export function WriteReviewSheet({
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [photoPlaceholders, setPhotoPlaceholders] = useState<number[]>([]);
 
   const canSubmit = rating > 0 && title.trim().length > 0;
 
@@ -55,6 +56,7 @@ export function WriteReviewSheet({
       setRating(0);
       setTitle('');
       setBody('');
+      setPhotoPlaceholders([]);
       onSubmitted();
       onClose();
     } catch (err) {
@@ -78,6 +80,7 @@ export function WriteReviewSheet({
             setRating(0);
             setTitle('');
             setBody('');
+            setPhotoPlaceholders([]);
             onClose();
           },
         },
@@ -85,6 +88,19 @@ export function WriteReviewSheet({
     } else {
       onClose();
     }
+  };
+
+  const handleAddPhoto = () => {
+    // Placeholder — future integration with expo-image-picker
+    if (photoPlaceholders.length >= 6) {
+      Alert.alert('Maximum Photos', 'You can add up to 6 photos per review.');
+      return;
+    }
+    setPhotoPlaceholders((prev) => [...prev, prev.length + 1]);
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setPhotoPlaceholders((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -106,6 +122,11 @@ export function WriteReviewSheet({
 
         {/* Sheet */}
         <View className="bg-cairn-bg border-t border-cairn-border rounded-t-3xl px-4 pt-4 pb-10">
+          {/* Handle bar */}
+          <View className="items-center mb-2">
+            <View className="w-10 h-1 rounded-full bg-cairn-border" />
+          </View>
+
           {/* Header */}
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-slate-100 font-bold text-lg">
@@ -173,9 +194,51 @@ export function WriteReviewSheet({
             />
 
             {/* Character count */}
-            <Text className="text-slate-600 text-xs text-right mt-1 mb-6">
+            <Text className="text-slate-600 text-xs text-right mt-1">
               {body.length}/2000
             </Text>
+
+            {/* ── Add Photos Section ── */}
+            <Text className="text-slate-300 text-sm font-medium mb-2 mt-4">
+              Photos
+            </Text>
+            <View className="flex-row flex-wrap gap-2 mb-6">
+              {/* Photo placeholders */}
+              {photoPlaceholders.map((_, index) => (
+                <View
+                  key={index}
+                  className="w-20 h-20 rounded-xl bg-cairn-elevated items-center justify-center"
+                  style={{ borderWidth: 1, borderColor: 'rgba(30, 58, 95, 0.5)' }}
+                >
+                  <ImageIcon size={16} color="#475569" />
+                  <Pressable
+                    onPress={() => handleRemovePhoto(index)}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 items-center justify-center"
+                  >
+                    <X size={10} color="white" />
+                  </Pressable>
+                </View>
+              ))}
+
+              {/* Add photo button */}
+              {photoPlaceholders.length < 6 && (
+                <Pressable
+                  onPress={handleAddPhoto}
+                  className="w-20 h-20 rounded-xl items-center justify-center"
+                  style={{
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(16, 185, 129, 0.4)',
+                    borderStyle: 'dashed',
+                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                  }}
+                >
+                  <Camera size={20} color="#10B981" />
+                  <Text className="text-canopy text-[10px] font-medium mt-1">
+                    Add Photo
+                  </Text>
+                </Pressable>
+              )}
+            </View>
 
             {/* Submit */}
             <Button

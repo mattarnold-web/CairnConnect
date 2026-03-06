@@ -28,6 +28,9 @@ import {
   Route,
   Shield,
   Trophy,
+  Activity,
+  ShieldCheck,
+  Crown,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -39,6 +42,13 @@ import { usePreferences } from '@/lib/preferences-context';
 import { useFormat } from '@/lib/use-format';
 import { shareGpx } from '@/lib/gpx-export';
 import { fetchUserActivities } from '@/lib/api';
+import { isAdmin as checkIsAdmin } from '@/lib/admin';
+import {
+  fetchSubscription,
+  isTrialActive,
+  getTrialDaysRemaining,
+  type Subscription,
+} from '@/lib/subscription';
 import { formatDuration } from '@cairn/shared';
 import type { UserActivity } from '@cairn/shared';
 import type { RecordedActivity } from '@/lib/activity-types';
@@ -49,6 +59,8 @@ export default function ProfileScreen() {
   const { preferences, dispatch: prefsDispatch } = usePreferences();
   const fmt = useFormat();
   const [refreshing, setRefreshing] = useState(false);
+  const [userIsAdmin, setUserIsAdmin] = useState(false);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
 
   // Server-side activities from Supabase
   const [serverActivities, setServerActivities] = useState<UserActivity[]>([]);
@@ -70,6 +82,10 @@ export default function ProfileScreen() {
       .finally(() => {
         if (!cancelled) setLoadingServer(false);
       });
+
+    // Check admin status and subscription
+    checkIsAdmin().then((val) => { if (!cancelled) setUserIsAdmin(val); }).catch(() => {});
+    fetchSubscription().then((sub) => { if (!cancelled) setSubscription(sub); }).catch(() => {});
 
     return () => {
       cancelled = true;
@@ -408,14 +424,66 @@ export default function ProfileScreen() {
               </View>
             )}
 
-            {/* Strava connect */}
-            <Button variant="secondary" size="md" className="mb-6">
-              <View className="flex-row items-center">
-                <Text className="text-slate-300 text-sm font-medium">
-                  Connect Strava
+            {/* Subscription banner */}
+            {subscription && isTrialActive(subscription) && (
+              <Card className="mb-4 border-canopy/30">
+                <View className="flex-row items-center">
+                  <Crown size={16} color="#10B981" />
+                  <Text className="text-canopy font-semibold text-sm ml-2 flex-1">
+                    Free Trial
+                  </Text>
+                  <View className="bg-canopy/20 px-2.5 py-1 rounded-full">
+                    <Text className="text-canopy text-xs font-medium">
+                      {getTrialDaysRemaining(subscription)} days left
+                    </Text>
+                  </View>
+                </View>
+                <Text className="text-slate-400 text-xs mt-1">
+                  Full access to all features
                 </Text>
-              </View>
-            </Button>
+              </Card>
+            )}
+
+            {/* Admin + Connected Apps navigation */}
+            <View className="gap-2 mb-4">
+              {userIsAdmin && (
+                <Pressable
+                  onPress={() => router.push('/(tabs)/profile/admin')}
+                  className="flex-row items-center bg-cairn-card border border-red-500/30 rounded-xl px-4 py-3 active:bg-cairn-card-hover"
+                >
+                  <View className="w-8 h-8 rounded-lg bg-red-500/20 items-center justify-center mr-3">
+                    <ShieldCheck size={16} color="#ef4444" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-slate-100 font-medium text-sm">
+                      Admin Dashboard
+                    </Text>
+                    <Text className="text-slate-500 text-xs">
+                      Users, stats, moderation
+                    </Text>
+                  </View>
+                  <ChevronRight size={16} color="#64748b" />
+                </Pressable>
+              )}
+
+              <Pressable
+                onPress={() => router.push('/(tabs)/profile/connected-apps')}
+                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
+              >
+                <View className="w-8 h-8 rounded-lg bg-canopy/20 items-center justify-center mr-3">
+                  <Activity size={16} color="#10B981" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-slate-100 font-medium text-sm">
+                    Connected Apps
+                  </Text>
+                  <Text className="text-slate-500 text-xs">
+                    Strava, Garmin, Apple Health, more
+                  </Text>
+                </View>
+                <ChevronRight size={16} color="#64748b" />
+              </Pressable>
+            </View>
 
             {/* Auth button */}
             {!user && (

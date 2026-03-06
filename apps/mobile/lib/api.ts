@@ -791,28 +791,341 @@ export async function createReview(
 }
 
 // ---------------------------------------------------------------------------
-// Search
+// Search — Types
 // ---------------------------------------------------------------------------
 
+/** Result row from the `search_locations` RPC. */
+export interface SearchLocationResult {
+  entity_type: 'trail' | 'business';
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  city: string | null;
+  state_province: string | null;
+  lat: number | null;
+  lng: number | null;
+  distance_km: number | null;
+  rating: number | null;
+  review_count: number;
+  cover_photo_url: string | null;
+  activity_types: string[];
+  difficulty: string | null;
+  category: string | null;
+  rank: number;
+}
+
+/** Result row from the `autocomplete_locations` RPC. */
+export interface AutocompleteResult {
+  entity_type: 'trail' | 'business';
+  id: string;
+  name: string;
+  slug: string;
+  city: string | null;
+  state_province: string | null;
+  similarity_score: number;
+}
+
+/** Result row from the `search_regions` RPC. */
+export interface RegionResult {
+  city: string;
+  state_province: string | null;
+  country: string | null;
+  lat: number;
+  lng: number;
+  trail_count: number;
+  business_count: number;
+}
+
+/** Result row from the `search_trails_for_trip` RPC. */
+export interface TripTrailResult {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  city: string | null;
+  state_province: string | null;
+  lat: number | null;
+  lng: number | null;
+  distance_km: number | null;
+  rating: number | null;
+  review_count: number;
+  cover_photo_url: string | null;
+  activity_types: string[];
+  difficulty: string | null;
+  difficulty_label: string | null;
+  distance_meters: number | null;
+  elevation_gain_meters: number | null;
+  trail_type: string | null;
+  rank: number;
+}
+
+export interface SearchAllOptions {
+  query: string;
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
+  activityTypes?: string[];
+  limit?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Search — Functions
+// ---------------------------------------------------------------------------
+
+/**
+ * Unified search across trails and businesses using the `search_locations`
+ * RPC. Falls back to the legacy client-side search when the RPC is not
+ * available (e.g., before migration 020 is applied).
+ */
 export async function searchAll(
-  query: string,
+  queryOrOptions: string | SearchAllOptions,
   _lat?: number,
   _lng?: number,
-): Promise<{ trails: Trail[]; businesses: Business[] }> {
-  try {
-    const [trails, businesses] = await Promise.all([
-      fetchTrails({ search: query, limit: 10 }),
-      fetchBusinesses({ search: query, limit: 10 }),
-    ]);
+): Promise<{ trails: Trail[]; businesses: Business[]; results: SearchLocationResult[] }> {
+  // Normalise arguments: support both the old (query, lat, lng) signature
+  // and the new options-object signature.
+  const opts: SearchAllOptions =
+    typeof queryOrOptions === 'string'
+      ? { query: queryOrOptions, lat: _lat, lng: _lng }
+      : queryOrOptions;
 
-    return { trails, businesses };
+  try {
+    const { data, error } = await sb.rpc('search_locations', {
+      p_query: opts.query || null,
+      p_lat: opts.lat ?? null,
+      p_lng: opts.lng ?? null,
+      p_radius_km: opts.radiusKm ?? 50,
+      p_activity_types: opts.activityTypes ?? null,
+      p_limit: opts.limit ?? 20,
+    });
+
+    if (error) throw error;
+
+    const results = (data ?? []) as SearchLocationResult[];
+
+    // Split into trails / businesses for backward compatibility
+    const trails = results
+      .filter((r) => r.entity_type === 'trail')
+      .map((r) => ({ ...r } as unknown as Trail));
+    const businesses = results
+      .filter((r) => r.entity_type === 'business')
+      .map((r) => ({ ...r } as unknown as Business));
+
+    return { trails, businesses, results };
   } catch (e) {
+    // Fallback: use the old client-side search if the RPC doesn't exist yet
     if (USE_MOCK_FALLBACK) {
       return {
-        trails: filterMockTrails({ search: query, limit: 10 }),
-        businesses: filterMockBusinesses({ search: query, limit: 10 }),
+        trails: filterMockTrails({ search: opts.query, limit: 10 }),
+        businesses: filterMockBusinesses({ search: opts.query, limit: 10 }),
+        results: [],
       };
     }
-    throw e;
+
+    // If the RPC doesn't exist, fall back to parallel table queries
+    try {
+      const [trails, businesses] = await Promise.all([
+        fetchTrails({ search: opts.query, limit: 10 }),
+        fetchBusinesses({ search: opts.query, limit: 10 }),
+      ]);
+      return { trails, businesses, results: [] };
+    } catch {
+      throw e;
+    }
   }
+}
+
+/**
+ * Fast autocomplete for search-as-you-type. Uses the `autocomplete_locations`
+ * RPC which leverages pg_trgm similarity on name columns.
+ */
+export async function autocompleteLocations(
+  query: string,
+  lat?: number,
+  lng?: number,
+  limit = 8,
+): Promise<AutocompleteResult[]> {
+  if (!query || query.trim().length === 0) return [];
+
+  try {
+    const { data, error } = await sb.rpc('autocomplete_locations', {
+      p_query: query,
+      p_lat: lat ?? null,
+      p_lng: lng ?? null,
+      p_limit: limit,
+    });
+
+    if (error) throw error;
+    return (data ?? []) as AutocompleteResult[];
+  } catch {
+    // Graceful degradation: return empty results
+    return [];
+  }
+}
+
+/**
+ * Search for regions by city name. Returns aggregated trail and business
+ * counts per city/state grouping. Useful for the trip destination picker.
+ */
+export async function searchRegions(
+  query?: string,
+  limit = 10,
+): Promise<RegionResult[]> {
+  try {
+    const { data, error } = await sb.rpc('search_regions', {
+      p_query: query ?? null,
+      p_limit: limit,
+    });
+
+    if (error) throw error;
+    return (data ?? []) as RegionResult[];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Full trail search for the trip planning wizard. Combines text search,
+ * spatial filtering, activity type filtering, and difficulty filtering
+ * with server-side pagination.
+ */
+export async function searchTrailsForTrip(options: {
+  query?: string;
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
+  activityTypes?: string[];
+  difficulty?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<TripTrailResult[]> {
+  try {
+    const { data, error } = await sb.rpc('search_trails_for_trip', {
+      p_query: options.query ?? null,
+      p_lat: options.lat ?? null,
+      p_lng: options.lng ?? null,
+      p_radius_km: options.radiusKm ?? 50,
+      p_activity_types: options.activityTypes ?? null,
+      p_difficulty: options.difficulty ?? null,
+      p_limit: options.limit ?? 20,
+      p_offset: options.offset ?? 0,
+    });
+
+    if (error) throw error;
+    return (data ?? []) as TripTrailResult[];
+  } catch {
+    // Fallback to basic trail fetch
+    const trails = await fetchTrails({
+      search: options.query,
+      activityTypes: options.activityTypes,
+      difficulty: options.difficulty,
+      limit: options.limit,
+      offset: options.offset,
+    });
+    return trails.map((t) => ({
+      id: t.id,
+      name: t.name,
+      slug: t.slug,
+      description: t.description ?? null,
+      city: t.city ?? null,
+      state_province: t.state_province ?? null,
+      lat: null,
+      lng: null,
+      distance_km: null,
+      rating: t.rating ?? null,
+      review_count: t.review_count ?? 0,
+      cover_photo_url: t.cover_photo_url ?? null,
+      activity_types: t.activity_types ?? [],
+      difficulty: t.difficulty ?? null,
+      difficulty_label: t.difficulty_label ?? null,
+      distance_meters: t.distance_meters ?? null,
+      elevation_gain_meters: t.elevation_gain_meters ?? null,
+      trail_type: t.trail_type ?? null,
+      rank: 0,
+    }));
+  }
+}
+
+// ── Chat / Messaging ─────────────────────────────────────────────────
+
+export interface ActivityPostMessage {
+  id: string;
+  post_id: string;
+  user_id: string;
+  body: string;
+  message: string;
+  created_at: string;
+  user_email?: string;
+  user_display_name?: string;
+  user_avatar?: string | null;
+}
+
+export async function fetchPostMessages(
+  postId: string,
+): Promise<ActivityPostMessage[]> {
+  try {
+    const { data, error } = await (sb as any)
+      .from('activity_post_messages')
+      .select('*')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return (data ?? []) as ActivityPostMessage[];
+  } catch {
+    return [];
+  }
+}
+
+export async function sendPostMessage(
+  postId: string,
+  body: string,
+): Promise<ActivityPostMessage | null> {
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) return null;
+
+  try {
+    const { data, error } = await (sb as any)
+      .from('activity_post_messages')
+      .insert({ post_id: postId, user_id: user.id, body })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as ActivityPostMessage;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchPostMessageCount(
+  postId: string,
+): Promise<number> {
+  try {
+    const { count, error } = await (sb as any)
+      .from('activity_post_messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('post_id', postId);
+
+    if (error) return 0;
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+// ── Trail search alias for trip components ───────────────────────────
+
+export async function searchTrailsNear(options: {
+  query?: string;
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
+  activityTypes?: string[];
+  limit?: number;
+}): Promise<TripTrailResult[]> {
+  return searchTrailsForTrip(options);
 }

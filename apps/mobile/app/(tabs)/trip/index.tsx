@@ -34,6 +34,8 @@ import { Badge } from '@/components/ui/Badge';
 import { FilterChip } from '@/components/ui/FilterChip';
 import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
+import { TrailSearchSheet } from '@/components/trip/TrailSearchSheet';
+import { ShareTripSheet } from '@/components/trip/ShareTripSheet';
 import { useTripContext } from '@/lib/trip-context';
 import { MOCK_REGIONS, MOCK_TRAILS } from '@/lib/mock-data';
 import { ACTIVITY_TYPES } from '@cairn/shared';
@@ -95,6 +97,8 @@ export default function TripScreen() {
   const [addingToDayId, setAddingToDayId] = useState<string | null>(null);
   const [customActivityTitle, setCustomActivityTitle] = useState('');
   const [expandedDayId, setExpandedDayId] = useState<string | null>(state.days[0]?.id ?? null);
+  const [trailSearchDayId, setTrailSearchDayId] = useState<string | null>(null);
+  const [shareSheetVisible, setShareSheetVisible] = useState(false);
 
   const handleNext = () => {
     if (currentStepIndex < STEPS.length - 1) {
@@ -588,15 +592,15 @@ export default function TripScreen() {
                       {/* Add activity section */}
                       {addingToDayId === day.id ? (
                         <View className="mt-2 border-t border-cairn-border pt-3">
-                          {/* Trail suggestions */}
+                          {/* Trail suggestions (quick picks) */}
                           {trailSuggestions.length > 0 && (
                             <View className="mb-3">
                               <Text className="text-slate-400 text-xs font-medium mb-2">
-                                Trail Suggestions
+                                Quick Picks
                               </Text>
                               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 <View className="flex-row gap-2">
-                                  {trailSuggestions.map((trail) => (
+                                  {trailSuggestions.slice(0, 5).map((trail) => (
                                     <Pressable
                                       key={trail.id}
                                       onPress={() => addTrailToDay(day.id, trail)}
@@ -626,6 +630,17 @@ export default function TripScreen() {
                               </ScrollView>
                             </View>
                           )}
+
+                          {/* Search all trails button */}
+                          <Pressable
+                            onPress={() => setTrailSearchDayId(day.id)}
+                            className="flex-row items-center justify-center py-2.5 bg-canopy/10 border border-canopy/30 rounded-xl mb-3"
+                          >
+                            <Mountain size={14} color="#10B981" />
+                            <Text className="text-canopy text-xs font-semibold ml-1.5">
+                              Search All Trails
+                            </Text>
+                          </Pressable>
 
                           {/* Custom activity */}
                           <Text className="text-slate-400 text-xs font-medium mb-1">
@@ -659,15 +674,26 @@ export default function TripScreen() {
                           </Pressable>
                         </View>
                       ) : (
-                        <Pressable
-                          onPress={() => setAddingToDayId(day.id)}
-                          className="flex-row items-center justify-center mt-2 py-2 bg-canopy/5 border border-dashed border-canopy/30 rounded-xl"
-                        >
-                          <Plus size={14} color="#10B981" />
-                          <Text className="text-canopy text-xs font-medium ml-1">
-                            Add Activity
-                          </Text>
-                        </Pressable>
+                        <View className="flex-row gap-2 mt-2">
+                          <Pressable
+                            onPress={() => setTrailSearchDayId(day.id)}
+                            className="flex-1 flex-row items-center justify-center py-2 bg-canopy/5 border border-dashed border-canopy/30 rounded-xl"
+                          >
+                            <Mountain size={14} color="#10B981" />
+                            <Text className="text-canopy text-xs font-medium ml-1">
+                              Add Trail
+                            </Text>
+                          </Pressable>
+                          <Pressable
+                            onPress={() => setAddingToDayId(day.id)}
+                            className="flex-1 flex-row items-center justify-center py-2 bg-cairn-elevated/50 border border-dashed border-cairn-border rounded-xl"
+                          >
+                            <Plus size={14} color="#64748b" />
+                            <Text className="text-slate-400 text-xs font-medium ml-1">
+                              Custom
+                            </Text>
+                          </Pressable>
+                        </View>
                       )}
                     </View>
                   )}
@@ -1086,11 +1112,11 @@ export default function TripScreen() {
               </View>
             )}
 
-            {/* Share + Reset */}
-            <Button onPress={handleShare} variant="secondary" size="lg" className="mb-3">
+            {/* Share Trip */}
+            <Button onPress={() => setShareSheetVisible(true)} size="lg" className="mb-3">
               <View className="flex-row items-center">
-                <Share2 size={18} color="#e2e8f0" />
-                <Text className="text-slate-300 font-semibold text-base ml-2">
+                <Share2 size={18} color="white" />
+                <Text className="text-white font-semibold text-base ml-2">
                   Share Trip
                 </Text>
               </View>
@@ -1140,6 +1166,28 @@ export default function TripScreen() {
           </Button>
         )}
       </View>
+
+      {/* Trail Search Sheet */}
+      <TrailSearchSheet
+        visible={trailSearchDayId !== null}
+        onClose={() => setTrailSearchDayId(null)}
+        onSelectTrail={(item) => {
+          if (trailSearchDayId) {
+            dispatch({ type: 'ADD_ITEM_TO_DAY', dayId: trailSearchDayId, item });
+          }
+          setTrailSearchDayId(null);
+          setAddingToDayId(null);
+        }}
+        regionName={state.region?.name ?? null}
+        selectedActivities={state.selectedActivities}
+      />
+
+      {/* Share Trip Sheet */}
+      <ShareTripSheet
+        visible={shareSheetVisible}
+        onClose={() => setShareSheetVisible(false)}
+        tripState={state}
+      />
     </SafeAreaView>
   );
 }

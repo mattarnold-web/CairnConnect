@@ -20,7 +20,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton';
-import { fetchActivityPostById } from '@/lib/api';
+import { ChatSheet } from '@/components/chat/ChatSheet';
+import { fetchActivityPostById, fetchPostMessageCount } from '@/lib/api';
 import { formatDate, timeUntil } from '@cairn/shared';
 import type { ActivityPost } from '@cairn/shared';
 
@@ -41,6 +42,8 @@ export default function PostDetailScreen() {
 
   const [post, setPost] = useState<ActivityPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const [chatVisible, setChatVisible] = useState(false);
+  const [messageCount, setMessageCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,8 +51,14 @@ export default function PostDetailScreen() {
     async function load() {
       setLoading(true);
       try {
-        const data = await fetchActivityPostById(id);
-        if (!cancelled) setPost(data);
+        const [data, count] = await Promise.all([
+          fetchActivityPostById(id),
+          fetchPostMessageCount(id),
+        ]);
+        if (!cancelled) {
+          setPost(data);
+          setMessageCount(count);
+        }
       } catch {
         // Error handled by api fallback
       } finally {
@@ -166,11 +175,13 @@ export default function PostDetailScreen() {
               <Text className="text-slate-500 text-xs">Organizer</Text>
             </View>
             <Pressable
-              onPress={handleMessage}
+              onPress={() => setChatVisible(true)}
               className="flex-row items-center bg-cairn-elevated rounded-lg px-3 py-1.5"
             >
-              <ContactIcon size={14} color="#10B981" />
-              <Text className="text-canopy text-xs font-medium ml-1.5">Message</Text>
+              <MessageCircle size={14} color="#10B981" />
+              <Text className="text-canopy text-xs font-medium ml-1.5">
+                Chat{messageCount > 0 ? ` (${messageCount})` : ''}
+              </Text>
             </Pressable>
           </View>
         </Card>
@@ -348,12 +359,14 @@ export default function PostDetailScreen() {
           <Button
             variant="secondary"
             size="lg"
-            onPress={handleMessage}
+            onPress={() => setChatVisible(true)}
             className="flex-1"
           >
             <View className="flex-row items-center">
-              <MessageCircle size={18} color="#e2e8f0" />
-              <Text className="text-slate-300 font-semibold text-base ml-2">Message</Text>
+              <MessageCircle size={18} color="#10B981" />
+              <Text className="text-canopy font-semibold text-base ml-2">
+                Chat{messageCount > 0 ? ` (${messageCount})` : ''}
+              </Text>
             </View>
           </Button>
           <Button
@@ -366,6 +379,14 @@ export default function PostDetailScreen() {
           </Button>
         </View>
       </View>
+
+      {/* Chat sheet */}
+      <ChatSheet
+        visible={chatVisible}
+        onClose={() => setChatVisible(false)}
+        postId={id}
+        postTitle={post.title}
+      />
     </SafeAreaView>
   );
 }

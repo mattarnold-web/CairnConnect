@@ -32,6 +32,12 @@ const STEPS: OnboardingStep[] = [
     subtitle: 'Your outdoor adventure companion.\nDiscover trails, find partners, and track your progress.',
   },
   {
+    id: 'trial',
+    emoji: '\u{1F389}',
+    title: 'Your Free Trial Starts Now',
+    subtitle: '30 days of full access to every feature.\nNo credit card required.',
+  },
+  {
     id: 'activities',
     emoji: '\u{1F3D4}\uFE0F',
     title: 'What do you love?',
@@ -89,6 +95,35 @@ export default function OnboardingScreen() {
           <Text className="text-slate-400 text-base text-center leading-6">
             {item.subtitle}
           </Text>
+        </View>
+      )}
+
+      {item.id === 'trial' && (
+        <View className="flex-1 items-center justify-center px-4">
+          <Text style={{ fontSize: 80, marginBottom: 24 }}>{item.emoji}</Text>
+          <Text className="text-slate-100 font-bold text-3xl text-center mb-3">
+            {item.title}
+          </Text>
+          <Text className="text-slate-400 text-base text-center leading-6 mb-8">
+            {item.subtitle}
+          </Text>
+          <View className="w-full gap-3">
+            {[
+              'Unlimited trip planning & sharing',
+              'Trail reviews & photo uploads',
+              'Activity board & group messaging',
+              'GPS recording & fitness sync',
+              'Challenges, badges & leaderboards',
+              'Safety center & emergency SOS',
+            ].map((feature) => (
+              <View key={feature} className="flex-row items-center">
+                <View className="w-5 h-5 rounded-full bg-canopy/20 items-center justify-center mr-3">
+                  <Text className="text-canopy text-xs">{'\u2713'}</Text>
+                </View>
+                <Text className="text-slate-300 text-sm">{feature}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       )}
 

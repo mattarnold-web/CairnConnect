@@ -21,6 +21,13 @@ import {
   Heart,
   Share2,
   Info,
+  Building2,
+  Mountain,
+  Route,
+  Clock,
+  ChevronRight,
+  BookOpen,
+  Locate,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -164,13 +171,10 @@ export default function SafetyCenterScreen() {
       >
         {/* ── SOS Button ── */}
         <View className="items-center mb-6">
-          <Text className="text-slate-400 text-xs mb-3">
-            Hold to call emergency services
-          </Text>
           <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
             <Pressable
               onPress={handleSOSPress}
-              className={`w-32 h-32 rounded-full items-center justify-center ${
+              className={`w-36 h-36 rounded-full items-center justify-center ${
                 sosActive ? 'bg-red-700' : 'bg-red-600'
               }`}
               style={{
@@ -183,7 +187,7 @@ export default function SafetyCenterScreen() {
             >
               {sosActive ? (
                 <View className="items-center">
-                  <Text className="text-white font-bold text-3xl">
+                  <Text className="text-white font-bold text-4xl">
                     {sosCountdown}
                   </Text>
                   <Text className="text-red-200 text-xs mt-1">
@@ -193,49 +197,60 @@ export default function SafetyCenterScreen() {
               ) : (
                 <View className="items-center">
                   <Phone size={28} color="white" />
-                  <Text className="text-white font-bold text-lg mt-1">SOS</Text>
+                  <Text className="text-white font-bold text-lg mt-1">
+                    Emergency SOS
+                  </Text>
                 </View>
               )}
             </Pressable>
           </Animated.View>
+          <Text className="text-slate-500 text-xs mt-3">
+            Hold for 3 seconds to activate
+          </Text>
         </View>
 
         {/* ── I'm Safe button ── */}
         <Pressable
           onPress={handleImSafe}
-          className="bg-emerald-600/20 border border-emerald-500/40 rounded-2xl p-4 mb-4 flex-row items-center"
+          className="bg-emerald-600/20 border-2 border-emerald-500/40 rounded-2xl p-4 mb-5 flex-row items-center"
         >
-          <View className="w-10 h-10 rounded-full bg-emerald-500/20 items-center justify-center mr-3">
-            <Heart size={20} color="#10B981" />
+          <View className="w-12 h-12 rounded-full bg-emerald-500/20 items-center justify-center mr-3">
+            <Heart size={22} color="#10B981" fill="#10B981" />
           </View>
           <View className="flex-1">
-            <Text className="text-emerald-400 font-semibold text-base">
+            <Text className="text-emerald-400 font-bold text-base">
               I'm Safe
             </Text>
             <Text className="text-slate-500 text-xs mt-0.5">
               Notify your emergency contacts
             </Text>
           </View>
+          <ChevronRight size={16} color="#10B981" />
         </Pressable>
 
         {/* ── Emergency Contacts ── */}
-        <Text className="text-slate-100 font-semibold text-lg mb-3">
+        <Text className="text-slate-100 font-bold text-lg mb-3">
           Emergency Contacts
         </Text>
-        <View className="mb-4">
+        <View className="mb-5">
           <EmergencyContact />
         </View>
 
         {/* ── Current Location ── */}
-        <Text className="text-slate-100 font-semibold text-lg mb-3">
+        <Text className="text-slate-100 font-bold text-lg mb-3">
           Current Location
         </Text>
-        <Card className="mb-4">
+        <Card className="mb-5">
           {currentCoords ? (
             <View>
-              <View className="flex-row items-center mb-2">
+              {/* Mini map placeholder */}
+              <View className="h-24 bg-cairn-elevated rounded-xl mb-3 items-center justify-center overflow-hidden">
+                <Locate size={24} color="#10B981" />
+                <Text className="text-slate-500 text-xs mt-1">Map View</Text>
+              </View>
+              <View className="flex-row items-center mb-3">
                 <MapPin size={14} color="#10B981" />
-                <Text className="text-slate-300 text-sm ml-2">
+                <Text className="text-slate-300 text-sm ml-2 font-mono">
                   {currentCoords.lat.toFixed(5)}, {currentCoords.lng.toFixed(5)}
                 </Text>
               </View>
@@ -248,18 +263,18 @@ export default function SafetyCenterScreen() {
                     );
                     Linking.openURL(url);
                   }}
-                  className="flex-row items-center bg-cairn-elevated rounded-lg px-3 py-2"
+                  className="flex-1 flex-row items-center justify-center bg-cairn-elevated rounded-xl px-3 py-2.5"
                 >
-                  <Navigation size={12} color="#10B981" />
+                  <Navigation size={13} color="#10B981" />
                   <Text className="text-canopy text-xs font-medium ml-1.5">
                     Open in Maps
                   </Text>
                 </Pressable>
                 <Pressable
                   onPress={handleShareLocation}
-                  className="flex-row items-center bg-cairn-elevated rounded-lg px-3 py-2"
+                  className="flex-1 flex-row items-center justify-center bg-cairn-elevated rounded-xl px-3 py-2.5"
                 >
-                  <Share2 size={12} color="#94a3b8" />
+                  <Share2 size={13} color="#94a3b8" />
                   <Text className="text-slate-400 text-xs font-medium ml-1.5">
                     Share Location
                   </Text>
@@ -279,15 +294,108 @@ export default function SafetyCenterScreen() {
         </Card>
 
         {/* ── Share Live Location ── */}
-        <Text className="text-slate-100 font-semibold text-lg mb-3">
+        <Text className="text-slate-100 font-bold text-lg mb-3">
           Live Location Sharing
         </Text>
-        <View className="mb-4">
+        <View className="mb-5">
           <LocationShareButton />
         </View>
 
-        {/* ── Emergency Info ── */}
-        <Text className="text-slate-100 font-semibold text-lg mb-3">
+        {/* ── Offline Emergency Info ── */}
+        <Text className="text-slate-100 font-bold text-lg mb-3">
+          Offline Emergency Info
+        </Text>
+        <Card className="mb-5">
+          <Text className="text-slate-400 text-xs mb-3">
+            Nearest resources based on your location
+          </Text>
+          <View className="gap-3">
+            {/* Ranger Station */}
+            <View className="flex-row items-center">
+              <View className="w-9 h-9 rounded-full bg-amber-500/15 items-center justify-center mr-3">
+                <Mountain size={16} color="#F59E0B" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-slate-200 text-sm font-medium">
+                  Ranger Station
+                </Text>
+                <Text className="text-slate-500 text-xs">Bear Creek Station</Text>
+              </View>
+              <Text className="text-amber-400 text-sm font-bold">3.2 mi</Text>
+            </View>
+
+            {/* Separator */}
+            <View className="h-px bg-cairn-border/50" />
+
+            {/* Hospital */}
+            <View className="flex-row items-center">
+              <View className="w-9 h-9 rounded-full bg-red-500/15 items-center justify-center mr-3">
+                <Building2 size={16} color="#ef4444" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-slate-200 text-sm font-medium">
+                  Hospital
+                </Text>
+                <Text className="text-slate-500 text-xs">Mountain Valley Medical</Text>
+              </View>
+              <Text className="text-red-400 text-sm font-bold">12.5 mi</Text>
+            </View>
+
+            {/* Separator */}
+            <View className="h-px bg-cairn-border/50" />
+
+            {/* Evacuation Point */}
+            <View className="flex-row items-center">
+              <View className="w-9 h-9 rounded-full bg-blue-500/15 items-center justify-center mr-3">
+                <Route size={16} color="#3b82f6" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-slate-200 text-sm font-medium">
+                  Evacuation Point
+                </Text>
+                <Text className="text-slate-500 text-xs">Trailhead Parking Area</Text>
+              </View>
+              <Text className="text-blue-400 text-sm font-bold">1.8 mi</Text>
+            </View>
+          </View>
+        </Card>
+
+        {/* ── Trip Plan Summary ── */}
+        <Text className="text-slate-100 font-bold text-lg mb-3">
+          Trip Plan Summary
+        </Text>
+        <Card className="mb-5">
+          <View className="flex-row items-center mb-3">
+            <View className="w-9 h-9 rounded-full bg-canopy/15 items-center justify-center mr-3">
+              <Clock size={16} color="#10B981" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-slate-200 text-sm font-medium">
+                Expected Return
+              </Text>
+              <Text className="text-canopy text-sm font-bold">
+                Today, 5:30 PM
+              </Text>
+            </View>
+          </View>
+          <View className="h-px bg-cairn-border/50 mb-3" />
+          <View className="flex-row items-center">
+            <View className="w-9 h-9 rounded-full bg-amber-500/15 items-center justify-center mr-3">
+              <AlertTriangle size={16} color="#F59E0B" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-slate-200 text-sm font-medium">
+                Auto-Alert
+              </Text>
+              <Text className="text-slate-500 text-xs mt-0.5">
+                Contacts notified if not checked in by 6:00 PM
+              </Text>
+            </View>
+          </View>
+        </Card>
+
+        {/* ── Emergency Resources ── */}
+        <Text className="text-slate-100 font-bold text-lg mb-3">
           Emergency Resources
         </Text>
         <Card className="mb-3">
@@ -304,6 +412,7 @@ export default function SafetyCenterScreen() {
               </Text>
               <Text className="text-slate-500 text-xs">911</Text>
             </View>
+            <Phone size={16} color="#ef4444" />
           </Pressable>
         </Card>
         <Card className="mb-3">
@@ -320,9 +429,10 @@ export default function SafetyCenterScreen() {
               </Text>
               <Text className="text-slate-500 text-xs">1-800-755-4000</Text>
             </View>
+            <Phone size={16} color="#f59e0b" />
           </Pressable>
         </Card>
-        <Card className="mb-4">
+        <Card className="mb-5">
           <View className="flex-row items-center">
             <View className="w-9 h-9 rounded-full bg-blue-500/20 items-center justify-center mr-3">
               <Info size={16} color="#3b82f6" />
@@ -338,6 +448,25 @@ export default function SafetyCenterScreen() {
             </View>
           </View>
         </Card>
+
+        {/* ── Quick Links ── */}
+        <Text className="text-slate-100 font-bold text-lg mb-3">
+          Quick Links
+        </Text>
+        <Pressable className="flex-row items-center bg-cairn-card border border-cairn-border rounded-2xl p-4 mb-3">
+          <View className="w-9 h-9 rounded-full bg-canopy/15 items-center justify-center mr-3">
+            <BookOpen size={16} color="#10B981" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-slate-200 font-medium text-sm">
+              First Aid Guide
+            </Text>
+            <Text className="text-slate-500 text-xs mt-0.5">
+              Basic wilderness first aid reference
+            </Text>
+          </View>
+          <ChevronRight size={16} color="#64748b" />
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
