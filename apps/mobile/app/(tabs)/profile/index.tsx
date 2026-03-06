@@ -24,6 +24,8 @@ import {
   MapPin,
   Image as ImageIcon,
   Award,
+  Activity,
+  Shield,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -329,14 +331,80 @@ export default function ProfileScreen() {
               </View>
             )}
 
-            {/* Strava connect */}
-            <Button variant="secondary" size="md" className="mb-6">
-              <View className="flex-row items-center">
-                <Text className="text-slate-300 text-sm font-medium">
-                  Connect Strava
-                </Text>
-              </View>
-            </Button>
+            {/* Connected Apps */}
+            <Pressable
+              onPress={() => router.push('/(tabs)/profile/connected-apps')}
+              className="mb-4"
+            >
+              <Card>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <View className="h-9 w-9 rounded-xl bg-canopy/20 items-center justify-center mr-3">
+                      <Activity size={18} color="#10B981" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-slate-100 font-medium text-sm">
+                        Connected Apps
+                      </Text>
+                      <Text className="text-slate-500 text-xs">
+                        Strava, Garmin, Apple Health, and more
+                      </Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={16} color="#64748b" />
+                </View>
+              </Card>
+            </Pressable>
+
+            {/* Challenges */}
+            <Pressable
+              onPress={() => router.push('/(tabs)/profile/challenges')}
+              className="mb-4"
+            >
+              <Card>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <View className="h-9 w-9 rounded-xl bg-amber-500/20 items-center justify-center mr-3">
+                      <Award size={18} color="#fbbf24" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-slate-100 font-medium text-sm">
+                        Challenges & Badges
+                      </Text>
+                      <Text className="text-slate-500 text-xs">
+                        Monthly challenges, leaderboards, achievements
+                      </Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={16} color="#64748b" />
+                </View>
+              </Card>
+            </Pressable>
+
+            {/* Safety Center */}
+            <Pressable
+              onPress={() => router.push('/(tabs)/profile/safety')}
+              className="mb-4"
+            >
+              <Card>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <View className="h-9 w-9 rounded-xl bg-red-500/20 items-center justify-center mr-3">
+                      <Shield size={18} color="#ef4444" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-slate-100 font-medium text-sm">
+                        Safety Center
+                      </Text>
+                      <Text className="text-slate-500 text-xs">
+                        SOS, emergency contacts, share location
+                      </Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={16} color="#64748b" />
+                </View>
+              </Card>
+            </Pressable>
 
             {/* Auth button */}
             {!user && (

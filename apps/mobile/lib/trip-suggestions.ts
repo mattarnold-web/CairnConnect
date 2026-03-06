@@ -1,4 +1,3 @@
-import { MOCK_BUSINESSES, MOCK_TRAILS, MOCK_ACTIVITY_POSTS } from './mock-data';
 import { TripState } from './trip-types';
 
 export type SuggestionCategory =
@@ -134,7 +133,12 @@ const SUGGESTION_CATEGORY_ORDER: SuggestionCategory[] = [
 
 export { SUGGESTION_CATEGORY_LABELS, SUGGESTION_CATEGORY_ORDER };
 
-export function generateSuggestions(state: TripState): TripSuggestion[] {
+export function generateSuggestions(
+  state: TripState,
+  trailData?: any[],
+  businessData?: any[],
+  postData?: any[],
+): TripSuggestion[] {
   const suggestions: TripSuggestion[] = [];
   const usedBusinessIds = new Set<string>();
   const usedPostIds = new Set<string>();
@@ -150,9 +154,9 @@ export function generateSuggestions(state: TripState): TripSuggestion[] {
     for (const item of day.items) {
       if (item.type === 'trail' && item.trailId) {
         allTrailIds.add(item.trailId);
-        const trail = MOCK_TRAILS.find((t) => t.id === item.trailId);
+        const trail = (trailData ?? []).find((t: any) => t.id === item.trailId);
         if (trail) {
-          trail.activity_types.forEach((at: string) => allActivityTypes.add(at));
+          (trail.activity_types || []).forEach((at: string) => allActivityTypes.add(at));
           if (trail.trail_type === 'point_to_point') {
             hasPointToPoint = true;
           }
@@ -186,7 +190,7 @@ export function generateSuggestions(state: TripState): TripSuggestion[] {
     });
 
     // Find matching open_permit posts
-    for (const post of MOCK_ACTIVITY_POSTS) {
+    for (const post of (postData ?? []) as any[]) {
       if (post.post_type === 'open_permit' && !usedPostIds.has(post.id)) {
         usedPostIds.add(post.id);
         suggestions.push({
@@ -206,7 +210,7 @@ export function generateSuggestions(state: TripState): TripSuggestion[] {
 
   // 2. Shuttle services for point-to-point trails
   if (hasPointToPoint) {
-    for (const biz of MOCK_BUSINESSES) {
+    for (const biz of (businessData ?? []) as any[]) {
       if (biz.category === 'bike_shuttle' && !usedBusinessIds.has(biz.id)) {
         usedBusinessIds.add(biz.id);
         suggestions.push({
@@ -229,7 +233,7 @@ export function generateSuggestions(state: TripState): TripSuggestion[] {
   // 3. Match businesses by activity type
   for (const actType of allActivityTypes) {
     const targetCategories = ACTIVITY_TO_BUSINESS_CATEGORIES[actType] || [];
-    for (const biz of MOCK_BUSINESSES) {
+    for (const biz of (businessData ?? []) as any[]) {
       if (usedBusinessIds.has(biz.id)) continue;
       if (targetCategories.includes(biz.category)) {
         usedBusinessIds.add(biz.id);
@@ -251,7 +255,7 @@ export function generateSuggestions(state: TripState): TripSuggestion[] {
   }
 
   // 4. Always suggest cafes
-  for (const biz of MOCK_BUSINESSES) {
+  for (const biz of (businessData ?? []) as any[]) {
     if (biz.category === 'trailhead_cafe' && !usedBusinessIds.has(biz.id)) {
       usedBusinessIds.add(biz.id);
       suggestions.push({
@@ -272,7 +276,7 @@ export function generateSuggestions(state: TripState): TripSuggestion[] {
 
   // 5. Suggest accommodation for multi-day trips
   if (state.days.length >= 2) {
-    for (const biz of MOCK_BUSINESSES) {
+    for (const biz of (businessData ?? []) as any[]) {
       if (
         (biz.category === 'adventure_hostel' || biz.category === 'camping') &&
         !usedBusinessIds.has(biz.id)
@@ -296,11 +300,11 @@ export function generateSuggestions(state: TripState): TripSuggestion[] {
   }
 
   // 6. Community activity posts matching trails in itinerary
-  for (const post of MOCK_ACTIVITY_POSTS) {
+  for (const post of (postData ?? []) as any[]) {
     if (usedPostIds.has(post.id)) continue;
     if (post.trail_id && allTrailIds.has(post.trail_id)) {
       usedPostIds.add(post.id);
-      const trail = MOCK_TRAILS.find((t) => t.id === post.trail_id);
+      const trail = (trailData ?? []).find((t: any) => t.id === post.trail_id);
       suggestions.push({
         id: `sug-post-${post.id}`,
         type: 'activity_post',

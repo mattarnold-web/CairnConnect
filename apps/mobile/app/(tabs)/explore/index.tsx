@@ -11,7 +11,8 @@ import { BusinessCard } from '@/components/business/BusinessCard';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
 import { MapPin } from '@/components/ui/MapPin';
 import { SkeletonCard } from '@/components/ui/Skeleton';
-import { fetchTrails, fetchBusinesses } from '@/lib/api';
+import { fetchTrails, fetchBusinesses, autocompleteLocations } from '@/lib/api';
+import type { AutocompleteResult } from '@/lib/api';
 import { exploreRegion } from '@/lib/discovery';
 import { ACTIVITY_TYPES, BUSINESS_CATEGORIES } from '@cairn/shared';
 import type { Trail, Business } from '@cairn/shared';
@@ -64,6 +65,8 @@ export default function ExploreScreen() {
   const [showAccommodations, setShowAccommodations] = useState(false);
   const [discovering, setDiscovering] = useState(false);
   const [discoveryMessage, setDiscoveryMessage] = useState<string | null>(null);
+  const [autocompleteResults, setAutocompleteResults] = useState<AutocompleteResult[]>([]);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   // Region from navigation params (coming from regions screen)
@@ -128,6 +131,27 @@ export default function ExploreScreen() {
       cancelled = true;
     };
   }, [debouncedSearch, selectedActivity]);
+
+  // Autocomplete effect
+  useEffect(() => {
+    if (!debouncedSearch || debouncedSearch.length < 2) {
+      setAutocompleteResults([]);
+      setShowAutocomplete(false);
+      return;
+    }
+    let cancelled = false;
+    autocompleteLocations(debouncedSearch, regionLat, regionLng, 6)
+      .then((results) => {
+        if (!cancelled) {
+          setAutocompleteResults(results);
+          setShowAutocomplete(results.length > 0);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setAutocompleteResults([]);
+      });
+    return () => { cancelled = true; };
+  }, [debouncedSearch, regionLat, regionLng]);
 
   const isLoading =
     activeTab === 'trails' ? loadingTrails : loadingBusinesses;
@@ -421,6 +445,46 @@ export default function ExploreScreen() {
             placeholder="Search trails & businesses..."
           />
         </View>
+
+        {/* Autocomplete dropdown */}
+        {showAutocomplete && (
+          <View className="mx-4 mb-2 bg-cairn-card border border-cairn-border rounded-xl overflow-hidden">
+            {autocompleteResults.map((result, i) => (
+              <Pressable
+                key={`${result.entity_type}-${result.id}`}
+                onPress={() => {
+                  if (result.entity_type === 'trail') {
+                    router.push(`/(tabs)/explore/trail/${result.slug}`);
+                  } else {
+                    router.push(`/(tabs)/explore/business/${result.slug}`);
+                  }
+                  setShowAutocomplete(false);
+                  setSearch('');
+                }}
+                className={`px-3 py-2.5 flex-row items-center ${
+                  i < autocompleteResults.length - 1 ? 'border-b border-cairn-border/50' : ''
+                }`}
+              >
+                <Text className="text-sm mr-2">
+                  {result.entity_type === 'trail' ? '🥾' : '🏪'}
+                </Text>
+                <View className="flex-1">
+                  <Text className="text-slate-200 text-sm" numberOfLines={1}>
+                    {result.name}
+                  </Text>
+                  {result.city && (
+                    <Text className="text-slate-500 text-xs">
+                      {result.city}{result.state_province ? `, ${result.state_province}` : ''}
+                    </Text>
+                  )}
+                </View>
+                <Text className="text-slate-600 text-[10px] uppercase">
+                  {result.entity_type}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
 
         {/* Activity filter chips */}
         <FlatList
