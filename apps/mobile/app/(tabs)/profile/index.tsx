@@ -24,6 +24,10 @@ import {
   MapPin,
   Image as ImageIcon,
   Award,
+  MessageSquare,
+  Route,
+  Shield,
+  Trophy,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -253,6 +257,81 @@ export default function ProfileScreen() {
                 <Text className="text-slate-300 text-xs font-medium ml-2">
                   Settings
                 </Text>
+              </Pressable>
+            </View>
+
+            {/* Navigation cards — Board, Trips, Safety, Challenges */}
+            <View className="gap-2 mb-4">
+              <Pressable
+                onPress={() => router.push('/(tabs)/board')}
+                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
+              >
+                <View className="w-8 h-8 rounded-lg bg-indigo-500/20 items-center justify-center mr-3">
+                  <MessageSquare size={16} color="#818cf8" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-slate-100 font-medium text-sm">
+                    Activity Board
+                  </Text>
+                  <Text className="text-slate-500 text-xs">
+                    Find adventure partners
+                  </Text>
+                </View>
+                <ChevronRight size={16} color="#64748b" />
+              </Pressable>
+
+              <Pressable
+                onPress={() => router.push('/(tabs)/trip')}
+                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
+              >
+                <View className="w-8 h-8 rounded-lg bg-canopy/20 items-center justify-center mr-3">
+                  <Route size={16} color="#10B981" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-slate-100 font-medium text-sm">
+                    My Trips
+                  </Text>
+                  <Text className="text-slate-500 text-xs">
+                    Plan and manage trips
+                  </Text>
+                </View>
+                <ChevronRight size={16} color="#64748b" />
+              </Pressable>
+
+              <Pressable
+                onPress={() => router.push('/(tabs)/profile/safety')}
+                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
+              >
+                <View className="w-8 h-8 rounded-lg bg-red-500/20 items-center justify-center mr-3">
+                  <Shield size={16} color="#ef4444" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-slate-100 font-medium text-sm">
+                    Safety Center
+                  </Text>
+                  <Text className="text-slate-500 text-xs">
+                    SOS, contacts, location
+                  </Text>
+                </View>
+                <ChevronRight size={16} color="#64748b" />
+              </Pressable>
+
+              <Pressable
+                onPress={() => router.push('/(tabs)/profile/challenges')}
+                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
+              >
+                <View className="w-8 h-8 rounded-lg bg-amber-500/20 items-center justify-center mr-3">
+                  <Trophy size={16} color="#f59e0b" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-slate-100 font-medium text-sm">
+                    Challenges
+                  </Text>
+                  <Text className="text-slate-500 text-xs">
+                    Leaderboards and badges
+                  </Text>
+                </View>
+                <ChevronRight size={16} color="#64748b" />
               </Pressable>
             </View>
 

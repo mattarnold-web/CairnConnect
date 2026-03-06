@@ -20,8 +20,9 @@ import {
   Navigation,
   DollarSign,
   Shield,
-  Hash,
   Users,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react-native';
 import { Button } from '@/components/ui/Button';
 import { FilterChip } from '@/components/ui/FilterChip';
@@ -29,9 +30,9 @@ import { Card } from '@/components/ui/Card';
 import { ACTIVITY_TYPES } from '@cairn/shared';
 
 const POST_TYPES = [
-  { slug: 'im_going', label: "I'm Going", emoji: '\u{1F7E2}', description: 'You are going and inviting others' },
-  { slug: 'open_permit', label: 'Open Permit', emoji: '\u{1F3AB}', description: 'You have permit slots to share' },
-  { slug: 'lfg', label: 'LFG', emoji: '\u{1F7E3}', description: 'Looking for a group to join' },
+  { slug: 'im_going', label: "I'm Going", emoji: '\u{1F7E2}' },
+  { slug: 'open_permit', label: 'Open Permit', emoji: '\u{1F3AB}' },
+  { slug: 'lfg', label: 'LFG', emoji: '\u{1F7E3}' },
 ];
 
 const SKILL_LEVELS = [
@@ -41,57 +42,28 @@ const SKILL_LEVELS = [
   { slug: 'expert', label: 'Expert' },
 ];
 
-const COMMON_GEAR = [
-  'Helmet',
-  'Water (3L+)',
-  'Full-suspension bike',
-  'Climbing shoes',
-  'Harness',
-  'Belay device',
-  'PFD / Life jacket',
-  'Dry bag',
-  'Headlamp',
-  'Trail runners',
-  'Layers',
-  'Sun protection',
-  'First aid kit',
-];
-
 export default function CreatePostScreen() {
+  // ── Essential fields (quick mode) ──
   const [postType, setPostType] = useState('im_going');
   const [activityType, setActivityType] = useState('');
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [activityDate, setActivityDate] = useState('');
   const [locationName, setLocationName] = useState('');
+
+  // ── Optional details (expandable) ──
+  const [showDetails, setShowDetails] = useState(false);
+  const [description, setDescription] = useState('');
   const [skillLevel, setSkillLevel] = useState('intermediate');
   const [maxParticipants, setMaxParticipants] = useState('4');
-  const [activityDate, setActivityDate] = useState('');
-  const [gearRequired, setGearRequired] = useState<string[]>([]);
-  const [customGear, setCustomGear] = useState('');
   const [costPerPerson, setCostPerPerson] = useState('');
   const [hasPermit, setHasPermit] = useState(false);
   const [permitType, setPermitType] = useState('');
-  const [permitSlots, setPermitSlots] = useState('');
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const toggleGearItem = (item: string) => {
-    setGearRequired((prev) =>
-      prev.includes(item) ? prev.filter((g) => g !== item) : [...prev, item],
-    );
-  };
-
-  const addCustomGear = () => {
-    const trimmed = customGear.trim();
-    if (trimmed && !gearRequired.includes(trimmed)) {
-      setGearRequired((prev) => [...prev, trimmed]);
-      setCustomGear('');
-    }
-  };
-
   const handleGPSFill = () => {
-    // Simulate GPS auto-fill
     setLocationName('Moab, UT');
-    Alert.alert('Location Set', 'GPS location auto-filled to Moab, UT (Demo mode)');
+    Alert.alert('Location Set', 'GPS location auto-filled to Moab, UT');
   };
 
   const validate = (): boolean => {
@@ -99,30 +71,19 @@ export default function CreatePostScreen() {
     if (!title.trim()) newErrors.title = 'Title is required';
     if (!activityType) newErrors.activityType = 'Select an activity type';
     if (!locationName.trim()) newErrors.location = 'Location is required';
-    if (postType === 'open_permit' && !permitType.trim()) {
-      newErrors.permitType = 'Permit type is required for Open Permit posts';
-    }
-    if (maxParticipants && (isNaN(Number(maxParticipants)) || Number(maxParticipants) < 2)) {
-      newErrors.maxParticipants = 'Must be at least 2';
-    }
-    if (costPerPerson && isNaN(Number(costPerPerson))) {
-      newErrors.cost = 'Must be a valid number';
-    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
     if (!validate()) {
-      Alert.alert('Validation Error', 'Please fix the highlighted fields');
+      Alert.alert('Missing Fields', 'Please fill in the required fields');
       return;
     }
-    Alert.alert('Success', 'Post created! (Demo mode)', [
+    Alert.alert('Success', 'Post created!', [
       { text: 'OK', onPress: () => router.back() },
     ]);
   };
-
-  const selectedPostTypeConfig = POST_TYPES.find((pt) => pt.slug === postType);
 
   return (
     <SafeAreaView className="flex-1 bg-cairn-bg" edges={['top']}>
@@ -131,7 +92,9 @@ export default function CreatePostScreen() {
         <Pressable onPress={() => router.back()} className="p-1 mr-3">
           <ArrowLeft size={24} color="#e2e8f0" />
         </Pressable>
-        <Text className="text-slate-100 font-bold text-lg flex-1">Create Post</Text>
+        <Text className="text-slate-100 font-bold text-lg flex-1">
+          New Post
+        </Text>
       </View>
 
       <KeyboardAvoidingView
@@ -143,48 +106,43 @@ export default function CreatePostScreen() {
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Post type */}
-          <Text className="text-slate-300 text-sm font-semibold mb-2 mt-4">
-            Post Type
-          </Text>
-          <View className="gap-2 mb-1">
+          {/* ── 1. Post Type (chip row) ── */}
+          <View className="flex-row gap-2 mt-4 mb-4">
             {POST_TYPES.map((pt) => (
               <Pressable
                 key={pt.slug}
-                onPress={() => {
-                  setPostType(pt.slug);
-                  if (pt.slug === 'open_permit') setHasPermit(true);
-                  else setHasPermit(false);
-                }}
-                className={`bg-cairn-card border rounded-xl p-3 flex-row items-center ${
-                  postType === pt.slug ? 'border-canopy bg-canopy/5' : 'border-cairn-border'
+                onPress={() => setPostType(pt.slug)}
+                className={`flex-row items-center rounded-xl px-3 py-2 border ${
+                  postType === pt.slug
+                    ? 'bg-canopy/15 border-canopy/30'
+                    : 'bg-cairn-card border-cairn-border'
                 }`}
               >
-                <Text className="text-lg mr-3">{pt.emoji}</Text>
-                <View className="flex-1">
-                  <Text
-                    className={`font-semibold text-sm ${
-                      postType === pt.slug ? 'text-canopy' : 'text-slate-300'
-                    }`}
-                  >
-                    {pt.label}
-                  </Text>
-                  <Text className="text-slate-500 text-xs">{pt.description}</Text>
-                </View>
+                <Text className="mr-1.5">{pt.emoji}</Text>
+                <Text
+                  className={`text-xs font-medium ${
+                    postType === pt.slug ? 'text-canopy' : 'text-slate-400'
+                  }`}
+                >
+                  {pt.label}
+                </Text>
               </Pressable>
             ))}
           </View>
 
-          {/* Activity type */}
-          <Text className="text-slate-300 text-sm font-semibold mb-2 mt-4">
-            Activity Type
-          </Text>
+          {/* ── 2. Activity Type ── */}
           {errors.activityType && (
-            <Text className="text-red-400 text-xs mb-1">{errors.activityType}</Text>
+            <Text className="text-red-400 text-xs mb-1">
+              {errors.activityType}
+            </Text>
           )}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mb-4"
+          >
             <View className="flex-row">
-              {ACTIVITY_TYPES.slice(0, 14).map((at) => (
+              {ACTIVITY_TYPES.slice(0, 10).map((at) => (
                 <FilterChip
                   key={at.slug}
                   label={at.label}
@@ -196,61 +154,40 @@ export default function CreatePostScreen() {
             </View>
           </ScrollView>
 
-          {/* Title */}
-          <Text className="text-slate-300 text-sm font-semibold mb-1.5">Title</Text>
+          {/* ── 3. Title ── */}
           {errors.title && (
             <Text className="text-red-400 text-xs mb-1">{errors.title}</Text>
           )}
           <TextInput
             value={title}
             onChangeText={setTitle}
-            placeholder="e.g., Morning ride at Slickrock"
+            placeholder="What's the plan? (e.g. Morning ride at Slickrock)"
             placeholderTextColor="#475569"
             style={[
-              createStyles.input,
-              createStyles.inputFull,
-              { marginBottom: 16 },
-              errors.title ? createStyles.inputError : createStyles.inputBorder,
+              styles.input,
+              { marginBottom: 12 },
+              errors.title ? styles.inputError : styles.inputBorder,
             ]}
           />
 
-          {/* Description */}
-          <Text className="text-slate-300 text-sm font-semibold mb-1.5">
-            Description
-          </Text>
-          <TextInput
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Tell others about your plans, experience level, what to expect..."
-            placeholderTextColor="#475569"
-            multiline
-            numberOfLines={4}
-            style={[createStyles.inputMultiline, createStyles.inputBorder]}
-            textAlignVertical="top"
-          />
-
-          {/* Date */}
-          <Text className="text-slate-300 text-sm font-semibold mb-1.5">
-            Activity Date
-          </Text>
-          <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl h-12 px-4 mb-4">
+          {/* ── 4. Date ── */}
+          <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl h-12 px-4 mb-3">
             <Calendar size={16} color="#64748b" />
             <TextInput
               value={activityDate}
               onChangeText={setActivityDate}
-              placeholder="YYYY-MM-DD"
+              placeholder="When? (YYYY-MM-DD)"
               placeholderTextColor="#475569"
-              style={createStyles.inputInline}
+              style={styles.inputInline}
               keyboardType="numbers-and-punctuation"
             />
           </View>
 
-          {/* Location */}
-          <Text className="text-slate-300 text-sm font-semibold mb-1.5">
-            Location
-          </Text>
+          {/* ── 5. Location ── */}
           {errors.location && (
-            <Text className="text-red-400 text-xs mb-1">{errors.location}</Text>
+            <Text className="text-red-400 text-xs mb-1">
+              {errors.location}
+            </Text>
           )}
           <View className="flex-row gap-2 mb-4">
             <View
@@ -262,9 +199,9 @@ export default function CreatePostScreen() {
               <TextInput
                 value={locationName}
                 onChangeText={setLocationName}
-                placeholder="e.g., Moab, UT"
+                placeholder="Where? (e.g. Moab, UT)"
                 placeholderTextColor="#475569"
-                style={createStyles.inputInline}
+                style={styles.inputInline}
               />
             </View>
             <Pressable
@@ -275,168 +212,117 @@ export default function CreatePostScreen() {
             </Pressable>
           </View>
 
-          {/* Skill level */}
-          <Text className="text-slate-300 text-sm font-semibold mb-2">
-            Skill Level
-          </Text>
-          <View className="flex-row flex-wrap mb-4">
-            {SKILL_LEVELS.map((level) => (
-              <FilterChip
-                key={level.slug}
-                label={level.label}
-                selected={skillLevel === level.slug}
-                onPress={() => setSkillLevel(level.slug)}
-              />
-            ))}
-          </View>
+          {/* ── Expandable Details ── */}
+          <Pressable
+            onPress={() => setShowDetails((prev) => !prev)}
+            className="flex-row items-center justify-center bg-cairn-card border border-cairn-border rounded-xl py-3 mb-4"
+          >
+            <Text className="text-slate-400 text-sm font-medium mr-2">
+              {showDetails ? 'Hide details' : 'Add details'}
+            </Text>
+            {showDetails ? (
+              <ChevronUp size={16} color="#64748b" />
+            ) : (
+              <ChevronDown size={16} color="#64748b" />
+            )}
+          </Pressable>
 
-          {/* Max participants */}
-          <Text className="text-slate-300 text-sm font-semibold mb-1.5">
-            Max Participants
-          </Text>
-          {errors.maxParticipants && (
-            <Text className="text-red-400 text-xs mb-1">{errors.maxParticipants}</Text>
-          )}
-          <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl h-12 px-4 mb-4">
-            <Users size={16} color="#64748b" />
-            <TextInput
-              value={maxParticipants}
-              onChangeText={setMaxParticipants}
-              placeholder="4"
-              placeholderTextColor="#475569"
-              keyboardType="number-pad"
-              style={createStyles.inputInline}
-            />
-          </View>
-
-          {/* Gear required */}
-          <Text className="text-slate-300 text-sm font-semibold mb-2">
-            Gear Required
-          </Text>
-          <View className="flex-row flex-wrap mb-2">
-            {COMMON_GEAR.map((gear) => (
-              <FilterChip
-                key={gear}
-                label={gear}
-                selected={gearRequired.includes(gear)}
-                onPress={() => toggleGearItem(gear)}
-              />
-            ))}
-          </View>
-          <View className="flex-row gap-2 mb-4">
-            <TextInput
-              value={customGear}
-              onChangeText={setCustomGear}
-              placeholder="Add custom gear item..."
-              placeholderTextColor="#475569"
-              style={[createStyles.input, createStyles.inputSmall, createStyles.inputBorder, { flex: 1 }]}
-              onSubmitEditing={addCustomGear}
-              returnKeyType="done"
-            />
-            <Pressable
-              onPress={addCustomGear}
-              className="h-10 px-3 bg-cairn-card border border-cairn-border rounded-xl items-center justify-center"
-            >
-              <Text className="text-canopy text-sm font-medium">Add</Text>
-            </Pressable>
-          </View>
-          {gearRequired.length > 0 && (
+          {showDetails && (
             <View className="mb-4">
-              <Text className="text-slate-500 text-xs mb-1">
-                Selected gear ({gearRequired.length}):
+              {/* Description */}
+              <Text className="text-slate-300 text-sm font-semibold mb-1.5">
+                Description
               </Text>
-              <View className="flex-row flex-wrap gap-1">
-                {gearRequired.map((gear) => (
-                  <Pressable
-                    key={gear}
-                    onPress={() => toggleGearItem(gear)}
-                    className="bg-canopy/10 border border-canopy/30 rounded-lg px-2 py-1"
-                  >
-                    <Text className="text-canopy text-xs">{gear} x</Text>
-                  </Pressable>
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Share more about the plan..."
+                placeholderTextColor="#475569"
+                multiline
+                numberOfLines={3}
+                style={[styles.textArea, styles.inputBorder]}
+                textAlignVertical="top"
+              />
+
+              {/* Skill level */}
+              <Text className="text-slate-300 text-sm font-semibold mb-2 mt-3">
+                Skill Level
+              </Text>
+              <View className="flex-row flex-wrap mb-3">
+                {SKILL_LEVELS.map((level) => (
+                  <FilterChip
+                    key={level.slug}
+                    label={level.label}
+                    selected={skillLevel === level.slug}
+                    onPress={() => setSkillLevel(level.slug)}
+                  />
                 ))}
               </View>
-            </View>
-          )}
 
-          {/* Cost per person */}
-          <Text className="text-slate-300 text-sm font-semibold mb-1.5">
-            Cost Per Person (Optional)
-          </Text>
-          {errors.cost && (
-            <Text className="text-red-400 text-xs mb-1">{errors.cost}</Text>
-          )}
-          <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl h-12 px-4 mb-4">
-            <DollarSign size={16} color="#64748b" />
-            <TextInput
-              value={costPerPerson}
-              onChangeText={setCostPerPerson}
-              placeholder="0.00"
-              placeholderTextColor="#475569"
-              keyboardType="decimal-pad"
-              style={createStyles.inputInline}
-            />
-            <Text className="text-slate-500 text-xs">per person</Text>
-          </View>
-
-          {/* Permit toggle and details */}
-          <Card className="mb-4">
-            <View className="flex-row items-center justify-between mb-2">
-              <View className="flex-row items-center">
-                <Shield size={16} color="#f59e0b" />
-                <Text className="text-slate-300 text-sm font-semibold ml-2">
-                  Permit Required
-                </Text>
+              {/* Max participants */}
+              <Text className="text-slate-300 text-sm font-semibold mb-1.5">
+                Max Participants
+              </Text>
+              <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl h-12 px-4 mb-3">
+                <Users size={16} color="#64748b" />
+                <TextInput
+                  value={maxParticipants}
+                  onChangeText={setMaxParticipants}
+                  placeholder="4"
+                  placeholderTextColor="#475569"
+                  keyboardType="number-pad"
+                  style={styles.inputInline}
+                />
               </View>
-              <Switch
-                value={hasPermit}
-                onValueChange={(val) => {
-                  setHasPermit(val);
-                  if (val && postType !== 'open_permit') {
-                    // Auto-switch to open_permit if enabling permit
-                  }
-                }}
-                trackColor={{ false: '#1E3A5F', true: '#10B981' }}
-                thumbColor="white"
-              />
-            </View>
 
-            {hasPermit && (
-              <View className="mt-2 gap-3">
-                <View>
-                  <Text className="text-slate-400 text-xs mb-1">Permit Type</Text>
-                  {errors.permitType && (
-                    <Text className="text-red-400 text-xs mb-1">{errors.permitType}</Text>
-                  )}
+              {/* Cost */}
+              <Text className="text-slate-300 text-sm font-semibold mb-1.5">
+                Cost Per Person
+              </Text>
+              <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl h-12 px-4 mb-3">
+                <DollarSign size={16} color="#64748b" />
+                <TextInput
+                  value={costPerPerson}
+                  onChangeText={setCostPerPerson}
+                  placeholder="0.00"
+                  placeholderTextColor="#475569"
+                  keyboardType="decimal-pad"
+                  style={styles.inputInline}
+                />
+              </View>
+
+              {/* Permit */}
+              <Card className="mb-2">
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center">
+                    <Shield size={16} color="#f59e0b" />
+                    <Text className="text-slate-300 text-sm font-semibold ml-2">
+                      Has Permit
+                    </Text>
+                  </View>
+                  <Switch
+                    value={hasPermit}
+                    onValueChange={setHasPermit}
+                    trackColor={{ false: '#1E3A5F', true: '#10B981' }}
+                    thumbColor="white"
+                  />
+                </View>
+                {hasPermit && (
                   <TextInput
                     value={permitType}
                     onChangeText={setPermitType}
-                    placeholder="e.g., Cataract Canyon River Permit"
+                    placeholder="Permit type (e.g. River Permit)"
                     placeholderTextColor="#475569"
-                    style={[
-                      createStyles.inputPermit,
-                      errors.permitType ? createStyles.inputError : createStyles.inputBorder,
-                    ]}
+                    style={[styles.inputSmall, styles.inputBorder, { marginTop: 12 }]}
                   />
-                </View>
-                <View>
-                  <Text className="text-slate-400 text-xs mb-1">Available Permit Slots</Text>
-                  <TextInput
-                    value={permitSlots}
-                    onChangeText={setPermitSlots}
-                    placeholder="2"
-                    placeholderTextColor="#475569"
-                    keyboardType="number-pad"
-                    style={[createStyles.inputPermit, createStyles.inputBorder]}
-                  />
-                </View>
-              </View>
-            )}
-          </Card>
+                )}
+              </Card>
+            </View>
+          )}
 
-          {/* Submit */}
+          {/* ── Submit ── */}
           <Button onPress={handleSubmit} size="lg">
-            Create Post
+            Post to Board
           </Button>
 
           <View className="h-8" />
@@ -446,29 +332,14 @@ export default function CreatePostScreen() {
   );
 }
 
-const createStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   input: {
     backgroundColor: '#112240',
     borderRadius: 12,
+    height: 48,
     paddingHorizontal: 16,
     fontSize: 14,
     color: '#f1f5f9',
-  },
-  inputFull: {
-    height: 48,
-  },
-  inputSmall: {
-    height: 40,
-    paddingHorizontal: 12,
-  },
-  inputMultiline: {
-    backgroundColor: '#112240',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 14,
-    color: '#f1f5f9',
-    minHeight: 100,
-    marginBottom: 16,
   },
   inputInline: {
     flex: 1,
@@ -476,13 +347,22 @@ const createStyles = StyleSheet.create({
     fontSize: 14,
     color: '#f1f5f9',
   },
-  inputPermit: {
+  inputSmall: {
     backgroundColor: '#0B1A2B',
     borderRadius: 12,
     height: 40,
     paddingHorizontal: 12,
     fontSize: 14,
     color: '#f1f5f9',
+  },
+  textArea: {
+    backgroundColor: '#112240',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 14,
+    color: '#f1f5f9',
+    minHeight: 80,
+    marginBottom: 8,
   },
   inputBorder: {
     borderWidth: 1,

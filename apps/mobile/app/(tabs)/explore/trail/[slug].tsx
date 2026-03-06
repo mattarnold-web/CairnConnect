@@ -23,6 +23,9 @@ import { Button } from '@/components/ui/Button';
 import { BusinessCard } from '@/components/business/BusinessCard';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton';
+import { ReviewSummary } from '@/components/reviews/ReviewSummary';
+import { ReviewCard } from '@/components/reviews/ReviewCard';
+import { WriteReviewSheet } from '@/components/reviews/WriteReviewSheet';
 import {
   fetchTrailBySlug,
   fetchTrailReviews,
@@ -57,6 +60,7 @@ export default function TrailDetailScreen() {
   const [nearbyBusinesses, setNearbyBusinesses] = useState<Business[]>([]);
   const [trailReviews, setTrailReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [writeReviewVisible, setWriteReviewVisible] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -448,63 +452,43 @@ export default function TrailDetailScreen() {
               <Text className="text-slate-100 font-semibold text-lg">
                 Reviews ({trailReviews.length})
               </Text>
-              {trail.review_count > 0 && (
-                <View className="flex-row items-center">
-                  <Star size={14} color="#F4A261" fill="#F4A261" />
-                  <Text className="text-slate-300 text-sm ml-1 font-medium">
-                    {trail.rating.toFixed(1)}
-                  </Text>
-                </View>
-              )}
+              <Pressable
+                onPress={() => setWriteReviewVisible(true)}
+                className="bg-canopy/15 border border-canopy/30 rounded-lg px-3 py-1.5"
+              >
+                <Text className="text-canopy text-xs font-semibold">
+                  Write Review
+                </Text>
+              </Pressable>
             </View>
 
+            {/* Summary with breakdown bars */}
+            {trail.review_count > 0 && (
+              <ReviewSummary
+                rating={trail.rating}
+                reviewCount={trail.review_count}
+                reviews={trailReviews}
+              />
+            )}
+
+            {/* Individual reviews */}
             {trailReviews.length > 0 ? (
-              trailReviews.slice(0, 3).map((review) => (
-                <Card key={review.id} className="mb-3">
-                  <View className="flex-row items-center justify-between mb-2">
-                    <View className="flex-row items-center">
-                      <View className="w-8 h-8 rounded-full bg-cairn-elevated items-center justify-center mr-2">
-                        <Text className="text-slate-300 text-xs font-semibold">
-                          {review.author_name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .join('')}
-                        </Text>
-                      </View>
-                      <View>
-                        <Text className="text-slate-200 text-sm font-medium">
-                          {review.author_name}
-                        </Text>
-                        <View className="flex-row items-center mt-0.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              size={10}
-                              color="#F4A261"
-                              fill={i < review.rating ? '#F4A261' : 'transparent'}
-                            />
-                          ))}
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                  {review.title && (
-                    <Text className="text-slate-200 font-medium text-sm mb-1">
-                      {review.title}
-                    </Text>
-                  )}
-                  {review.body && (
-                    <Text className="text-slate-400 text-sm leading-5">
-                      {review.body}
-                    </Text>
-                  )}
-                </Card>
-              ))
+              trailReviews
+                .slice(0, 5)
+                .map((review) => (
+                  <ReviewCard key={review.id} review={review} />
+                ))
             ) : (
               <Card className="mb-3">
-                <Text className="text-slate-500 text-sm text-center py-2">
-                  No reviews yet. Be the first to review this trail!
-                </Text>
+                <View className="items-center py-4">
+                  <Star size={24} color="#F4A261" />
+                  <Text className="text-slate-100 font-medium text-sm mt-2">
+                    No reviews yet
+                  </Text>
+                  <Text className="text-slate-500 text-xs mt-1">
+                    Be the first to share your experience!
+                  </Text>
+                </View>
               </Card>
             )}
           </View>
@@ -540,6 +524,20 @@ export default function TrailDetailScreen() {
           </Button>
         </View>
       </View>
+
+      {/* Write Review Sheet */}
+      <WriteReviewSheet
+        visible={writeReviewVisible}
+        entityType="trail"
+        entityId={trail.id}
+        entityName={trail.name}
+        onClose={() => setWriteReviewVisible(false)}
+        onSubmitted={async () => {
+          // Refresh reviews after submission
+          const reviews = await fetchTrailReviews(trail.id);
+          setTrailReviews(reviews);
+        }}
+      />
     </SafeAreaView>
   );
 }

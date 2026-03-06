@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Map, MessageSquare, CircleDot, Route, User } from 'lucide-react-native';
+import { House, Map, CircleDot, User } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -23,19 +23,17 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="home"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color, size }) => <House size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
           tabBarIcon: ({ color, size }) => <Map size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="board"
-        options={{
-          title: 'Board',
-          tabBarIcon: ({ color, size }) => (
-            <MessageSquare size={size} color={color} />
-          ),
         }}
       />
       <Tabs.Screen
@@ -48,17 +46,23 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="trip"
-        options={{
-          title: 'Trip',
-          tabBarIcon: ({ color, size }) => <Route size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+        }}
+      />
+      {/* Board & Trip remain routable but hidden from tab bar */}
+      <Tabs.Screen
+        name="board"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="trip"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
