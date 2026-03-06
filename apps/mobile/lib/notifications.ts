@@ -1,7 +1,4 @@
-import { Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-constants';
-import { saveToStorage, loadFromStorage } from './storage';
+import { loadFromStorage, saveToStorage } from './storage';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -22,7 +19,6 @@ export interface NotificationPreferences {
   weatherAlerts: boolean;
 }
 
-const PUSH_TOKEN_KEY = 'cairn-push-token';
 const NOTIFICATION_PREFS_KEY = 'cairn-notification-prefs';
 
 export const DEFAULT_NOTIFICATION_PREFS: NotificationPreferences = {
@@ -34,128 +30,58 @@ export const DEFAULT_NOTIFICATION_PREFS: NotificationPreferences = {
 };
 
 // ---------------------------------------------------------------------------
-// Configure notification handling
+// Stubbed notification functions
+// expo-notifications has a native build incompatibility with expo-modules-core
+// on SDK 55 (EXPermissionsService.parsePermission). These stubs maintain the
+// API surface so the rest of the app compiles. Push notifications will be
+// re-enabled once the upstream packages are patched.
 // ---------------------------------------------------------------------------
 
-/** Set how foreground notifications are displayed */
+/** No-op in stub mode */
 export function configureNotificationHandler() {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-    }),
-  });
+  // Stubbed — expo-notifications removed due to native build error
 }
 
-// ---------------------------------------------------------------------------
-// Permissions & Token
-// ---------------------------------------------------------------------------
-
-/** Request push notification permissions and return the Expo push token */
+/** Always returns null in stub mode */
 export async function requestPushPermissions(): Promise<string | null> {
-  if (Platform.OS === 'web') return null;
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') {
-    return null;
-  }
-
-  // Android notification channel
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'Default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#10B981',
-    });
-  }
-
-  try {
-    const tokenData = await Notifications.getExpoPushTokenAsync({
-      projectId: Device.default.expoConfig?.extra?.eas?.projectId,
-    });
-    const token = tokenData.data;
-
-    // Persist the token locally
-    await saveToStorage(PUSH_TOKEN_KEY, token);
-    return token;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
-/** Get saved push token without re-requesting */
+/** Always returns null in stub mode */
 export async function getSavedPushToken(): Promise<string | null> {
-  return loadFromStorage<string>(PUSH_TOKEN_KEY);
+  return null;
 }
 
-// ---------------------------------------------------------------------------
-// Notification handlers
-// ---------------------------------------------------------------------------
-
-/** Register a handler for when a notification is received while the app is foregrounded */
+/** No-op listener in stub mode */
 export function onNotificationReceived(
-  handler: (notification: Notifications.Notification) => void,
-): Notifications.EventSubscription {
-  return Notifications.addNotificationReceivedListener(handler);
+  _handler: (notification: unknown) => void,
+): { remove: () => void } {
+  return { remove: () => {} };
 }
 
-/** Register a handler for when the user taps a notification */
+/** No-op listener in stub mode */
 export function onNotificationResponse(
-  handler: (response: Notifications.NotificationResponse) => void,
-): Notifications.EventSubscription {
-  return Notifications.addNotificationResponseReceivedListener(handler);
+  _handler: (response: unknown) => void,
+): { remove: () => void } {
+  return { remove: () => {} };
 }
 
-// ---------------------------------------------------------------------------
-// Local notifications
-// ---------------------------------------------------------------------------
-
-/** Schedule a local notification after a delay (in seconds) */
+/** Returns empty string in stub mode */
 export async function scheduleLocalNotification(
-  payload: NotificationPayload,
-  delaySeconds: number = 0,
+  _payload: NotificationPayload,
+  _delaySeconds: number = 0,
 ): Promise<string> {
-  const trigger: Notifications.NotificationTriggerInput = delaySeconds > 0
-    ? {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: delaySeconds,
-      }
-    : null;
-
-  return Notifications.scheduleNotificationAsync({
-    content: {
-      title: payload.title,
-      body: payload.body,
-      data: { type: payload.type, ...payload.data },
-      sound: true,
-    },
-    trigger,
-  });
+  return '';
 }
 
-/** Cancel a specific scheduled notification */
-export async function cancelNotification(id: string): Promise<void> {
-  await Notifications.cancelScheduledNotificationAsync(id);
-}
+/** No-op in stub mode */
+export async function cancelNotification(_id: string): Promise<void> {}
 
-/** Cancel all scheduled notifications */
-export async function cancelAllNotifications(): Promise<void> {
-  await Notifications.cancelAllScheduledNotificationsAsync();
-}
+/** No-op in stub mode */
+export async function cancelAllNotifications(): Promise<void> {}
 
 // ---------------------------------------------------------------------------
-// Preferences
+// Preferences (these work without the native module)
 // ---------------------------------------------------------------------------
 
 export async function getNotificationPreferences(): Promise<NotificationPreferences> {
