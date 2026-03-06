@@ -99,6 +99,7 @@ export function encodeTripState(state: TripState): string {
     region: state.region,
     selectedActivities: state.selectedActivities,
     startDate: state.startDate,
+    endDate: state.endDate,
     days: state.days.map((day) => ({
       id: day.id,
       dayNumber: day.dayNumber,
@@ -124,6 +125,7 @@ export function decodeTripState(encoded: string): TripState | null {
       region: parsed.region ?? null,
       selectedActivities: parsed.selectedActivities ?? [],
       startDate: parsed.startDate ?? null,
+      endDate: parsed.endDate ?? null,
       days: parsed.days ?? [],
       tripName: parsed.tripName ?? '',
     };

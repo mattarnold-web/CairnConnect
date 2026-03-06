@@ -9,6 +9,7 @@ import {
   Alert,
   Share,
   StyleSheet,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -36,6 +37,7 @@ import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
 import { TrailSearchSheet } from '@/components/trip/TrailSearchSheet';
 import { ShareTripSheet } from '@/components/trip/ShareTripSheet';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useTripContext } from '@/lib/trip-context';
 import { MOCK_REGIONS, MOCK_TRAILS } from '@/lib/mock-data';
 import { ACTIVITY_TYPES } from '@cairn/shared';
@@ -99,6 +101,30 @@ export default function TripScreen() {
   const [expandedDayId, setExpandedDayId] = useState<string | null>(state.days[0]?.id ?? null);
   const [trailSearchDayId, setTrailSearchDayId] = useState<string | null>(null);
   const [shareSheetVisible, setShareSheetVisible] = useState(false);
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
+  const handleStartDateChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (Platform.OS === 'android') setShowStartPicker(false);
+    if (selectedDate) {
+      dispatch({ type: 'SET_START_DATE', date: selectedDate.toISOString().split('T')[0] });
+      if (Platform.OS === 'ios') setShowStartPicker(false);
+    }
+  };
+
+  const handleEndDateChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (Platform.OS === 'android') setShowEndPicker(false);
+    if (selectedDate) {
+      dispatch({ type: 'SET_END_DATE', date: selectedDate.toISOString().split('T')[0] });
+      if (Platform.OS === 'ios') setShowEndPicker(false);
+    }
+  };
+
+  const formatDateDisplay = (dateStr: string | null): string => {
+    if (!dateStr) return 'Select';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
 
   const handleNext = () => {
     if (currentStepIndex < STEPS.length - 1) {
@@ -411,30 +437,63 @@ export default function TripScreen() {
               {state.region?.name ? `Plan your ${state.region.name} trip` : 'Add activities to your days'}
             </Text>
 
-            {/* Trip name and date row */}
+            {/* Trip name */}
+            <View className="mb-3">
+              <Text className="text-slate-400 text-xs mb-1">Trip Name</Text>
+              <TextInput
+                value={state.tripName}
+                onChangeText={(name) => dispatch({ type: 'SET_TRIP_NAME', name })}
+                placeholder={`My ${state.region?.name ?? ''} Trip`}
+                placeholderTextColor="#475569"
+                style={tripStyles.inputSmall}
+              />
+            </View>
+
+            {/* Date pickers row */}
             <View className="flex-row gap-3 mb-4">
               <View className="flex-1">
-                <Text className="text-slate-400 text-xs mb-1">Trip Name</Text>
-                <TextInput
-                  value={state.tripName}
-                  onChangeText={(name) => dispatch({ type: 'SET_TRIP_NAME', name })}
-                  placeholder={`My ${state.region?.name ?? ''} Trip`}
-                  placeholderTextColor="#475569"
-                  style={tripStyles.inputSmall}
-                />
-              </View>
-              <View className="w-32">
                 <Text className="text-slate-400 text-xs mb-1">Start Date</Text>
-                <TextInput
-                  value={state.startDate ?? ''}
-                  onChangeText={(date) => {
-                    if (date) dispatch({ type: 'SET_START_DATE', date });
-                  }}
-                  placeholder="YYYY-MM-DD"
-                  placeholderTextColor="#475569"
-                  style={tripStyles.inputSmall}
-                  keyboardType="numbers-and-punctuation"
-                />
+                <Pressable
+                  onPress={() => setShowStartPicker(true)}
+                  className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-3 py-2.5"
+                >
+                  <Calendar size={14} color="#10B981" />
+                  <Text className={`ml-2 text-sm ${state.startDate ? 'text-slate-100 font-medium' : 'text-slate-500'}`}>
+                    {formatDateDisplay(state.startDate)}
+                  </Text>
+                </Pressable>
+                {showStartPicker && (
+                  <DateTimePicker
+                    value={state.startDate ? new Date(state.startDate) : new Date()}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleStartDateChange}
+                    minimumDate={new Date()}
+                    themeVariant="dark"
+                  />
+                )}
+              </View>
+              <View className="flex-1">
+                <Text className="text-slate-400 text-xs mb-1">End Date</Text>
+                <Pressable
+                  onPress={() => setShowEndPicker(true)}
+                  className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-3 py-2.5"
+                >
+                  <Calendar size={14} color="#10B981" />
+                  <Text className={`ml-2 text-sm ${state.endDate ? 'text-slate-100 font-medium' : 'text-slate-500'}`}>
+                    {formatDateDisplay(state.endDate)}
+                  </Text>
+                </Pressable>
+                {showEndPicker && (
+                  <DateTimePicker
+                    value={state.endDate ? new Date(state.endDate) : (state.startDate ? new Date(new Date(state.startDate).getTime() + 2 * 86400000) : new Date())}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleEndDateChange}
+                    minimumDate={state.startDate ? new Date(state.startDate) : new Date()}
+                    themeVariant="dark"
+                  />
+                )}
               </View>
             </View>
 

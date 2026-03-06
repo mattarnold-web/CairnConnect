@@ -62,6 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'Cairn Connect uses the camera to capture photos during your outdoor activities.',
       },
     ],
+    '@react-native-community/datetimepicker',
   ],
   updates: {
     url: 'https://u.expo.dev/51e09a5a-06f0-4b35-877d-493cd4ed6d1e',

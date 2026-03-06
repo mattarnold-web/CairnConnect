@@ -23,6 +23,7 @@ import {
   Flame,
   Ticket,
   Award,
+  GripVertical,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { TrailCard } from '@/components/trail/TrailCard';
@@ -85,9 +86,12 @@ function SectionHeader({
       onPress={onAction}
       className="flex-row items-center justify-between mb-3"
     >
-      <Text className="text-slate-100 font-bold text-lg">
-        {title}
-      </Text>
+      <View className="flex-row items-center">
+        <GripVertical size={16} color="#475569" style={{ marginRight: 6 }} />
+        <Text className="text-slate-100 font-bold text-lg">
+          {title}
+        </Text>
+      </View>
       <View className="flex-row items-center">
         <Text className="text-canopy text-sm font-semibold mr-1">
           {actionLabel}
@@ -414,46 +418,6 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* ── From the Board ── */}
-        <View className="mb-6">
-          <SectionHeader
-            title="From the Board"
-            actionLabel="See All"
-            onAction={() => router.push('/(tabs)/board')}
-          />
-
-          {loading ? (
-            <View>
-              <SkeletonCard className="mb-3" />
-              <SkeletonCard />
-            </View>
-          ) : posts.length > 0 ? (
-            posts
-              .slice(0, 3)
-              .map((post) => (
-                <ActivityBoardCard
-                  key={post.id}
-                  post={post}
-                  onPress={() => router.push(`/(tabs)/board/${post.id}`)}
-                />
-              ))
-          ) : (
-            <Pressable onPress={() => router.push('/(tabs)/board/create')}>
-              <Card>
-                <View className="items-center py-4">
-                  <Calendar size={32} color="#10B981" />
-                  <Text className="text-slate-100 font-medium text-sm mt-2">
-                    No upcoming activities
-                  </Text>
-                  <Text className="text-slate-500 text-xs mt-1">
-                    Post to the board and find adventure partners
-                  </Text>
-                </View>
-              </Card>
-            </Pressable>
-          )}
-        </View>
-
         {/* ── Your Trips ── */}
         <View className="mb-6">
           <SectionHeader
@@ -499,6 +463,46 @@ export default function HomeScreen() {
                   </Text>
                   <Text className="text-slate-500 text-xs mt-1">
                     Build an itinerary with trails, lodging, and more
+                  </Text>
+                </View>
+              </Card>
+            </Pressable>
+          )}
+        </View>
+
+        {/* ── Happening Nearby ── */}
+        <View className="mb-6">
+          <SectionHeader
+            title="Happening Nearby"
+            actionLabel="See All"
+            onAction={() => router.push('/(tabs)/board')}
+          />
+
+          {loading ? (
+            <View>
+              <SkeletonCard className="mb-3" />
+              <SkeletonCard />
+            </View>
+          ) : posts.length > 0 ? (
+            posts
+              .slice(0, 3)
+              .map((post) => (
+                <ActivityBoardCard
+                  key={post.id}
+                  post={post}
+                  onPress={() => router.push(`/(tabs)/board/${post.id}`)}
+                />
+              ))
+          ) : (
+            <Pressable onPress={() => router.push('/(tabs)/board/create')}>
+              <Card>
+                <View className="items-center py-4">
+                  <Calendar size={32} color="#10B981" />
+                  <Text className="text-slate-100 font-medium text-sm mt-2">
+                    No upcoming activities
+                  </Text>
+                  <Text className="text-slate-500 text-xs mt-1">
+                    Post to the board and find adventure partners
                   </Text>
                 </View>
               </Card>

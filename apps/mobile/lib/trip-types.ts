@@ -38,6 +38,7 @@ export interface TripState {
   region: TripRegion | null;
   selectedActivities: string[];
   startDate: string | null;
+  endDate: string | null;
   days: TripDay[];
   tripName: string;
 }
@@ -47,6 +48,7 @@ export type TripAction =
   | { type: 'SET_REGION'; region: TripRegion }
   | { type: 'TOGGLE_ACTIVITY'; activitySlug: string }
   | { type: 'SET_START_DATE'; date: string }
+  | { type: 'SET_END_DATE'; date: string }
   | { type: 'SET_TRIP_NAME'; name: string }
   | { type: 'ADD_DAY' }
   | { type: 'REMOVE_DAY'; dayId: string }
@@ -75,6 +77,7 @@ export function createInitialTripState(): TripState {
     region: null,
     selectedActivities: [],
     startDate: null,
+    endDate: null,
     days: [
       { id: 'day-1', dayNumber: 1, date: null, label: '', items: [] },
       { id: 'day-2', dayNumber: 2, date: null, label: '', items: [] },
@@ -85,6 +88,29 @@ export function createInitialTripState(): TripState {
 }
 
 export const initialTripState: TripState = createInitialTripState();
+
+/** Build an array of TripDay for a date range, preserving existing items where possible. */
+function buildDaysForRange(
+  startDate: string,
+  endDate: string,
+  existingDays: TripDay[],
+): TripDay[] {
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
+  const dayCount = Math.max(1, Math.round((end - start) / 86400000) + 1);
+  const days: TripDay[] = [];
+  for (let i = 0; i < dayCount; i++) {
+    const existing = existingDays[i];
+    days.push({
+      id: existing?.id ?? `day-${Date.now()}-${i}`,
+      dayNumber: i + 1,
+      date: new Date(start + i * 86400000).toISOString(),
+      label: existing?.label ?? '',
+      items: existing?.items ?? [],
+    });
+  }
+  return days;
+}
 
 export function tripReducer(state: TripState, action: TripAction): TripState {
   switch (action.type) {
@@ -105,6 +131,10 @@ export function tripReducer(state: TripState, action: TripAction): TripState {
     }
 
     case 'SET_START_DATE': {
+      if (state.endDate) {
+        const days = buildDaysForRange(action.date, state.endDate, state.days);
+        return { ...state, startDate: action.date, days };
+      }
       const newDays = state.days.map((day) => ({
         ...day,
         date: new Date(
@@ -112,6 +142,14 @@ export function tripReducer(state: TripState, action: TripAction): TripState {
         ).toISOString(),
       }));
       return { ...state, startDate: action.date, days: newDays };
+    }
+
+    case 'SET_END_DATE': {
+      if (state.startDate) {
+        const days = buildDaysForRange(state.startDate, action.date, state.days);
+        return { ...state, endDate: action.date, days };
+      }
+      return { ...state, endDate: action.date };
     }
 
     case 'SET_TRIP_NAME':
