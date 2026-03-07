@@ -4,32 +4,30 @@ import {
   Text,
   TextInput,
   Pressable,
-  Modal,
+  Alert,
+  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
-  Alert,
 } from 'react-native';
-import { X, Send, Camera, Image as ImageIcon } from 'lucide-react-native';
+import { X, Send } from 'lucide-react-native';
 import { StarRating } from './StarRating';
-import { Button } from '@/components/ui/Button';
 import { createReview } from '@/lib/api';
 
 interface WriteReviewSheetProps {
-  visible: boolean;
   entityType: 'trail' | 'business';
   entityId: string;
   entityName: string;
+  visible: boolean;
   onClose: () => void;
   onSubmitted: () => void;
 }
 
 export function WriteReviewSheet({
-  visible,
   entityType,
   entityId,
   entityName,
+  visible,
   onClose,
   onSubmitted,
 }: WriteReviewSheetProps) {
@@ -37,12 +35,19 @@ export function WriteReviewSheet({
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [photoPlaceholders, setPhotoPlaceholders] = useState<number[]>([]);
 
-  const canSubmit = rating > 0 && title.trim().length > 0;
+  if (!visible) return null;
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
+    if (rating === 0) {
+      Alert.alert('Rating Required', 'Please select a star rating.');
+      return;
+    }
+    if (!title.trim()) {
+      Alert.alert('Title Required', 'Please add a title for your review.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await createReview({
@@ -52,227 +57,197 @@ export function WriteReviewSheet({
         title: title.trim(),
         body: body.trim(),
       });
-      // Reset form
+      Alert.alert('Review Submitted', 'Thank you for your review!');
       setRating(0);
       setTitle('');
       setBody('');
-      setPhotoPlaceholders([]);
       onSubmitted();
       onClose();
-    } catch (err) {
+    } catch (error: any) {
       Alert.alert(
         'Error',
-        err instanceof Error ? err.message : 'Could not submit review. Please try again.',
+        error?.message ?? 'Failed to submit review. Please try again.',
       );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleClose = () => {
-    if (title || body || rating > 0) {
-      Alert.alert('Discard Review?', 'Your review will not be saved.', [
-        { text: 'Keep Editing', style: 'cancel' },
-        {
-          text: 'Discard',
-          style: 'destructive',
-          onPress: () => {
-            setRating(0);
-            setTitle('');
-            setBody('');
-            setPhotoPlaceholders([]);
-            onClose();
-          },
-        },
-      ]);
-    } else {
-      onClose();
-    }
-  };
-
-  const handleAddPhoto = () => {
-    // Placeholder — future integration with expo-image-picker
-    if (photoPlaceholders.length >= 6) {
-      Alert.alert('Maximum Photos', 'You can add up to 6 photos per review.');
-      return;
-    }
-    setPhotoPlaceholders((prev) => [...prev, prev.length + 1]);
-  };
-
-  const handleRemovePhoto = (index: number) => {
-    setPhotoPlaceholders((prev) => prev.filter((_, i) => i !== index));
-  };
-
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent
-      onRequestClose={handleClose}
-    >
+    <View style={styles.overlay}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 justify-end"
+        style={styles.container}
       >
-        {/* Backdrop */}
-        <Pressable
-          onPress={handleClose}
-          className="absolute inset-0 bg-black/50"
-        />
-
-        {/* Sheet */}
-        <View className="bg-cairn-bg border-t border-cairn-border rounded-t-3xl px-4 pt-4 pb-10">
-          {/* Handle bar */}
-          <View className="items-center mb-2">
-            <View className="w-10 h-1 rounded-full bg-cairn-border" />
-          </View>
-
+        <View style={styles.sheet}>
           {/* Header */}
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-slate-100 font-bold text-lg">
-              Write a Review
-            </Text>
-            <Pressable onPress={handleClose} className="p-1">
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Write a Review</Text>
+            <Pressable onPress={onClose} style={styles.closeButton}>
               <X size={20} color="#94a3b8" />
             </Pressable>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {/* Entity name */}
-            <Text className="text-slate-400 text-sm mb-4" numberOfLines={1}>
-              {entityName}
-            </Text>
+          <ScrollView
+            style={styles.content}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={styles.entityName}>{entityName}</Text>
 
-            {/* Star picker */}
-            <View className="items-center mb-6">
-              <Text className="text-slate-300 text-sm font-medium mb-3">
-                Your Rating
-              </Text>
-              <StarRating rating={rating} size={32} onRate={setRating} />
-              {rating > 0 && (
-                <Text className="text-amber-400 text-sm mt-2 font-medium">
-                  {rating === 1
-                    ? 'Poor'
-                    : rating === 2
-                      ? 'Fair'
-                      : rating === 3
-                        ? 'Good'
-                        : rating === 4
-                          ? 'Great'
-                          : 'Excellent'}
-                </Text>
-              )}
+            {/* Star rating */}
+            <View style={styles.ratingSection}>
+              <Text style={styles.label}>Your Rating</Text>
+              <StarRating rating={rating} size={32} interactive onRate={setRating} />
             </View>
 
             {/* Title */}
-            <Text className="text-slate-300 text-sm font-medium mb-2">
-              Title
-            </Text>
-            <TextInput
-              value={title}
-              onChangeText={setTitle}
-              placeholder="Summarize your experience"
-              placeholderTextColor="#475569"
-              style={styles.input}
-              maxLength={100}
-            />
-
-            {/* Body */}
-            <Text className="text-slate-300 text-sm font-medium mb-2 mt-4">
-              Review
-            </Text>
-            <TextInput
-              value={body}
-              onChangeText={setBody}
-              placeholder="Share details about your experience..."
-              placeholderTextColor="#475569"
-              style={[styles.input, styles.textArea]}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-              maxLength={2000}
-            />
-
-            {/* Character count */}
-            <Text className="text-slate-600 text-xs text-right mt-1">
-              {body.length}/2000
-            </Text>
-
-            {/* ── Add Photos Section ── */}
-            <Text className="text-slate-300 text-sm font-medium mb-2 mt-4">
-              Photos
-            </Text>
-            <View className="flex-row flex-wrap gap-2 mb-6">
-              {/* Photo placeholders */}
-              {photoPlaceholders.map((_, index) => (
-                <View
-                  key={index}
-                  className="w-20 h-20 rounded-xl bg-cairn-elevated items-center justify-center"
-                  style={{ borderWidth: 1, borderColor: 'rgba(30, 58, 95, 0.5)' }}
-                >
-                  <ImageIcon size={16} color="#475569" />
-                  <Pressable
-                    onPress={() => handleRemovePhoto(index)}
-                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 items-center justify-center"
-                  >
-                    <X size={10} color="white" />
-                  </Pressable>
-                </View>
-              ))}
-
-              {/* Add photo button */}
-              {photoPlaceholders.length < 6 && (
-                <Pressable
-                  onPress={handleAddPhoto}
-                  className="w-20 h-20 rounded-xl items-center justify-center"
-                  style={{
-                    borderWidth: 1.5,
-                    borderColor: 'rgba(16, 185, 129, 0.4)',
-                    borderStyle: 'dashed',
-                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                  }}
-                >
-                  <Camera size={20} color="#10B981" />
-                  <Text className="text-canopy text-[10px] font-medium mt-1">
-                    Add Photo
-                  </Text>
-                </Pressable>
-              )}
+            <View style={styles.inputSection}>
+              <Text style={styles.label}>Title</Text>
+              <TextInput
+                value={title}
+                onChangeText={setTitle}
+                placeholder="Summarize your experience"
+                placeholderTextColor="#475569"
+                style={styles.input}
+              />
             </View>
 
-            {/* Submit */}
-            <Button
-              onPress={handleSubmit}
-              disabled={!canSubmit}
-              loading={submitting}
-              size="lg"
-            >
-              <View className="flex-row items-center">
-                <Send size={16} color="white" />
-                <Text className="text-white font-semibold text-base ml-2">
-                  Submit Review
-                </Text>
-              </View>
-            </Button>
+            {/* Body */}
+            <View style={styles.inputSection}>
+              <Text style={styles.label}>Review</Text>
+              <TextInput
+                value={body}
+                onChangeText={setBody}
+                placeholder="Share details about your experience..."
+                placeholderTextColor="#475569"
+                style={[styles.input, styles.textArea]}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
           </ScrollView>
+
+          {/* Submit button */}
+          <View style={styles.footer}>
+            <Pressable
+              onPress={handleSubmit}
+              disabled={submitting || rating === 0}
+              style={[
+                styles.submitButton,
+                (submitting || rating === 0) && styles.submitButtonDisabled,
+              ]}
+            >
+              <Send size={16} color="white" />
+              <Text style={styles.submitText}>
+                {submitting ? 'Submitting...' : 'Submit Review'}
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </KeyboardAvoidingView>
-    </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+    zIndex: 100,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: '#0B1A2B',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderTopWidth: 1,
+    borderColor: '#1E3A5F',
+    maxHeight: '85%',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1E3A5F',
+  },
+  headerTitle: {
+    color: '#e2e8f0',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  entityName: {
+    color: '#94a3b8',
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  ratingSection: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  label: {
+    color: '#94a3b8',
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  inputSection: {
+    marginBottom: 16,
+  },
   input: {
     backgroundColor: '#0F2337',
     borderWidth: 1,
     borderColor: '#1E3A5F',
     borderRadius: 12,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 10,
+    color: '#e2e8f0',
     fontSize: 14,
-    color: '#f1f5f9',
   },
   textArea: {
     minHeight: 100,
+    paddingTop: 12,
+  },
+  footer: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    paddingBottom: 32,
+    borderTopWidth: 1,
+    borderTopColor: '#1E3A5F',
+  },
+  submitButton: {
+    backgroundColor: '#10B981',
+    borderRadius: 14,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
+  submitText: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });

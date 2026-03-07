@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, Pressable, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -17,7 +17,7 @@ import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { decodeTripState } from '@/lib/trip-share';
 import { estimateTripCost } from '@/lib/trip-cost';
 import { useTripContext } from '@/lib/trip-context';
-import { MOCK_TRAILS } from '@/lib/mock-data';
+import { fetchTrails } from '@/lib/api';
 import { ACTIVITY_TYPES } from '@cairn/shared';
 import { Share } from 'react-native';
 
@@ -53,6 +53,23 @@ export default function SharedTripScreen() {
     return decodeTripState(code);
   }, [code]);
 
+  const [trails, setTrails] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!tripState) return;
+    const trailIds = new Set<string>();
+    for (const day of tripState.days) {
+      for (const item of day.items) {
+        if (item.type === 'trail' && item.trailId) trailIds.add(item.trailId);
+      }
+    }
+    if (trailIds.size === 0) return;
+
+    fetchTrails({ limit: 100 })
+      .then(setTrails)
+      .catch(() => setTrails([]));
+  }, [tripState]);
+
   const costEstimate = useMemo(() => {
     if (!tripState) return null;
     return estimateTripCost(tripState);
@@ -68,7 +85,7 @@ export default function SharedTripScreen() {
     for (const day of tripState.days) {
       for (const item of day.items) {
         if (item.type === 'trail' && item.trailId) {
-          const trail = MOCK_TRAILS.find((t) => t.id === item.trailId);
+          const trail = trails.find((t) => t.id === item.trailId);
           if (trail) {
             totalTrails++;
             totalDistance += trail.distance_meters;
@@ -80,7 +97,7 @@ export default function SharedTripScreen() {
     }
 
     return { totalTrails, totalDistance, totalElevation, totalDuration };
-  }, [tripState]);
+  }, [tripState, trails]);
 
   const formatDistance = (meters: number) => {
     const miles = meters / 1609.34;
@@ -287,7 +304,7 @@ export default function SharedTripScreen() {
                 <View className="gap-2">
                   {day.items.map((item) => {
                     if (item.type === 'trail' && item.trailId) {
-                      const trail = MOCK_TRAILS.find((t) => t.id === item.trailId);
+                      const trail = trails.find((t) => t.id === item.trailId);
                       if (!trail) return null;
                       return (
                         <View

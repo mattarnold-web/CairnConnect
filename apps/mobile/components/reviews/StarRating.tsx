@@ -3,42 +3,36 @@ import { Star } from 'lucide-react-native';
 
 interface StarRatingProps {
   rating: number;
+  maxStars?: number;
   size?: number;
-  /** If provided, stars are tappable */
+  interactive?: boolean;
   onRate?: (rating: number) => void;
-  color?: string;
 }
 
 export function StarRating({
   rating,
-  size = 14,
+  maxStars = 5,
+  size = 16,
+  interactive = false,
   onRate,
-  color = '#F4A261',
 }: StarRatingProps) {
-  const stars = Array.from({ length: 5 }, (_, i) => i + 1);
-
   return (
-    <View className="flex-row items-center gap-0.5">
-      {stars.map((star) => {
-        const filled = star <= Math.round(rating);
-        const starElement = (
-          <Star
-            key={star}
-            size={size}
-            color={color}
-            fill={filled ? color : 'transparent'}
-          />
+    <View style={{ flexDirection: 'row', gap: 2 }}>
+      {Array.from({ length: maxStars }).map((_, i) => {
+        const filled = i < Math.round(rating);
+        const StarWrapper = interactive ? Pressable : View;
+        return (
+          <StarWrapper
+            key={i}
+            onPress={interactive ? () => onRate?.(i + 1) : undefined}
+          >
+            <Star
+              size={size}
+              color={filled ? '#fbbf24' : '#334155'}
+              fill={filled ? '#fbbf24' : 'transparent'}
+            />
+          </StarWrapper>
         );
-
-        if (onRate) {
-          return (
-            <Pressable key={star} onPress={() => onRate(star)} hitSlop={4}>
-              {starElement}
-            </Pressable>
-          );
-        }
-
-        return starElement;
       })}
     </View>
   );

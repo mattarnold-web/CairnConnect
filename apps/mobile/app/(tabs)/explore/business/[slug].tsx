@@ -20,6 +20,8 @@ import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { TrailCard } from '@/components/trail/TrailCard';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton';
+import { ReviewCard } from '@/components/reviews/ReviewCard';
+import { WriteReviewSheet } from '@/components/reviews/WriteReviewSheet';
 import {
   fetchBusinessBySlug,
   fetchBusinessReviews,
@@ -49,6 +51,7 @@ export default function BusinessDetailScreen() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [relatedTrails, setRelatedTrails] = useState<Trail[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWriteReview, setShowWriteReview] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -459,45 +462,7 @@ export default function BusinessDetailScreen() {
 
             {reviews.length > 0 ? (
               reviews.slice(0, 3).map((review) => (
-                <Card key={review.id} className="mb-3">
-                  <View className="flex-row items-center justify-between mb-2">
-                    <View className="flex-row items-center">
-                      <View className="w-8 h-8 rounded-full bg-cairn-elevated items-center justify-center mr-2">
-                        <Text className="text-slate-300 text-xs font-semibold">
-                          {review.author_name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .join('')}
-                        </Text>
-                      </View>
-                      <View>
-                        <Text className="text-slate-200 text-sm font-medium">
-                          {review.author_name}
-                        </Text>
-                        <View className="flex-row items-center mt-0.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              size={10}
-                              color="#F4A261"
-                              fill={i < review.rating ? '#F4A261' : 'transparent'}
-                            />
-                          ))}
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                  {review.title && (
-                    <Text className="text-slate-200 font-medium text-sm mb-1">
-                      {review.title}
-                    </Text>
-                  )}
-                  {review.body && (
-                    <Text className="text-slate-400 text-sm leading-5">
-                      {review.body}
-                    </Text>
-                  )}
-                </Card>
+                <ReviewCard key={review.id} review={review} />
               ))
             ) : (
               <Card className="mb-3">
@@ -506,6 +471,14 @@ export default function BusinessDetailScreen() {
                 </Text>
               </Card>
             )}
+
+            {/* Write Review button */}
+            <Pressable
+              onPress={() => setShowWriteReview(true)}
+              className="bg-canopy/10 border border-canopy/30 rounded-xl py-3 items-center mb-2"
+            >
+              <Text className="text-canopy font-semibold text-sm">Write a Review</Text>
+            </Pressable>
           </View>
 
           {/* Accommodation Links */}
@@ -526,6 +499,21 @@ export default function BusinessDetailScreen() {
           <View className="h-8" />
         </View>
       </ScrollView>
+
+      {/* Write Review Sheet */}
+      {business && (
+        <WriteReviewSheet
+          entityType="business"
+          entityId={business.id}
+          entityName={business.name}
+          visible={showWriteReview}
+          onClose={() => setShowWriteReview(false)}
+          onSubmitted={async () => {
+            const newReviews = await fetchBusinessReviews(business.id);
+            setReviews(newReviews);
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }

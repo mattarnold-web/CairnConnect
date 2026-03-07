@@ -11,6 +11,8 @@ export interface TripRegion {
   trailCount: number;
   businessCount: number;
   hasData: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 export interface TripDay {

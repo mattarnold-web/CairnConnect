@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Alert,
   Share,
   StyleSheet,
-  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -35,11 +35,10 @@ import { Badge } from '@/components/ui/Badge';
 import { FilterChip } from '@/components/ui/FilterChip';
 import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
-import { TrailSearchSheet } from '@/components/trip/TrailSearchSheet';
-import { ShareTripSheet } from '@/components/trip/ShareTripSheet';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { SearchBar } from '@/components/ui/SearchBar';
 import { useTripContext } from '@/lib/trip-context';
-import { MOCK_REGIONS, MOCK_TRAILS } from '@/lib/mock-data';
+import { searchRegions, searchTrailsForTrip } from '@/lib/api';
+import type { RegionResult, TripTrailResult } from '@/lib/api';
 import { ACTIVITY_TYPES } from '@cairn/shared';
 import { encodeTripState } from '@/lib/trip-share';
 import { estimateTripCost } from '@/lib/trip-cost';
@@ -93,6 +92,15 @@ const UNIT_LABELS: Record<string, string> = {
   flat: '',
 };
 
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(timer);
+  }, [value, delayMs]);
+  return debounced;
+}
+
 export default function TripScreen() {
   const { state, dispatch } = useTripContext();
   const currentStepIndex = STEPS.findIndex((s) => s.key === state.currentStep);
@@ -126,6 +134,50 @@ export default function TripScreen() {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  // Real data state
+  const [regions, setRegions] = useState<RegionResult[]>([]);
+  const [loadingRegions, setLoadingRegions] = useState(true);
+  const [regionSearch, setRegionSearch] = useState('');
+  const [trailResults, setTrailResults] = useState<TripTrailResult[]>([]);
+  const [loadingTrails, setLoadingTrails] = useState(false);
+  // Cache of full trail data for resolving names/details in itinerary display
+  const [trailCache, setTrailCache] = useState<Record<string, any>>({});
+
+  const debouncedRegionSearch = useDebouncedValue(regionSearch, 300);
+
+  // Load regions on mount
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingRegions(true);
+    searchRegions(undefined, 20)
+      .then((data) => {
+        if (!cancelled) setRegions(data);
+      })
+      .catch(() => {
+        if (!cancelled) setRegions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingRegions(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Refetch regions when search query changes
+  useEffect(() => {
+    if (!debouncedRegionSearch) return;
+    let cancelled = false;
+    setLoadingRegions(true);
+    searchRegions(debouncedRegionSearch, 20)
+      .then((data) => {
+        if (!cancelled) setRegions(data);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoadingRegions(false);
+      });
+    return () => { cancelled = true; };
+  }, [debouncedRegionSearch]);
+
   const handleNext = () => {
     if (currentStepIndex < STEPS.length - 1) {
       dispatch({ type: 'SET_STEP', step: STEPS[currentStepIndex + 1].key });
@@ -145,20 +197,31 @@ export default function TripScreen() {
     });
   };
 
-  // Trail suggestions based on region and selected activities
-  const trailSuggestions = useMemo(() => {
-    if (!state.region) return [];
-    return MOCK_TRAILS.filter((trail) => {
-      // Match region by city name
-      if (trail.city.toLowerCase() !== state.region!.name.toLowerCase()) return false;
-      // If activities selected, match at least one
-      if (state.selectedActivities.length > 0) {
-        return trail.activity_types.some((at: string) =>
-          state.selectedActivities.includes(at),
-        );
-      }
-      return true;
-    });
+  // Fetch trail suggestions when region or activities change
+  useEffect(() => {
+    if (!state.region) {
+      setTrailResults([]);
+      return;
+    }
+    let cancelled = false;
+    setLoadingTrails(true);
+    searchTrailsForTrip({
+      lat: state.region.lat ?? undefined,
+      lng: state.region.lng ?? undefined,
+      radiusKm: 50,
+      activityTypes: state.selectedActivities.length > 0 ? state.selectedActivities : undefined,
+      limit: 20,
+    })
+      .then((data) => {
+        if (!cancelled) setTrailResults(data);
+      })
+      .catch(() => {
+        if (!cancelled) setTrailResults([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingTrails(false);
+      });
+    return () => { cancelled = true; };
   }, [state.region, state.selectedActivities]);
 
   // Smart suggestions
@@ -177,19 +240,19 @@ export default function TripScreen() {
     for (const day of state.days) {
       for (const item of day.items) {
         if (item.type === 'trail' && item.trailId) {
-          const trail = MOCK_TRAILS.find((t) => t.id === item.trailId);
+          const trail = trailCache[item.trailId];
           if (trail) {
             totalTrails++;
-            totalDistance += trail.distance_meters;
-            totalElevation += trail.elevation_gain_meters;
-            totalDuration += trail.estimated_duration_minutes ?? 0;
+            totalDistance += trail.distance_meters ?? 0;
+            totalElevation += trail.elevation_gain_meters ?? 0;
+            // TripTrailResult doesn't have estimated_duration_minutes
           }
         }
       }
     }
 
     return { totalTrails, totalDistance, totalElevation, totalDuration };
-  }, [state.days]);
+  }, [state.days, trailCache]);
 
   const formatDistance = (meters: number) => {
     const miles = meters / 1609.34;
@@ -208,7 +271,7 @@ export default function TripScreen() {
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   };
 
-  const addTrailToDay = (dayId: string, trail: (typeof MOCK_TRAILS)[number]) => {
+  const addTrailToDay = (dayId: string, trail: TripTrailResult) => {
     const item: TripDayItem = {
       id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       type: 'trail',
@@ -219,6 +282,10 @@ export default function TripScreen() {
       timeSlot: null,
     };
     dispatch({ type: 'ADD_ITEM_TO_DAY', dayId, item });
+    setTrailCache((prev) => ({
+      ...prev,
+      [trail.id]: trail,
+    }));
     setAddingToDayId(null);
   };
 
@@ -320,56 +387,86 @@ export default function TripScreen() {
             <Text className="text-slate-500 text-sm mb-4">
               Select where you want to explore
             </Text>
-            <View className="flex-row flex-wrap gap-3">
-              {MOCK_REGIONS.map((region) => (
-                <Pressable
-                  key={region.slug}
-                  onPress={() => {
-                    dispatch({ type: 'SET_REGION', region });
-                    handleNext();
-                  }}
-                  className={`bg-cairn-card border rounded-2xl p-4 w-[47%] active:bg-cairn-card-hover ${
-                    state.region?.slug === region.slug
-                      ? 'border-canopy'
-                      : 'border-cairn-border'
-                  }`}
-                >
-                  <Text className="text-3xl mb-2">{region.coverEmoji}</Text>
-                  <Text className="text-slate-100 font-semibold text-sm">
-                    {region.name}
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    {region.state_province}, {region.country}
-                  </Text>
-                  {region.hasData ? (
-                    <View className="flex-row items-center mt-2 gap-2">
-                      <View className="flex-row items-center">
-                        <Mountain size={10} color="#10B981" />
-                        <Text className="text-canopy text-[10px] font-medium ml-0.5">
-                          {region.trailCount} trails
-                        </Text>
-                      </View>
-                      <Text className="text-slate-600 text-[10px]">{'\u2022'}</Text>
-                      <Text className="text-slate-500 text-[10px]">
-                        {region.businessCount} biz
-                      </Text>
-                    </View>
-                  ) : (
-                    <Text className="text-slate-600 text-[10px] mt-2 italic">
-                      Coming soon
-                    </Text>
-                  )}
-                  {region.description && (
-                    <Text
-                      className="text-slate-500 text-[10px] mt-1 leading-3"
-                      numberOfLines={2}
+
+            {/* Region search */}
+            <SearchBar
+              value={regionSearch}
+              onChangeText={setRegionSearch}
+              placeholder="Search regions..."
+            />
+
+            {loadingRegions ? (
+              <View className="items-center justify-center py-12">
+                <ActivityIndicator size="large" color="#10B981" />
+                <Text className="text-slate-500 text-sm mt-3">Loading regions...</Text>
+              </View>
+            ) : regions.length === 0 ? (
+              <View className="items-center justify-center py-12">
+                <Text className="text-slate-500 text-sm">No regions found</Text>
+              </View>
+            ) : (
+              <View className="flex-row flex-wrap gap-3 mt-3">
+                {regions.map((region) => {
+                  const regionSlug = region.city.toLowerCase().replace(/\s+/g, '-');
+                  return (
+                    <Pressable
+                      key={`${region.city}-${region.state_province}`}
+                      onPress={() => {
+                        dispatch({
+                          type: 'SET_REGION',
+                          region: {
+                            slug: regionSlug,
+                            name: region.city,
+                            state_province: region.state_province ?? '',
+                            country: region.country ?? '',
+                            continent: '',
+                            description: '',
+                            coverEmoji: '\u{1F3D4}\uFE0F',
+                            trailCount: region.trail_count,
+                            businessCount: region.business_count,
+                            hasData: region.trail_count > 0,
+                            lat: region.lat,
+                            lng: region.lng,
+                          },
+                        });
+                        handleNext();
+                      }}
+                      className={`bg-cairn-card border rounded-2xl p-4 w-[47%] active:bg-cairn-card-hover ${
+                        state.region?.slug === regionSlug
+                          ? 'border-canopy'
+                          : 'border-cairn-border'
+                      }`}
                     >
-                      {region.description}
-                    </Text>
-                  )}
-                </Pressable>
-              ))}
-            </View>
+                      <Text className="text-3xl mb-2">{'\u{1F3D4}\uFE0F'}</Text>
+                      <Text className="text-slate-100 font-semibold text-sm">
+                        {region.city}
+                      </Text>
+                      <Text className="text-slate-500 text-xs">
+                        {region.state_province ?? ''}{region.state_province && region.country ? ', ' : ''}{region.country ?? ''}
+                      </Text>
+                      {region.trail_count > 0 ? (
+                        <View className="flex-row items-center mt-2 gap-2">
+                          <View className="flex-row items-center">
+                            <Mountain size={10} color="#10B981" />
+                            <Text className="text-canopy text-[10px] font-medium ml-0.5">
+                              {region.trail_count} trails
+                            </Text>
+                          </View>
+                          <Text className="text-slate-600 text-[10px]">{'\u2022'}</Text>
+                          <Text className="text-slate-500 text-[10px]">
+                            {region.business_count} biz
+                          </Text>
+                        </View>
+                      ) : (
+                        <Text className="text-slate-600 text-[10px] mt-2 italic">
+                          Coming soon
+                        </Text>
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
           </View>
         )}
 
@@ -583,8 +680,8 @@ export default function TripScreen() {
                             {allItems.length > 0 ? (
                               allItems.map((item) => {
                                 const trail =
-                                  item.type === 'trail'
-                                    ? MOCK_TRAILS.find((t) => t.id === item.trailId)
+                                  item.type === 'trail' && item.trailId
+                                    ? trailCache[item.trailId]
                                     : null;
                                 return (
                                   <View
@@ -597,13 +694,17 @@ export default function TripScreen() {
                                       </Text>
                                       {trail && (
                                         <View className="flex-row items-center gap-2 mt-0.5">
-                                          <Badge
-                                            label={DIFFICULTY_LABELS[trail.difficulty] ?? trail.difficulty}
-                                            variant={DIFFICULTY_BADGE_VARIANT[trail.difficulty] ?? 'default'}
-                                          />
-                                          <Text className="text-slate-500 text-[10px]">
-                                            {formatDistance(trail.distance_meters)}
-                                          </Text>
+                                          {trail.difficulty && (
+                                            <Badge
+                                              label={DIFFICULTY_LABELS[trail.difficulty] ?? trail.difficulty}
+                                              variant={DIFFICULTY_BADGE_VARIANT[trail.difficulty] ?? 'default'}
+                                            />
+                                          )}
+                                          {trail.distance_meters != null && (
+                                            <Text className="text-slate-500 text-[10px]">
+                                              {formatDistance(trail.distance_meters)}
+                                            </Text>
+                                          )}
                                         </View>
                                       )}
                                     </View>
@@ -651,15 +752,20 @@ export default function TripScreen() {
                       {/* Add activity section */}
                       {addingToDayId === day.id ? (
                         <View className="mt-2 border-t border-cairn-border pt-3">
-                          {/* Trail suggestions (quick picks) */}
-                          {trailSuggestions.length > 0 && (
+                          {/* Trail suggestions */}
+                          {loadingTrails ? (
+                            <View className="items-center py-4 mb-3">
+                              <ActivityIndicator size="small" color="#10B981" />
+                              <Text className="text-slate-500 text-[10px] mt-1">Loading trails...</Text>
+                            </View>
+                          ) : trailResults.length > 0 ? (
                             <View className="mb-3">
                               <Text className="text-slate-400 text-xs font-medium mb-2">
                                 Quick Picks
                               </Text>
                               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 <View className="flex-row gap-2">
-                                  {trailSuggestions.slice(0, 5).map((trail) => (
+                                  {trailResults.map((trail) => (
                                     <Pressable
                                       key={trail.id}
                                       onPress={() => addTrailToDay(day.id, trail)}
@@ -668,27 +774,35 @@ export default function TripScreen() {
                                       <Text className="text-slate-200 text-xs font-semibold" numberOfLines={1}>
                                         {trail.name}
                                       </Text>
-                                      <View className="flex-row items-center gap-1 mt-1">
-                                        <Badge
-                                          label={DIFFICULTY_LABELS[trail.difficulty] ?? trail.difficulty}
-                                          variant={DIFFICULTY_BADGE_VARIANT[trail.difficulty] ?? 'default'}
-                                        />
-                                      </View>
+                                      {trail.difficulty && (
+                                        <View className="flex-row items-center gap-1 mt-1">
+                                          <Badge
+                                            label={DIFFICULTY_LABELS[trail.difficulty] ?? trail.difficulty}
+                                            variant={DIFFICULTY_BADGE_VARIANT[trail.difficulty] ?? 'default'}
+                                          />
+                                        </View>
+                                      )}
                                       <View className="flex-row items-center gap-2 mt-1">
-                                        <Text className="text-slate-500 text-[10px]">
-                                          {formatDistance(trail.distance_meters)}
-                                        </Text>
-                                        <Text className="text-slate-600 text-[10px]">{'\u2022'}</Text>
-                                        <Text className="text-slate-500 text-[10px]">
-                                          {formatDuration(trail.estimated_duration_minutes)}
-                                        </Text>
+                                        {trail.distance_meters != null && (
+                                          <Text className="text-slate-500 text-[10px]">
+                                            {formatDistance(trail.distance_meters)}
+                                          </Text>
+                                        )}
+                                        {trail.distance_km != null && (
+                                          <>
+                                            <Text className="text-slate-600 text-[10px]">{'\u2022'}</Text>
+                                            <Text className="text-slate-500 text-[10px]">
+                                              {trail.distance_km.toFixed(1)} km away
+                                            </Text>
+                                          </>
+                                        )}
                                       </View>
                                     </Pressable>
                                   ))}
                                 </View>
                               </ScrollView>
                             </View>
-                          )}
+                          ) : null}
 
                           {/* Search all trails button */}
                           <Pressable
@@ -927,8 +1041,16 @@ export default function TripScreen() {
                   <View className="gap-2">
                     {day.items.map((item) => {
                       if (item.type === 'trail' && item.trailId) {
-                        const trail = MOCK_TRAILS.find((t) => t.id === item.trailId);
-                        if (!trail) return null;
+                        const trail = trailCache[item.trailId];
+                        if (!trail) return (
+                          <View
+                            key={item.id}
+                            className="flex-row items-start gap-2 p-2 bg-cairn-bg/50 rounded-lg"
+                          >
+                            <View className="h-2.5 w-2.5 rounded-full mt-1.5 bg-slate-500" />
+                            <Text className="text-slate-300 text-xs">Trail</Text>
+                          </View>
+                        );
                         return (
                           <View
                             key={item.id}
@@ -954,13 +1076,19 @@ export default function TripScreen() {
                                 {trail.name}
                               </Text>
                               <View className="flex-row items-center gap-1 mt-0.5">
-                                <Text className="text-slate-500 text-[10px]">
-                                  {DIFFICULTY_LABELS[trail.difficulty]}
-                                </Text>
-                                <Text className="text-slate-600 text-[10px]">{'\u2022'}</Text>
-                                <Text className="text-slate-500 text-[10px]">
-                                  {formatDistance(trail.distance_meters)}
-                                </Text>
+                                {trail.difficulty && (
+                                  <Text className="text-slate-500 text-[10px]">
+                                    {DIFFICULTY_LABELS[trail.difficulty] ?? trail.difficulty}
+                                  </Text>
+                                )}
+                                {trail.distance_meters != null && (
+                                  <>
+                                    {trail.difficulty && <Text className="text-slate-600 text-[10px]">{'\u2022'}</Text>}
+                                    <Text className="text-slate-500 text-[10px]">
+                                      {formatDistance(trail.distance_meters)}
+                                    </Text>
+                                  </>
+                                )}
                                 {item.timeSlot && (
                                   <>
                                     <Text className="text-slate-600 text-[10px]">{'\u2022'}</Text>
@@ -1154,8 +1282,8 @@ export default function TripScreen() {
               <View className="mb-3">
                 <AccommodationLinks
                   locationName={`${state.region.name}, ${state.region.state_province}`}
-                  lat={0}
-                  lng={0}
+                  lat={state.region.lat ?? 0}
+                  lng={state.region.lng ?? 0}
                   checkin={state.startDate ?? undefined}
                   checkout={
                     state.startDate && state.days.length > 0

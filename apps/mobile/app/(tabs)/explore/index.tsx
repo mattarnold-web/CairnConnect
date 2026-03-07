@@ -10,24 +10,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
-import {
-  Map as MapIcon,
-  List,
-  Navigation,
-  Compass,
-  Search as SearchIcon,
-} from 'lucide-react-native';
+import { Map as MapIcon, Navigation, Layers, Compass, Bed, Search as SearchIcon, Store } from 'lucide-react-native';
+import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { TrailCard } from '@/components/trail/TrailCard';
 import { BusinessCard } from '@/components/business/BusinessCard';
 import { MapPin } from '@/components/ui/MapPin';
 import { SkeletonCard } from '@/components/ui/Skeleton';
-import {
-  FilterSheet,
-  FilterButton,
-  type FilterState,
-} from '@/components/ui/FilterSheet';
-import { fetchTrails, fetchBusinesses } from '@/lib/api';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { fetchTrails, fetchBusinesses, autocompleteLocations } from '@/lib/api';
+import type { AutocompleteResult } from '@/lib/api';
 import { exploreRegion } from '@/lib/discovery';
 import { BUSINESS_CATEGORIES } from '@cairn/shared';
 import type { Trail, Business } from '@cairn/shared';
@@ -90,7 +82,9 @@ export default function ExploreScreen() {
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const [discovering, setDiscovering] = useState(false);
   const [discoveryMessage, setDiscoveryMessage] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
+  const [autocompleteResults, setAutocompleteResults] = useState<AutocompleteResult[]>([]);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const regionName = params.regionName ?? 'Moab, Utah';
   const regionLat = params.lat ? parseFloat(params.lat) : 38.5733;
@@ -156,6 +150,27 @@ export default function ExploreScreen() {
       cancelled = true;
     };
   }, [debouncedSearch, filters]);
+
+  // Autocomplete effect
+  useEffect(() => {
+    if (!debouncedSearch || debouncedSearch.length < 2) {
+      setAutocompleteResults([]);
+      setShowAutocomplete(false);
+      return;
+    }
+    let cancelled = false;
+    autocompleteLocations(debouncedSearch, regionLat, regionLng, 6)
+      .then((results) => {
+        if (!cancelled) {
+          setAutocompleteResults(results);
+          setShowAutocomplete(results.length > 0);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setAutocompleteResults([]);
+      });
+    return () => { cancelled = true; };
+  }, [debouncedSearch, regionLat, regionLng]);
 
   const isLoading =
     activeTab === 'trails' ? loadingTrails : loadingBusinesses;
@@ -237,9 +252,82 @@ export default function ExploreScreen() {
   // Map area — full height minus search bar area
   const MAP_HEIGHT = Dimensions.get('window').height - 200;
 
-  // Find selected pin entity for popup card
-  const selectedTrail = trails.find((t) => t.id === selectedPinId);
-  const selectedBiz = businesses.find((b) => b.id === selectedPinId);
+  const activityFilterData = useMemo(
+    () => [
+      { slug: null as string | null, emoji: '\u{1F30D}', label: 'All' },
+      ...ACTIVITY_TYPES.slice(0, 10),
+    ],
+    [],
+  );
+
+  const getCategoryInfo = useCallback(
+    (category: string) => BUSINESS_CATEGORIES.find((c) => c.value === category),
+    [],
+  );
+
+  type ListItem =
+    | { type: 'trail'; data: Trail }
+    | { type: 'business'; data: Business };
+
+  const renderBottomSheetContent = useCallback(() => {
+    if (isLoading) {
+      return (
+        <View style={{ paddingHorizontal: 16, paddingBottom: 100 }}>
+          <SkeletonCard className="mb-3" />
+          <SkeletonCard className="mb-3" />
+          <SkeletonCard className="mb-3" />
+        </View>
+      );
+    }
+
+    const items: ListItem[] =
+      activeTab === 'trails'
+        ? trails.map((t) => ({ type: 'trail' as const, data: t }))
+        : businesses.map((b) => ({ type: 'business' as const, data: b }));
+
+    return (
+      <BottomSheetFlatList<ListItem>
+        data={items}
+        keyExtractor={(item: ListItem) => item.data.id}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
+        renderItem={({ item }: { item: ListItem }) => {
+          if (item.type === 'trail') {
+            return (
+              <TrailCard
+                trail={item.data as Trail}
+                onPress={() => handleTrailPress(item.data as Trail)}
+              />
+            );
+          }
+          return (
+            <BusinessCard
+              business={item.data as Business}
+              onPress={() => handleBusinessPress(item.data as Business)}
+            />
+          );
+        }}
+        ListEmptyComponent={
+          activeTab === 'trails' ? (
+            <EmptyState
+              icon={MapIcon}
+              title="No trails found"
+              description="Try adjusting your search or filters to discover trails in this area."
+              actionLabel={selectedActivity || debouncedSearch ? 'Clear Filters' : undefined}
+              onAction={selectedActivity || debouncedSearch ? () => { setSelectedActivity(null); setSearch(''); } : undefined}
+            />
+          ) : (
+            <EmptyState
+              icon={Store}
+              title="No businesses found"
+              description="Try expanding your search area to find local outdoor businesses."
+              actionLabel={selectedActivity || debouncedSearch ? 'Clear Filters' : undefined}
+              onAction={selectedActivity || debouncedSearch ? () => { setSelectedActivity(null); setSearch(''); } : undefined}
+            />
+          )
+        }
+      />
+    );
+  }, [activeTab, trails, businesses, isLoading, handleTrailPress, handleBusinessPress, selectedActivity, debouncedSearch]);
 
   return (
     <SafeAreaView className="flex-1 bg-cairn-bg" edges={['top']}>
@@ -304,289 +392,62 @@ export default function ExploreScreen() {
         </Pressable>
       </View>
 
-      {viewMode === 'map' ? (
-        /* ── MAP MODE ── */
-        <View className="flex-1 relative">
-          {/* Map placeholder */}
-          <View className="flex-1 bg-[#091422]">
-            {/* Grid lines */}
-            {Array.from({ length: 8 }).map((_, i) => (
-              <View
-                key={`h-${i}`}
-                className="absolute left-0 right-0 border-b border-cairn-border/20"
-                style={{ top: (i + 1) * (MAP_HEIGHT / 9) }}
-              />
-            ))}
-            {Array.from({ length: 6 }).map((_, i) => (
-              <View
-                key={`v-${i}`}
-                className="absolute top-0 bottom-0 border-r border-cairn-border/20"
-                style={{ left: (i + 1) * (SCREEN_WIDTH / 7) }}
-              />
-            ))}
-
-            {/* Road lines */}
-            <View
-              className="absolute bg-cairn-border/30"
-              style={{
-                top: MAP_HEIGHT * 0.3,
-                left: 0,
-                right: 0,
-                height: 2,
-                transform: [{ rotate: '-15deg' }],
-              }}
-            />
-            <View
-              className="absolute bg-cairn-border/30"
-              style={{
-                top: 0,
-                bottom: 0,
-                left: SCREEN_WIDTH * 0.45,
-                width: 2,
-              }}
-            />
-            <View
-              className="absolute bg-blue-900/40"
-              style={{
-                top: MAP_HEIGHT * 0.5,
-                left: 0,
-                right: SCREEN_WIDTH * 0.3,
-                height: 3,
-                transform: [{ rotate: '-8deg' }],
-              }}
-            />
-
-            {/* Region label */}
-            <View
-              className="absolute"
-              style={{ top: 12, left: SCREEN_WIDTH * 0.35 }}
-            >
-              <Text className="text-slate-600/60 text-xs font-medium tracking-wider">
-                {regionName.toUpperCase()}
-              </Text>
-            </View>
-
-            {/* Trail pins */}
-            {activeTab === 'trails' &&
-              trails.map((trail) => {
-                const pos = latLngToXY(
-                  trail.lat,
-                  trail.lng,
-                  SCREEN_WIDTH,
-                  MAP_HEIGHT,
-                );
-                const emoji =
-                  trail.activity_types[0] === 'mtb'
-                    ? '\u{1F6B5}'
-                    : trail.activity_types[0] === 'hiking'
-                      ? '\u{1F97E}'
-                      : '\u26F0\uFE0F';
-                return (
-                  <View
-                    key={trail.id}
-                    className="absolute"
-                    style={{ left: pos.x - 14, top: pos.y - 18 }}
-                  >
-                    <MapPin
-                      type="trail"
-                      variant={trail.difficulty}
-                      emoji={emoji}
-                      size="sm"
-                      selected={selectedPinId === trail.id}
-                      onPress={() => handlePinPress(trail.id)}
-                    />
-                  </View>
-                );
-              })}
-
-            {/* Business pins */}
-            {activeTab === 'businesses' &&
-              businesses.map((biz) => {
-                const cat = getCategoryInfo(biz.category);
-                const pos = latLngToXY(
-                  biz.lat,
-                  biz.lng,
-                  SCREEN_WIDTH,
-                  MAP_HEIGHT,
-                );
-                return (
-                  <View
-                    key={biz.id}
-                    className="absolute"
-                    style={{ left: pos.x - 14, top: pos.y - 18 }}
-                  >
-                    <MapPin
-                      type="business"
-                      variant={biz.category}
-                      emoji={cat?.icon ?? '\u{1F4CD}'}
-                      size="sm"
-                      selected={selectedPinId === biz.id}
-                      onPress={() => handlePinPress(biz.id)}
-                    />
-                  </View>
-                );
-              })}
-
-            {/* Loading spinner */}
-            {isLoading && (
-              <View className="absolute left-3 top-3">
-                <ActivityIndicator size="small" color="#10B981" />
-              </View>
-            )}
-
-            {/* Map controls */}
-            <View className="absolute right-3 top-3">
-              <View className="bg-cairn-card/90 border border-cairn-border rounded-xl overflow-hidden">
-                <Pressable
-                  onPress={() => router.push('/(tabs)/explore/regions')}
-                  className="p-2.5 items-center justify-center border-b border-cairn-border/50"
-                >
-                  <Compass size={18} color="#10B981" />
-                </Pressable>
-                <Pressable className="p-2.5 items-center justify-center">
-                  <Navigation size={18} color="#94a3b8" />
-                </Pressable>
-              </View>
-            </View>
-
-            {/* Location count */}
-            <View className="absolute left-3 bottom-3">
-              <View className="flex-row items-center bg-cairn-card/90 border border-cairn-border rounded-lg px-2.5 py-1.5">
-                <MapIcon size={12} color="#10B981" />
-                <Text className="text-slate-400 text-[10px] ml-1.5">
-                  {trails.length + businesses.length} locations
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Popup card when a pin is tapped */}
-          {selectedTrail && (
-            <View className="absolute bottom-4 left-4 right-4">
-              <TrailCard
-                trail={selectedTrail}
-                onPress={() => handleTrailPress(selectedTrail)}
-              />
-            </View>
-          )}
-          {selectedBiz && (
-            <View className="absolute bottom-4 left-4 right-4">
-              <BusinessCard
-                business={selectedBiz}
-                onPress={() => handleBusinessPress(selectedBiz)}
-              />
-            </View>
-          )}
-        </View>
-      ) : (
-        /* ── LIST MODE ── */
-        <View className="flex-1">
-          {/* Regions link */}
-          <View className="flex-row items-center gap-2 mx-4 mb-2">
-            <Pressable
-              onPress={() => router.push('/(tabs)/explore/regions')}
-              className="flex-row items-center bg-canopy/15 border border-canopy/30 rounded-lg px-3 py-2"
-            >
-              <Compass size={14} color="#10B981" />
-              <Text className="text-canopy text-xs font-semibold ml-1.5">
-                Regions
-              </Text>
-            </Pressable>
-          </View>
-
-          {/* Sparse results — Discover prompt */}
-          {hasSparseResults && (
-            <View className="mx-4 mb-2">
+        {/* Autocomplete dropdown */}
+        {showAutocomplete && (
+          <View className="mx-4 mb-2 bg-cairn-card border border-cairn-border rounded-xl overflow-hidden">
+            {autocompleteResults.map((result, i) => (
               <Pressable
-                onPress={handleDiscoverArea}
-                disabled={discovering}
-                className="bg-canopy/10 border border-canopy/30 rounded-xl p-3 flex-row items-center"
+                key={`${result.entity_type}-${result.id}`}
+                onPress={() => {
+                  if (result.entity_type === 'trail') {
+                    router.push(`/(tabs)/explore/trail/${result.slug}`);
+                  } else {
+                    router.push(`/(tabs)/explore/business/${result.slug}`);
+                  }
+                  setShowAutocomplete(false);
+                  setSearch('');
+                }}
+                className={`px-3 py-2.5 flex-row items-center ${
+                  i < autocompleteResults.length - 1 ? 'border-b border-cairn-border/50' : ''
+                }`}
               >
-                <View className="w-8 h-8 rounded-full bg-canopy/20 items-center justify-center mr-3">
-                  {discovering ? (
-                    <ActivityIndicator size="small" color="#10B981" />
-                  ) : (
-                    <SearchIcon size={16} color="#10B981" />
+                <Text className="text-sm mr-2">
+                  {result.entity_type === 'trail' ? '🥾' : '🏪'}
+                </Text>
+                <View className="flex-1">
+                  <Text className="text-slate-200 text-sm" numberOfLines={1}>
+                    {result.name}
+                  </Text>
+                  {result.city && (
+                    <Text className="text-slate-500 text-xs">
+                      {result.city}{result.state_province ? `, ${result.state_province}` : ''}
+                    </Text>
                   )}
                 </View>
-                <View className="flex-1">
-                  <Text className="text-canopy font-semibold text-sm">
-                    Discover this area
-                  </Text>
-                  <Text className="text-slate-500 text-xs mt-0.5">
-                    Search for trails and businesses nearby
-                  </Text>
-                </View>
+                <Text className="text-slate-600 text-[10px] uppercase">
+                  {result.entity_type}
+                </Text>
               </Pressable>
-              {discoveryMessage && (
-                <Text className="text-slate-400 text-xs mt-2 px-1">
-                  {discoveryMessage}
-                </Text>
-              )}
-            </View>
-          )}
+            ))}
+          </View>
+        )}
 
-          {/* Content list */}
-          {isLoading ? (
-            <View style={{ paddingHorizontal: 16 }}>
-              <SkeletonCard className="mb-3" />
-              <SkeletonCard className="mb-3" />
-              <SkeletonCard className="mb-3" />
-            </View>
-          ) : activeTab === 'trails' ? (
-            <FlatList
-              data={trails}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={{
-                paddingHorizontal: 16,
-                paddingBottom: 32,
-              }}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  tintColor="#10B981"
-                  colors={['#10B981']}
-                />
-              }
-              renderItem={({ item }) => (
-                <TrailCard
-                  trail={item}
-                  onPress={() => handleTrailPress(item)}
-                />
-              )}
-              ListEmptyComponent={
-                <Text className="text-slate-500 text-center mt-8">
-                  No trails found
-                </Text>
-              }
-            />
-          ) : (
-            <FlatList
-              data={businesses}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={{
-                paddingHorizontal: 16,
-                paddingBottom: 32,
-              }}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  tintColor="#10B981"
-                  colors={['#10B981']}
-                />
-              }
-              renderItem={({ item }) => (
-                <BusinessCard
-                  business={item}
-                  onPress={() => handleBusinessPress(item)}
-                />
-              )}
-              ListEmptyComponent={
-                <Text className="text-slate-500 text-center mt-8">
-                  No businesses found
-                </Text>
+        {/* Activity filter chips */}
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={activityFilterData}
+          keyExtractor={(item) => item.slug ?? 'all'}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8 }}
+          renderItem={({ item }) => (
+            <FilterChip
+              label={item.label}
+              emoji={item.emoji}
+              selected={selectedActivity === item.slug}
+              onPress={() =>
+                setSelectedActivity(
+                  item.slug === selectedActivity ? null : item.slug,
+                )
               }
             />
           )}

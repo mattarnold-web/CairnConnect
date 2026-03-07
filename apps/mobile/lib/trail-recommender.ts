@@ -1,5 +1,3 @@
-import { MOCK_TRAILS } from './mock-data';
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -12,7 +10,7 @@ export interface QuizAnswers {
 }
 
 export interface ScoredTrail {
-  trail: (typeof MOCK_TRAILS)[number];
+  trail: any;
   score: number;
   matchReasons: string[];
 }
@@ -84,10 +82,14 @@ const ACTIVITY_LABELS: Record<string, string> = {
 // Main scoring function
 // ---------------------------------------------------------------------------
 
-export function scoreTrails(answers: QuizAnswers): ScoredTrail[] {
+/**
+ * Score and rank trails based on quiz answers.
+ * Pass in trails fetched from Supabase.
+ */
+export function scoreTrails(answers: QuizAnswers, trails: any[] = []): ScoredTrail[] {
   const results: ScoredTrail[] = [];
 
-  for (const trail of MOCK_TRAILS) {
+  for (const trail of trails) {
     let score = 0;
     const matchReasons: string[] = [];
 

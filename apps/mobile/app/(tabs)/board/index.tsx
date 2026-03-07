@@ -7,6 +7,7 @@ import { SearchBar } from '@/components/ui/SearchBar';
 import { FilterChip } from '@/components/ui/FilterChip';
 import { ActivityBoardCard } from '@/components/activity/ActivityBoardCard';
 import { SkeletonCard } from '@/components/ui/Skeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { fetchActivityPosts } from '@/lib/api';
 import { ACTIVITY_TYPES } from '@cairn/shared';
 import type { ActivityPost } from '@cairn/shared';
@@ -202,25 +203,13 @@ export default function BoardScreen() {
     }
 
     return (
-      <View className="items-center justify-center py-16 px-8">
-        <View className="h-16 w-16 rounded-full bg-cairn-card border border-cairn-border items-center justify-center mb-4">
-          <Users size={28} color="#475569" />
-        </View>
-        <Text className="text-slate-300 font-semibold text-base mb-1 text-center">
-          No activities match your filters
-        </Text>
-        <Text className="text-slate-500 text-sm text-center mb-4">
-          Try adjusting your filters to see more results
-        </Text>
-        {hasActiveFilters && (
-          <Pressable
-            onPress={clearFilters}
-            className="bg-cairn-card border border-cairn-border rounded-xl px-4 py-2"
-          >
-            <Text className="text-canopy text-sm font-medium">Clear all filters</Text>
-          </Pressable>
-        )}
-      </View>
+      <EmptyState
+        icon={Users}
+        title="No activities match your filters"
+        description="Try adjusting your filters to see more results."
+        actionLabel={hasActiveFilters ? 'Clear All Filters' : undefined}
+        onAction={hasActiveFilters ? clearFilters : undefined}
+      />
     );
   };
 

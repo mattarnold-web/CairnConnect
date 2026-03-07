@@ -24,18 +24,15 @@ import {
   MapPin,
   Image as ImageIcon,
   Award,
-  MessageSquare,
-  Route,
-  Shield,
-  Trophy,
   Activity,
-  ShieldCheck,
-  Crown,
+  Shield,
+  Footprints,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { SkeletonCard } from '@/components/ui/Skeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useAuth } from '@/lib/auth-context';
 import { useActivityContext } from '@/lib/activity-context';
 import { usePreferences } from '@/lib/preferences-context';
@@ -424,66 +421,80 @@ export default function ProfileScreen() {
               </View>
             )}
 
-            {/* Subscription banner */}
-            {subscription && isTrialActive(subscription) && (
-              <Card className="mb-4 border-canopy/30">
-                <View className="flex-row items-center">
-                  <Crown size={16} color="#10B981" />
-                  <Text className="text-canopy font-semibold text-sm ml-2 flex-1">
-                    Free Trial
-                  </Text>
-                  <View className="bg-canopy/20 px-2.5 py-1 rounded-full">
-                    <Text className="text-canopy text-xs font-medium">
-                      {getTrialDaysRemaining(subscription)} days left
-                    </Text>
-                  </View>
-                </View>
-                <Text className="text-slate-400 text-xs mt-1">
-                  Full access to all features
-                </Text>
-              </Card>
-            )}
-
-            {/* Admin + Connected Apps navigation */}
-            <View className="gap-2 mb-4">
-              {userIsAdmin && (
-                <Pressable
-                  onPress={() => router.push('/(tabs)/profile/admin')}
-                  className="flex-row items-center bg-cairn-card border border-red-500/30 rounded-xl px-4 py-3 active:bg-cairn-card-hover"
-                >
-                  <View className="w-8 h-8 rounded-lg bg-red-500/20 items-center justify-center mr-3">
-                    <ShieldCheck size={16} color="#ef4444" />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-slate-100 font-medium text-sm">
-                      Admin Dashboard
-                    </Text>
-                    <Text className="text-slate-500 text-xs">
-                      Users, stats, moderation
-                    </Text>
+            {/* Connected Apps */}
+            <Pressable
+              onPress={() => router.push('/(tabs)/profile/connected-apps')}
+              className="mb-4"
+            >
+              <Card>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <View className="h-9 w-9 rounded-xl bg-canopy/20 items-center justify-center mr-3">
+                      <Activity size={18} color="#10B981" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-slate-100 font-medium text-sm">
+                        Connected Apps
+                      </Text>
+                      <Text className="text-slate-500 text-xs">
+                        Strava, Garmin, Apple Health, and more
+                      </Text>
+                    </View>
                   </View>
                   <ChevronRight size={16} color="#64748b" />
-                </Pressable>
-              )}
+                </View>
+              </Card>
+            </Pressable>
 
-              <Pressable
-                onPress={() => router.push('/(tabs)/profile/connected-apps')}
-                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
-              >
-                <View className="w-8 h-8 rounded-lg bg-canopy/20 items-center justify-center mr-3">
-                  <Activity size={16} color="#10B981" />
+            {/* Challenges */}
+            <Pressable
+              onPress={() => router.push('/(tabs)/profile/challenges')}
+              className="mb-4"
+            >
+              <Card>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <View className="h-9 w-9 rounded-xl bg-amber-500/20 items-center justify-center mr-3">
+                      <Award size={18} color="#fbbf24" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-slate-100 font-medium text-sm">
+                        Challenges & Badges
+                      </Text>
+                      <Text className="text-slate-500 text-xs">
+                        Monthly challenges, leaderboards, achievements
+                      </Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={16} color="#64748b" />
                 </View>
-                <View className="flex-1">
-                  <Text className="text-slate-100 font-medium text-sm">
-                    Connected Apps
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    Strava, Garmin, Apple Health, more
-                  </Text>
+              </Card>
+            </Pressable>
+
+            {/* Safety Center */}
+            <Pressable
+              onPress={() => router.push('/(tabs)/profile/safety')}
+              className="mb-4"
+            >
+              <Card>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <View className="h-9 w-9 rounded-xl bg-red-500/20 items-center justify-center mr-3">
+                      <Shield size={18} color="#ef4444" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-slate-100 font-medium text-sm">
+                        Safety Center
+                      </Text>
+                      <Text className="text-slate-500 text-xs">
+                        SOS, emergency contacts, share location
+                      </Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={16} color="#64748b" />
                 </View>
-                <ChevronRight size={16} color="#64748b" />
-              </Pressable>
-            </View>
+              </Card>
+            </Pressable>
 
             {/* Auth button */}
             {!user && (
@@ -591,9 +602,13 @@ export default function ProfileScreen() {
               <SkeletonCard className="mb-3" />
             </View>
           ) : (
-            <Text className="text-slate-500 text-center mt-4">
-              No activities recorded yet. Hit the Record tab to get started!
-            </Text>
+            <EmptyState
+              icon={Footprints}
+              title="No activities yet"
+              description="Start recording your outdoor adventures! Head to the Record tab to begin."
+              actionLabel="Start Recording"
+              onAction={() => router.push('/(tabs)/record')}
+            />
           )
         }
       />

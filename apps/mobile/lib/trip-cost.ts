@@ -1,4 +1,3 @@
-import { MOCK_BUSINESSES, MOCK_TRAILS } from './mock-data';
 import { TripState } from './trip-types';
 import { generateSuggestions } from './trip-suggestions';
 
@@ -28,16 +27,25 @@ const SUGGESTION_CATEGORY_LABEL_MAP: Record<string, string> = {
   accommodation: 'Accommodation',
 };
 
-export function estimateTripCost(state: TripState): CostEstimate {
-  const suggestions = generateSuggestions(state);
+/**
+ * Estimate trip costs from suggestions and trail data.
+ * Accepts optional pre-fetched data for businesses and trails.
+ */
+export function estimateTripCost(
+  state: TripState,
+  businessData?: any[],
+  trailCache?: Record<string, any>,
+): CostEstimate {
+  const suggestions = generateSuggestions(state, undefined, businessData);
   const items: CostLineItem[] = [];
+  const businesses = businessData ?? [];
 
   // Build cost line items from business suggestions that have a price_range
   for (const suggestion of suggestions) {
     if (suggestion.type !== 'business' || !suggestion.businessSlug) continue;
 
-    const business = MOCK_BUSINESSES.find(
-      (b) => b.slug === suggestion.businessSlug
+    const business = businesses.find(
+      (b: any) => b.slug === suggestion.businessSlug,
     );
     if (!business) continue;
 
@@ -59,14 +67,15 @@ export function estimateTripCost(state: TripState): CostEstimate {
   // Calculate permit costs from trails in the itinerary
   let permitCosts = 0;
   const countedTrailIds = new Set<string>();
+  const cache = trailCache ?? {};
 
   for (const day of state.days) {
     for (const item of day.items) {
       if (item.type === 'trail' && item.trailId && !countedTrailIds.has(item.trailId)) {
         countedTrailIds.add(item.trailId);
-        const trail = MOCK_TRAILS.find((t) => t.id === item.trailId);
+        const trail = cache[item.trailId];
         if (trail && trail.requires_permit) {
-          permitCosts += (trail as any).permit_cost || 0;
+          permitCosts += trail.permit_cost || 0;
         }
       }
     }

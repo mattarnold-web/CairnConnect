@@ -1,11 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
+  TextInput,
   ScrollView,
   Pressable,
-  Linking,
   Alert,
+  Linking,
+  Platform,
+  StyleSheet,
   Vibration,
   Animated,
 } from 'react-native';
@@ -14,460 +17,652 @@ import { router } from 'expo-router';
 import {
   ArrowLeft,
   Phone,
-  Shield,
   MapPin,
-  Navigation,
+  Shield,
   AlertTriangle,
-  Heart,
   Share2,
-  Info,
-  Building2,
-  Mountain,
-  Route,
-  Clock,
-  ChevronRight,
-  BookOpen,
-  Locate,
+  CheckCircle,
+  Navigation,
+  Plus,
+  Trash2,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { EmergencyContact } from '@/components/safety/EmergencyContact';
-import { LocationShareButton } from '@/components/safety/LocationShareButton';
-import { getCurrentLocation, generateMapsUrl } from '@/lib/location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location';
+
+interface EmergencyContact {
+  id: string;
+  name: string;
+  phone: string;
+}
+
+const STORAGE_KEY = 'cairn-emergency-contacts';
 
 export default function SafetyCenterScreen() {
-  const [currentCoords, setCurrentCoords] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [contacts, setContacts] = useState<EmergencyContact[]>([]);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
+  const [locationLoading, setLocationLoading] = useState(false);
   const [sosActive, setSosActive] = useState(false);
-  const [sosCountdown, setSosCountdown] = useState(3);
-  const sosTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sosTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [addingContact, setAddingContact] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
 
-  // Pulse animation for SOS button
+  // Load contacts from storage
   useEffect(() => {
-    if (sosActive) {
-      const animation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1.1,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-        ]),
-      );
-      animation.start();
-      return () => animation.stop();
-    } else {
-      pulseAnim.setValue(1);
-    }
-  }, [sosActive, pulseAnim]);
-
-  const fetchLocation = useCallback(async () => {
-    setLoadingLocation(true);
-    try {
-      const loc = await getCurrentLocation();
-      if (loc) {
-        setCurrentCoords({ lat: loc.coords.latitude, lng: loc.coords.longitude });
-      }
-    } catch {
-      // Location unavailable
-    } finally {
-      setLoadingLocation(false);
-    }
+    AsyncStorage.getItem(STORAGE_KEY).then((data) => {
+      if (data) setContacts(JSON.parse(data));
+    });
   }, []);
 
-  useEffect(() => {
-    fetchLocation();
-  }, [fetchLocation]);
+  // Save contacts
+  const saveContacts = async (updated: EmergencyContact[]) => {
+    setContacts(updated);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  };
 
-  const handleSOSPress = () => {
-    if (sosActive) {
-      // Cancel SOS
-      if (sosTimerRef.current) clearInterval(sosTimerRef.current);
-      setSosActive(false);
-      setSosCountdown(3);
-      return;
+  // Get current location
+  const refreshLocation = async () => {
+    setLocationLoading(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Denied',
+          'Location permission is needed for safety features.',
+        );
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+      setLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+    } catch {
+      Alert.alert('Location Error', 'Could not get your current location.');
+    } finally {
+      setLocationLoading(false);
     }
+  };
 
+  useEffect(() => {
+    refreshLocation();
+  }, []);
+
+  // SOS hold handler
+  const startSOS = () => {
     setSosActive(true);
-    setSosCountdown(3);
     Vibration.vibrate([0, 200, 100, 200, 100, 200]);
 
-    sosTimerRef.current = setInterval(() => {
-      setSosCountdown((prev) => {
-        if (prev <= 1) {
-          if (sosTimerRef.current) clearInterval(sosTimerRef.current);
-          // Trigger emergency call
-          Linking.openURL('tel:911');
-          setSosActive(false);
-          return 3;
-        }
-        Vibration.vibrate(200);
-        return prev - 1;
-      });
-    }, 1000);
+    // Pulse animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    sosTimer.current = setTimeout(() => {
+      // After 3 seconds, trigger emergency call
+      Alert.alert(
+        'Emergency Call',
+        'Calling 911 now. Share your location with emergency contacts?',
+        [
+          {
+            text: 'Call 911',
+            onPress: () => {
+              Linking.openURL('tel:911');
+              shareLocationWithContacts();
+            },
+          },
+          { text: 'Cancel', style: 'cancel', onPress: cancelSOS },
+        ],
+      );
+    }, 3000);
+  };
+
+  const cancelSOS = () => {
+    setSosActive(false);
+    if (sosTimer.current) clearTimeout(sosTimer.current);
+    pulseAnim.stopAnimation();
+    pulseAnim.setValue(1);
+  };
+
+  const shareLocationWithContacts = async () => {
+    if (!location) return;
+    const message = `EMERGENCY: I need help! My current location: https://maps.google.com/?q=${location.lat},${location.lng}`;
+    for (const contact of contacts) {
+      try {
+        await Linking.openURL(
+          `sms:${contact.phone}&body=${encodeURIComponent(message)}`,
+        );
+      } catch {
+        // Continue with next contact
+      }
+    }
   };
 
   const handleImSafe = () => {
+    if (contacts.length === 0) {
+      Alert.alert(
+        'No Contacts',
+        'Add emergency contacts first to notify them.',
+      );
+      return;
+    }
     Alert.alert(
       "I'm Safe",
-      'This will send a message to your emergency contacts letting them know you are safe.',
+      'Send a safety message to all emergency contacts?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Send',
-          onPress: () => {
-            Alert.alert('Sent!', 'Your emergency contacts have been notified.');
+          onPress: async () => {
+            const message = `I'm safe! Current location: https://maps.google.com/?q=${location?.lat},${location?.lng}`;
+            for (const contact of contacts) {
+              try {
+                await Linking.openURL(
+                  `sms:${contact.phone}&body=${encodeURIComponent(message)}`,
+                );
+              } catch {
+                // Continue with next contact
+              }
+            }
           },
         },
       ],
     );
   };
 
-  const handleShareLocation = async () => {
-    if (!currentCoords) {
-      Alert.alert('Location Unavailable', 'Please enable location services.');
+  const addContact = () => {
+    if (!newName.trim() || !newPhone.trim()) {
+      Alert.alert('Missing Info', 'Please enter both name and phone number.');
       return;
     }
-    const url = generateMapsUrl(currentCoords.lat, currentCoords.lng);
-    try {
-      await Linking.openURL(
-        `sms:?body=My current location: ${url}`,
-      );
-    } catch {
-      Alert.alert('Error', 'Could not open messaging app.');
-    }
+    const contact: EmergencyContact = {
+      id: `ec-${Date.now()}`,
+      name: newName.trim(),
+      phone: newPhone.trim(),
+    };
+    saveContacts([...contacts, contact]);
+    setNewName('');
+    setNewPhone('');
+    setAddingContact(false);
+  };
+
+  const removeContact = (id: string) => {
+    Alert.alert('Remove Contact', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => saveContacts(contacts.filter((c) => c.id !== id)),
+      },
+    ]);
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cairn-bg" edges={['top']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: '#071019' }}
+      edges={['top']}
+    >
       {/* Header */}
-      <View className="flex-row items-center px-4 py-3">
+      <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
-          className="w-9 h-9 rounded-full bg-cairn-card items-center justify-center mr-3"
+          style={{ padding: 4, marginRight: 12 }}
         >
-          <ArrowLeft size={20} color="#e2e8f0" />
+          <ArrowLeft size={24} color="#e2e8f0" />
         </Pressable>
-        <View className="flex-1">
-          <Text className="text-slate-100 font-bold text-xl">
-            Safety Center
-          </Text>
-        </View>
-        <Shield size={20} color="#ef4444" />
+        <Shield size={20} color="#10B981" />
+        <Text style={styles.headerTitle}>Safety Center</Text>
       </View>
 
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
       >
-        {/* ── SOS Button ── */}
-        <View className="items-center mb-6">
+        {/* SOS Button */}
+        <View style={{ alignItems: 'center', marginBottom: 24 }}>
           <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
             <Pressable
-              onPress={handleSOSPress}
-              className={`w-36 h-36 rounded-full items-center justify-center ${
-                sosActive ? 'bg-red-700' : 'bg-red-600'
-              }`}
-              style={{
-                shadowColor: '#ef4444',
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.5,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
+              onPressIn={startSOS}
+              onPressOut={cancelSOS}
+              style={[
+                styles.sosButton,
+                sosActive && styles.sosButtonActive,
+              ]}
             >
-              {sosActive ? (
-                <View className="items-center">
-                  <Text className="text-white font-bold text-4xl">
-                    {sosCountdown}
-                  </Text>
-                  <Text className="text-red-200 text-xs mt-1">
-                    Tap to cancel
-                  </Text>
-                </View>
-              ) : (
-                <View className="items-center">
-                  <Phone size={28} color="white" />
-                  <Text className="text-white font-bold text-lg mt-1">
-                    Emergency SOS
-                  </Text>
-                </View>
-              )}
+              <AlertTriangle size={32} color="white" />
+              <Text style={styles.sosText}>SOS</Text>
             </Pressable>
           </Animated.View>
-          <Text className="text-slate-500 text-xs mt-3">
-            Hold for 3 seconds to activate
+          <Text style={styles.sosHint}>
+            {sosActive
+              ? 'Hold for 3 seconds...'
+              : 'Hold to activate emergency SOS'}
           </Text>
         </View>
 
-        {/* ── I'm Safe button ── */}
-        <Pressable
-          onPress={handleImSafe}
-          className="bg-emerald-600/20 border-2 border-emerald-500/40 rounded-2xl p-4 mb-5 flex-row items-center"
-        >
-          <View className="w-12 h-12 rounded-full bg-emerald-500/20 items-center justify-center mr-3">
-            <Heart size={22} color="#10B981" fill="#10B981" />
-          </View>
-          <View className="flex-1">
-            <Text className="text-emerald-400 font-bold text-base">
-              I'm Safe
-            </Text>
-            <Text className="text-slate-500 text-xs mt-0.5">
-              Notify your emergency contacts
-            </Text>
-          </View>
-          <ChevronRight size={16} color="#10B981" />
+        {/* I'm Safe Button */}
+        <Pressable onPress={handleImSafe} style={styles.imSafeButton}>
+          <CheckCircle size={18} color="#10B981" />
+          <Text style={styles.imSafeText}>I'm Safe — Notify Contacts</Text>
         </Pressable>
 
-        {/* ── Emergency Contacts ── */}
-        <Text className="text-slate-100 font-bold text-lg mb-3">
-          Emergency Contacts
-        </Text>
-        <View className="mb-5">
-          <EmergencyContact />
-        </View>
-
-        {/* ── Current Location ── */}
-        <Text className="text-slate-100 font-bold text-lg mb-3">
-          Current Location
-        </Text>
-        <Card className="mb-5">
-          {currentCoords ? (
-            <View>
-              {/* Mini map placeholder */}
-              <View className="h-24 bg-cairn-elevated rounded-xl mb-3 items-center justify-center overflow-hidden">
-                <Locate size={24} color="#10B981" />
-                <Text className="text-slate-500 text-xs mt-1">Map View</Text>
-              </View>
-              <View className="flex-row items-center mb-3">
-                <MapPin size={14} color="#10B981" />
-                <Text className="text-slate-300 text-sm ml-2 font-mono">
-                  {currentCoords.lat.toFixed(5)}, {currentCoords.lng.toFixed(5)}
-                </Text>
-              </View>
-              <View className="flex-row gap-2">
-                <Pressable
-                  onPress={() => {
-                    const url = generateMapsUrl(
-                      currentCoords.lat,
-                      currentCoords.lng,
-                    );
-                    Linking.openURL(url);
-                  }}
-                  className="flex-1 flex-row items-center justify-center bg-cairn-elevated rounded-xl px-3 py-2.5"
-                >
-                  <Navigation size={13} color="#10B981" />
-                  <Text className="text-canopy text-xs font-medium ml-1.5">
-                    Open in Maps
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={handleShareLocation}
-                  className="flex-1 flex-row items-center justify-center bg-cairn-elevated rounded-xl px-3 py-2.5"
-                >
-                  <Share2 size={13} color="#94a3b8" />
-                  <Text className="text-slate-400 text-xs font-medium ml-1.5">
-                    Share Location
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-          ) : (
-            <View className="flex-row items-center">
-              <MapPin size={14} color="#64748b" />
-              <Text className="text-slate-500 text-sm ml-2">
-                {loadingLocation
-                  ? 'Getting location...'
-                  : 'Location unavailable'}
+        {/* Current Location */}
+        <Card className="mb-4">
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 8,
+            }}
+          >
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+            >
+              <MapPin size={16} color="#10B981" />
+              <Text
+                style={{
+                  color: '#e2e8f0',
+                  fontSize: 14,
+                  fontWeight: '600',
+                }}
+              >
+                Current Location
               </Text>
             </View>
+            <Pressable onPress={refreshLocation} disabled={locationLoading}>
+              <Navigation
+                size={16}
+                color={locationLoading ? '#475569' : '#10B981'}
+              />
+            </Pressable>
+          </View>
+          {location ? (
+            <View>
+              <Text style={{ color: '#94a3b8', fontSize: 12 }}>
+                {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+              </Text>
+              <Pressable
+                onPress={() => {
+                  const url = Platform.select({
+                    ios: `maps:0,0?q=${location.lat},${location.lng}`,
+                    android: `geo:${location.lat},${location.lng}?q=${location.lat},${location.lng}`,
+                  });
+                  if (url) Linking.openURL(url);
+                }}
+                style={{ marginTop: 8 }}
+              >
+                <Text
+                  style={{
+                    color: '#10B981',
+                    fontSize: 12,
+                    fontWeight: '500',
+                  }}
+                >
+                  Open in Maps
+                </Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Text style={{ color: '#475569', fontSize: 12 }}>
+              {locationLoading
+                ? 'Getting location...'
+                : 'Location unavailable'}
+            </Text>
           )}
         </Card>
 
-        {/* ── Share Live Location ── */}
-        <Text className="text-slate-100 font-bold text-lg mb-3">
-          Live Location Sharing
-        </Text>
-        <View className="mb-5">
-          <LocationShareButton />
+        {/* Share Location */}
+        <Pressable
+          onPress={() => {
+            if (!location) {
+              Alert.alert(
+                'No Location',
+                'Wait for location to be acquired.',
+              );
+              return;
+            }
+            const url = `https://maps.google.com/?q=${location.lat},${location.lng}`;
+            Linking.openURL(
+              `sms:&body=${encodeURIComponent(`My current location: ${url}`)}`,
+            );
+          }}
+          style={styles.shareLocationButton}
+        >
+          <Share2 size={16} color="#10B981" />
+          <Text
+            style={{
+              color: '#10B981',
+              fontSize: 13,
+              fontWeight: '500',
+              marginLeft: 8,
+            }}
+          >
+            Share My Location
+          </Text>
+        </Pressable>
+
+        {/* Emergency Contacts */}
+        <View style={{ marginTop: 16 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 12,
+            }}
+          >
+            <Text
+              style={{
+                color: '#e2e8f0',
+                fontSize: 16,
+                fontWeight: '700',
+              }}
+            >
+              Emergency Contacts
+            </Text>
+            <Pressable onPress={() => setAddingContact(true)}>
+              <Plus size={20} color="#10B981" />
+            </Pressable>
+          </View>
+
+          {contacts.map((contact) => (
+            <Card key={contact.id} className="mb-2">
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      color: '#e2e8f0',
+                      fontSize: 14,
+                      fontWeight: '500',
+                    }}
+                  >
+                    {contact.name}
+                  </Text>
+                  <Text style={{ color: '#64748b', fontSize: 12 }}>
+                    {contact.phone}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                  <Pressable
+                    onPress={() => Linking.openURL(`tel:${contact.phone}`)}
+                  >
+                    <Phone size={18} color="#10B981" />
+                  </Pressable>
+                  <Pressable onPress={() => removeContact(contact.id)}>
+                    <Trash2 size={18} color="#ef4444" />
+                  </Pressable>
+                </View>
+              </View>
+            </Card>
+          ))}
+
+          {contacts.length === 0 && !addingContact && (
+            <Text
+              style={{
+                color: '#475569',
+                fontSize: 13,
+                textAlign: 'center',
+                paddingVertical: 20,
+              }}
+            >
+              No emergency contacts added yet. Tap + to add one.
+            </Text>
+          )}
+
+          {/* Add contact form */}
+          {addingContact && (
+            <Card className="mt-2">
+              <Text
+                style={{
+                  color: '#94a3b8',
+                  fontSize: 12,
+                  marginBottom: 8,
+                }}
+              >
+                Add Contact
+              </Text>
+              <View style={{ gap: 8 }}>
+                <View style={styles.inputRow}>
+                  <Text style={styles.inputLabel}>Name</Text>
+                  <View style={styles.inputWrapper}>
+                    <TextInput
+                      value={newName}
+                      onChangeText={setNewName}
+                      placeholder="Contact name"
+                      placeholderTextColor="#475569"
+                      style={styles.textInput}
+                    />
+                  </View>
+                </View>
+                <View style={styles.inputRow}>
+                  <Text style={styles.inputLabel}>Phone</Text>
+                  <View style={styles.inputWrapper}>
+                    <TextInput
+                      value={newPhone}
+                      onChangeText={setNewPhone}
+                      placeholder="Phone number"
+                      placeholderTextColor="#475569"
+                      style={styles.textInput}
+                      keyboardType="phone-pad"
+                    />
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    gap: 8,
+                    marginTop: 4,
+                  }}
+                >
+                  <Pressable
+                    onPress={() => {
+                      setAddingContact(false);
+                      setNewName('');
+                      setNewPhone('');
+                    }}
+                    style={[
+                      styles.formButton,
+                      { backgroundColor: '#1E3A5F' },
+                    ]}
+                  >
+                    <Text style={{ color: '#94a3b8', fontSize: 13 }}>
+                      Cancel
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={addContact}
+                    style={[
+                      styles.formButton,
+                      { backgroundColor: '#10B981' },
+                    ]}
+                  >
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontSize: 13,
+                        fontWeight: '600',
+                      }}
+                    >
+                      Save
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Card>
+          )}
         </View>
 
-        {/* ── Offline Emergency Info ── */}
-        <Text className="text-slate-100 font-bold text-lg mb-3">
-          Offline Emergency Info
-        </Text>
-        <Card className="mb-5">
-          <Text className="text-slate-400 text-xs mb-3">
-            Nearest resources based on your location
+        {/* Emergency Numbers */}
+        <View style={{ marginTop: 24 }}>
+          <Text
+            style={{
+              color: '#e2e8f0',
+              fontSize: 16,
+              fontWeight: '700',
+              marginBottom: 12,
+            }}
+          >
+            Emergency Services
           </Text>
-          <View className="gap-3">
-            {/* Ranger Station */}
-            <View className="flex-row items-center">
-              <View className="w-9 h-9 rounded-full bg-amber-500/15 items-center justify-center mr-3">
-                <Mountain size={16} color="#F59E0B" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-slate-200 text-sm font-medium">
-                  Ranger Station
+          {[
+            { name: 'Emergency (911)', number: '911' },
+            { name: 'Poison Control', number: '1-800-222-1222' },
+            { name: 'Search & Rescue (non-emergency)', number: '211' },
+          ].map((service) => (
+            <Pressable
+              key={service.number}
+              onPress={() => Linking.openURL(`tel:${service.number}`)}
+              style={styles.emergencyServiceRow}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <Phone size={14} color="#ef4444" />
+                <Text style={{ color: '#e2e8f0', fontSize: 13 }}>
+                  {service.name}
                 </Text>
-                <Text className="text-slate-500 text-xs">Bear Creek Station</Text>
               </View>
-              <Text className="text-amber-400 text-sm font-bold">3.2 mi</Text>
-            </View>
-
-            {/* Separator */}
-            <View className="h-px bg-cairn-border/50" />
-
-            {/* Hospital */}
-            <View className="flex-row items-center">
-              <View className="w-9 h-9 rounded-full bg-red-500/15 items-center justify-center mr-3">
-                <Building2 size={16} color="#ef4444" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-slate-200 text-sm font-medium">
-                  Hospital
-                </Text>
-                <Text className="text-slate-500 text-xs">Mountain Valley Medical</Text>
-              </View>
-              <Text className="text-red-400 text-sm font-bold">12.5 mi</Text>
-            </View>
-
-            {/* Separator */}
-            <View className="h-px bg-cairn-border/50" />
-
-            {/* Evacuation Point */}
-            <View className="flex-row items-center">
-              <View className="w-9 h-9 rounded-full bg-blue-500/15 items-center justify-center mr-3">
-                <Route size={16} color="#3b82f6" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-slate-200 text-sm font-medium">
-                  Evacuation Point
-                </Text>
-                <Text className="text-slate-500 text-xs">Trailhead Parking Area</Text>
-              </View>
-              <Text className="text-blue-400 text-sm font-bold">1.8 mi</Text>
-            </View>
-          </View>
-        </Card>
-
-        {/* ── Trip Plan Summary ── */}
-        <Text className="text-slate-100 font-bold text-lg mb-3">
-          Trip Plan Summary
-        </Text>
-        <Card className="mb-5">
-          <View className="flex-row items-center mb-3">
-            <View className="w-9 h-9 rounded-full bg-canopy/15 items-center justify-center mr-3">
-              <Clock size={16} color="#10B981" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-slate-200 text-sm font-medium">
-                Expected Return
+              <Text style={{ color: '#64748b', fontSize: 12 }}>
+                {service.number}
               </Text>
-              <Text className="text-canopy text-sm font-bold">
-                Today, 5:30 PM
-              </Text>
-            </View>
-          </View>
-          <View className="h-px bg-cairn-border/50 mb-3" />
-          <View className="flex-row items-center">
-            <View className="w-9 h-9 rounded-full bg-amber-500/15 items-center justify-center mr-3">
-              <AlertTriangle size={16} color="#F59E0B" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-slate-200 text-sm font-medium">
-                Auto-Alert
-              </Text>
-              <Text className="text-slate-500 text-xs mt-0.5">
-                Contacts notified if not checked in by 6:00 PM
-              </Text>
-            </View>
-          </View>
-        </Card>
-
-        {/* ── Emergency Resources ── */}
-        <Text className="text-slate-100 font-bold text-lg mb-3">
-          Emergency Resources
-        </Text>
-        <Card className="mb-3">
-          <Pressable
-            onPress={() => Linking.openURL('tel:911')}
-            className="flex-row items-center"
-          >
-            <View className="w-9 h-9 rounded-full bg-red-500/20 items-center justify-center mr-3">
-              <Phone size={16} color="#ef4444" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-slate-100 font-medium text-sm">
-                Emergency Services
-              </Text>
-              <Text className="text-slate-500 text-xs">911</Text>
-            </View>
-            <Phone size={16} color="#ef4444" />
-          </Pressable>
-        </Card>
-        <Card className="mb-3">
-          <Pressable
-            onPress={() => Linking.openURL('tel:+18007554000')}
-            className="flex-row items-center"
-          >
-            <View className="w-9 h-9 rounded-full bg-amber-500/20 items-center justify-center mr-3">
-              <AlertTriangle size={16} color="#f59e0b" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-slate-100 font-medium text-sm">
-                Poison Control
-              </Text>
-              <Text className="text-slate-500 text-xs">1-800-755-4000</Text>
-            </View>
-            <Phone size={16} color="#f59e0b" />
-          </Pressable>
-        </Card>
-        <Card className="mb-5">
-          <View className="flex-row items-center">
-            <View className="w-9 h-9 rounded-full bg-blue-500/20 items-center justify-center mr-3">
-              <Info size={16} color="#3b82f6" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-slate-100 font-medium text-sm">
-                Safety Tips
-              </Text>
-              <Text className="text-slate-500 text-xs mt-0.5">
-                Always tell someone your plan. Carry extra water and layers.
-                Know before you go.
-              </Text>
-            </View>
-          </View>
-        </Card>
-
-        {/* ── Quick Links ── */}
-        <Text className="text-slate-100 font-bold text-lg mb-3">
-          Quick Links
-        </Text>
-        <Pressable className="flex-row items-center bg-cairn-card border border-cairn-border rounded-2xl p-4 mb-3">
-          <View className="w-9 h-9 rounded-full bg-canopy/15 items-center justify-center mr-3">
-            <BookOpen size={16} color="#10B981" />
-          </View>
-          <View className="flex-1">
-            <Text className="text-slate-200 font-medium text-sm">
-              First Aid Guide
-            </Text>
-            <Text className="text-slate-500 text-xs mt-0.5">
-              Basic wilderness first aid reference
-            </Text>
-          </View>
-          <ChevronRight size={16} color="#64748b" />
-        </Pressable>
+            </Pressable>
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1E3A5F',
+    gap: 8,
+  },
+  headerTitle: {
+    color: '#e2e8f0',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  sosButton: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#dc2626',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#dc2626',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  sosButtonActive: {
+    backgroundColor: '#991b1b',
+  },
+  sosText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: '800',
+    marginTop: 4,
+  },
+  sosHint: {
+    color: '#64748b',
+    fontSize: 12,
+    marginTop: 8,
+  },
+  imSafeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+    borderRadius: 16,
+    paddingVertical: 14,
+    marginBottom: 24,
+    gap: 8,
+  },
+  imSafeText: {
+    color: '#10B981',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  shareLocationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0F2337',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 12,
+    paddingVertical: 12,
+  },
+  inputRow: {
+    gap: 4,
+  },
+  inputLabel: {
+    color: '#94a3b8',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  inputWrapper: {
+    backgroundColor: '#071019',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 10,
+  },
+  textInput: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    color: '#e2e8f0',
+    fontSize: 14,
+  },
+  formButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  emergencyServiceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#0F2337',
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 8,
+  },
+});

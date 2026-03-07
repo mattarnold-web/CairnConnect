@@ -28,6 +28,8 @@ import { Button } from '@/components/ui/Button';
 import { FilterChip } from '@/components/ui/FilterChip';
 import { Card } from '@/components/ui/Card';
 import { ACTIVITY_TYPES } from '@cairn/shared';
+import { createActivityPost } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 
 const POST_TYPES = [
   { slug: 'im_going', label: "I'm Going", emoji: '\u{1F7E2}' },
@@ -43,7 +45,8 @@ const SKILL_LEVELS = [
 ];
 
 export default function CreatePostScreen() {
-  // ── Essential fields (quick mode) ──
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const [postType, setPostType] = useState('im_going');
   const [activityType, setActivityType] = useState('');
   const [title, setTitle] = useState('');
@@ -75,14 +78,42 @@ export default function CreatePostScreen() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) {
       Alert.alert('Missing Fields', 'Please fill in the required fields');
       return;
     }
-    Alert.alert('Success', 'Post created!', [
-      { text: 'OK', onPress: () => router.back() },
-    ]);
+
+    if (!user) {
+      Alert.alert('Sign In Required', 'Please sign in to create a post');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await createActivityPost({
+        post_type: postType,
+        activity_type: activityType,
+        title: title.trim(),
+        description: description.trim() || undefined,
+        location_name: locationName.trim(),
+        activity_date: activityDate || undefined,
+        skill_level: skillLevel,
+        max_participants: maxParticipants ? Number(maxParticipants) : undefined,
+        gear_required: gearRequired.length > 0 ? gearRequired : undefined,
+        cost_per_person: costPerPerson ? Number(costPerPerson) : undefined,
+        has_permit: hasPermit,
+        permit_type: hasPermit ? permitType.trim() : undefined,
+        permit_slots: hasPermit && permitSlots ? Number(permitSlots) : undefined,
+      });
+      Alert.alert('Success', 'Your post has been created!', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Failed to create post. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -320,9 +351,9 @@ export default function CreatePostScreen() {
             </View>
           )}
 
-          {/* ── Submit ── */}
-          <Button onPress={handleSubmit} size="lg">
-            Post to Board
+          {/* Submit */}
+          <Button onPress={handleSubmit} size="lg" loading={submitting}>
+            Create Post
           </Button>
 
           <View className="h-8" />

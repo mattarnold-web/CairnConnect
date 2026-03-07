@@ -1,5 +1,15 @@
 {
   "name": "@cairn/database",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "scripts": {
+    "seed:trails": "npx tsx seeders/seed-trails-osm.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "@cairn/shared": "workspace:*"
+  }
 }

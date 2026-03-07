@@ -251,7 +251,7 @@ export async function connectPlatform(
 
     // Extract authorization code from redirect URL
     const url = new URL(result.url);
-    const code = (url.searchParams as any).get('code') as string | null;
+    const code = (url.searchParams as any).get('code');
 
     if (!code) {
       return { success: false, error: 'No authorization code received' };
@@ -355,7 +355,7 @@ async function connectGarmin(): Promise<{
 
     // Step 3: Extract oauth_verifier and exchange for access token
     const url = new URL(result.url);
-    const oauthVerifier = (url.searchParams as any).get('oauth_verifier') as string | null;
+    const oauthVerifier = (url.searchParams as any).get('oauth_verifier');
 
     if (!oauthVerifier) {
       return { success: false, error: 'No verifier received from Garmin' };

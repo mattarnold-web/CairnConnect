@@ -705,6 +705,62 @@ export async function fetchActivityPostById(
 }
 
 // ---------------------------------------------------------------------------
+// Activity Board — Create
+// ---------------------------------------------------------------------------
+
+export interface CreateActivityPostPayload {
+  post_type: string;
+  activity_type: string;
+  title: string;
+  description?: string;
+  location_name: string;
+  activity_date?: string;
+  skill_level: string;
+  max_participants?: number;
+  gear_required?: string[];
+  cost_per_person?: number;
+  has_permit?: boolean;
+  permit_type?: string;
+  permit_slots?: number;
+}
+
+export async function createActivityPost(
+  payload: CreateActivityPostPayload,
+): Promise<ActivityPost> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('You must be signed in to create a post.');
+
+  const { data, error } = await sb
+    .from('activity_posts')
+    .insert({
+      organizer_id: user.id,
+      post_type: payload.post_type,
+      activity_type: payload.activity_type,
+      title: payload.title,
+      description: payload.description || null,
+      location_name: payload.location_name,
+      activity_date: payload.activity_date || null,
+      skill_level: payload.skill_level,
+      max_participants: payload.max_participants || null,
+      gear_required: payload.gear_required || [],
+      cost_per_person: payload.cost_per_person || null,
+      has_permit: payload.has_permit || false,
+      permit_type: payload.permit_type || null,
+      permit_slots: payload.permit_slots || null,
+      status: 'active',
+      is_public: true,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as ActivityPost;
+}
+
+// ---------------------------------------------------------------------------
 // User Activities
 // ---------------------------------------------------------------------------
 
@@ -933,6 +989,117 @@ export async function searchAll(
     } catch {
       throw e;
     }
+  }
+}
+
+/**
+ * Fast autocomplete for search-as-you-type. Uses the `autocomplete_locations`
+ * RPC which leverages pg_trgm similarity on name columns.
+ */
+export async function autocompleteLocations(
+  query: string,
+  lat?: number,
+  lng?: number,
+  limit = 8,
+): Promise<AutocompleteResult[]> {
+  if (!query || query.trim().length === 0) return [];
+
+  try {
+    const { data, error } = await sb.rpc('autocomplete_locations', {
+      p_query: query,
+      p_lat: lat ?? null,
+      p_lng: lng ?? null,
+      p_limit: limit,
+    });
+
+    if (error) throw error;
+    return (data ?? []) as AutocompleteResult[];
+  } catch {
+    // Graceful degradation: return empty results
+    return [];
+  }
+}
+
+/**
+ * Search for regions by city name. Returns aggregated trail and business
+ * counts per city/state grouping. Useful for the trip destination picker.
+ */
+export async function searchRegions(
+  query?: string,
+  limit = 10,
+): Promise<RegionResult[]> {
+  try {
+    const { data, error } = await sb.rpc('search_regions', {
+      p_query: query ?? null,
+      p_limit: limit,
+    });
+
+    if (error) throw error;
+    return (data ?? []) as RegionResult[];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Full trail search for the trip planning wizard. Combines text search,
+ * spatial filtering, activity type filtering, and difficulty filtering
+ * with server-side pagination.
+ */
+export async function searchTrailsForTrip(options: {
+  query?: string;
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
+  activityTypes?: string[];
+  difficulty?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<TripTrailResult[]> {
+  try {
+    const { data, error } = await sb.rpc('search_trails_for_trip', {
+      p_query: options.query ?? null,
+      p_lat: options.lat ?? null,
+      p_lng: options.lng ?? null,
+      p_radius_km: options.radiusKm ?? 50,
+      p_activity_types: options.activityTypes ?? null,
+      p_difficulty: options.difficulty ?? null,
+      p_limit: options.limit ?? 20,
+      p_offset: options.offset ?? 0,
+    });
+
+    if (error) throw error;
+    return (data ?? []) as TripTrailResult[];
+  } catch {
+    // Fallback to basic trail fetch
+    const trails = await fetchTrails({
+      search: options.query,
+      activityTypes: options.activityTypes,
+      difficulty: options.difficulty,
+      limit: options.limit,
+      offset: options.offset,
+    });
+    return trails.map((t) => ({
+      id: t.id,
+      name: t.name,
+      slug: t.slug,
+      description: t.description ?? null,
+      city: t.city ?? null,
+      state_province: t.state_province ?? null,
+      lat: null,
+      lng: null,
+      distance_km: null,
+      rating: t.rating ?? null,
+      review_count: t.review_count ?? 0,
+      cover_photo_url: t.cover_photo_url ?? null,
+      activity_types: t.activity_types ?? [],
+      difficulty: t.difficulty ?? null,
+      difficulty_label: t.difficulty_label ?? null,
+      distance_meters: t.distance_meters ?? null,
+      elevation_gain_meters: t.elevation_gain_meters ?? null,
+      trail_type: t.trail_type ?? null,
+      rank: 0,
+    }));
   }
 }
 

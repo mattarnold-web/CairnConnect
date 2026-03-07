@@ -23,7 +23,6 @@ import { Button } from '@/components/ui/Button';
 import { BusinessCard } from '@/components/business/BusinessCard';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton';
-import { ReviewSummary } from '@/components/reviews/ReviewSummary';
 import { ReviewCard } from '@/components/reviews/ReviewCard';
 import { WriteReviewSheet } from '@/components/reviews/WriteReviewSheet';
 import {
@@ -60,7 +59,7 @@ export default function TrailDetailScreen() {
   const [nearbyBusinesses, setNearbyBusinesses] = useState<Business[]>([]);
   const [trailReviews, setTrailReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [writeReviewVisible, setWriteReviewVisible] = useState(false);
+  const [showWriteReview, setShowWriteReview] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -473,11 +472,9 @@ export default function TrailDetailScreen() {
 
             {/* Individual reviews */}
             {trailReviews.length > 0 ? (
-              trailReviews
-                .slice(0, 5)
-                .map((review) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))
+              trailReviews.slice(0, 3).map((review) => (
+                <ReviewCard key={review.id} review={review} />
+              ))
             ) : (
               <Card className="mb-3">
                 <View className="items-center py-4">
@@ -491,6 +488,14 @@ export default function TrailDetailScreen() {
                 </View>
               </Card>
             )}
+
+            {/* Write Review button */}
+            <Pressable
+              onPress={() => setShowWriteReview(true)}
+              className="bg-canopy/10 border border-canopy/30 rounded-xl py-3 items-center mb-2"
+            >
+              <Text className="text-canopy font-semibold text-sm">Write a Review</Text>
+            </Pressable>
           </View>
 
           {/* Bottom spacer for floating button */}
@@ -526,18 +531,19 @@ export default function TrailDetailScreen() {
       </View>
 
       {/* Write Review Sheet */}
-      <WriteReviewSheet
-        visible={writeReviewVisible}
-        entityType="trail"
-        entityId={trail.id}
-        entityName={trail.name}
-        onClose={() => setWriteReviewVisible(false)}
-        onSubmitted={async () => {
-          // Refresh reviews after submission
-          const reviews = await fetchTrailReviews(trail.id);
-          setTrailReviews(reviews);
-        }}
-      />
+      {trail && (
+        <WriteReviewSheet
+          entityType="trail"
+          entityId={trail.id}
+          entityName={trail.name}
+          visible={showWriteReview}
+          onClose={() => setShowWriteReview(false)}
+          onSubmitted={async () => {
+            const reviews = await fetchTrailReviews(trail.id);
+            setTrailReviews(reviews);
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }
