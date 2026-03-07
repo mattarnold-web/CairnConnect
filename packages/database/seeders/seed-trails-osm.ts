@@ -17,9 +17,6 @@
  *   requests and retries with exponential back-off on 429 / 5xx.
  */
 
-import { createClient } from '@supabase/supabase-js';
-import { ANCHOR_CITIES, type AnchorCity } from '@cairn/shared/constants/anchorCities';
-
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
@@ -32,7 +29,33 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+const SB_HEADERS = {
+  'apikey': SUPABASE_SERVICE_KEY,
+  'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'resolution=merge-duplicates,return=representation',
+};
+
+interface AnchorCity {
+  slug: string; name: string; state_province: string; country: string;
+  country_code: string; lat: number; lng: number; radius_km: number;
+}
+
+const ANCHOR_CITIES: AnchorCity[] = [
+  { slug: 'moab_ut', name: 'Moab', state_province: 'Utah', country: 'United States', country_code: 'US', lat: 38.5733, lng: -109.5498, radius_km: 60 },
+  { slug: 'bend_or', name: 'Bend', state_province: 'Oregon', country: 'United States', country_code: 'US', lat: 44.0582, lng: -121.3153, radius_km: 50 },
+  { slug: 'boulder_co', name: 'Boulder', state_province: 'Colorado', country: 'United States', country_code: 'US', lat: 40.0150, lng: -105.2705, radius_km: 50 },
+  { slug: 'sedona_az', name: 'Sedona', state_province: 'Arizona', country: 'United States', country_code: 'US', lat: 34.8697, lng: -111.7610, radius_km: 40 },
+  { slug: 'lake_tahoe_ca', name: 'Lake Tahoe', state_province: 'California', country: 'United States', country_code: 'US', lat: 39.0968, lng: -120.0324, radius_km: 50 },
+  { slug: 'park_city_ut', name: 'Park City', state_province: 'Utah', country: 'United States', country_code: 'US', lat: 40.6461, lng: -111.4980, radius_km: 40 },
+  { slug: 'jackson_wy', name: 'Jackson Hole', state_province: 'Wyoming', country: 'United States', country_code: 'US', lat: 43.4799, lng: -110.7624, radius_km: 50 },
+  { slug: 'asheville_nc', name: 'Asheville', state_province: 'North Carolina', country: 'United States', country_code: 'US', lat: 35.5951, lng: -82.5515, radius_km: 50 },
+  { slug: 'chattanooga_tn', name: 'Chattanooga', state_province: 'Tennessee', country: 'United States', country_code: 'US', lat: 35.0456, lng: -85.3097, radius_km: 50 },
+  { slug: 'bellingham_wa', name: 'Bellingham', state_province: 'Washington', country: 'United States', country_code: 'US', lat: 48.7519, lng: -122.4787, radius_km: 50 },
+  { slug: 'whistler_bc', name: 'Whistler', state_province: 'British Columbia', country: 'Canada', country_code: 'CA', lat: 50.1163, lng: -122.9574, radius_km: 40 },
+  { slug: 'queenstown_nz', name: 'Queenstown', state_province: 'Otago', country: 'New Zealand', country_code: 'NZ', lat: -45.0312, lng: 168.6626, radius_km: 50 },
+  { slug: 'chamonix_fr', name: 'Chamonix', state_province: 'Haute-Savoie', country: 'France', country_code: 'FR', lat: 45.9237, lng: 6.8694, radius_km: 30 },
+];
 
 const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
 const REQUEST_DELAY_MS = 2_000;
@@ -352,37 +375,32 @@ async function upsertTrails(trails: TrailInsert[]): Promise<{ inserted: number; 
   let inserted = 0;
   let errors = 0;
 
-  // Process in batches
+  // Process in batches via REST API
   for (let i = 0; i < trails.length; i += BATCH_SIZE) {
     const batch = trails.slice(i, i + BATCH_SIZE);
 
-    const { data, error } = await supabase
-      .from('trails')
-      .upsert(batch, {
-        onConflict: 'slug',
-        ignoreDuplicates: false,
-      })
-      .select('id');
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/trails`, {
+      method: 'POST',
+      headers: SB_HEADERS,
+      body: JSON.stringify(batch),
+    });
 
-    if (error) {
-      console.error(`  Batch upsert error:`, error.message);
-      // Fall back to individual inserts for this batch
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error(`  Batch upsert error: ${errText.substring(0, 120)}`);
+      // Fall back to individual inserts
       for (const trail of batch) {
-        const { error: singleError } = await supabase
-          .from('trails')
-          .upsert(trail, {
-            onConflict: 'slug',
-            ignoreDuplicates: true,
-          });
-
-        if (singleError) {
-          errors++;
-        } else {
-          inserted++;
-        }
+        const singleRes = await fetch(`${SUPABASE_URL}/rest/v1/trails`, {
+          method: 'POST',
+          headers: { ...SB_HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify(trail),
+        });
+        if (singleRes.ok) inserted++;
+        else errors++;
       }
     } else {
-      inserted += data?.length ?? batch.length;
+      const data = await res.json();
+      inserted += Array.isArray(data) ? data.length : batch.length;
     }
   }
 
