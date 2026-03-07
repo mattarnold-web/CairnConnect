@@ -152,7 +152,7 @@ function activityReducer(state: ActivityState, action: ActivityAction): Activity
   }
 }
 
-export function ActivityProvider({ children }: { children: React.ReactNode }) {
+export function ActivityProvider({ children }: { children: any }) {
   const [state, dispatch] = useReducer(activityReducer, null, () => {
     const saved = loadFromStorage();
     return saved ?? DEFAULT_STATE;

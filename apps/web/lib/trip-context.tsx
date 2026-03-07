@@ -36,7 +36,7 @@ function saveToStorage(state: TripState): void {
   }
 }
 
-export function TripProvider({ children }: { children: React.ReactNode }) {
+export function TripProvider({ children }: { children: any }) {
   const [state, dispatch] = useReducer(tripReducer, null, () => {
     const saved = loadFromStorage();
     return saved ?? createInitialTripState();

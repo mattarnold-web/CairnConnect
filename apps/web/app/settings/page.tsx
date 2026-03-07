@@ -88,13 +88,12 @@ export default function SettingsPage() {
   // Persist profile changes to the server
   const syncProfile = useCallback(
     (field: string, value: string | null) => {
-      startTransition(async () => {
+      startTransition(() => {
         const input: Record<string, string | null> = {};
         if (field === 'displayName') input.displayName = value;
         if (field === 'bio') input.bio = value;
         if (field === 'avatarUrl') input.avatarUrl = value;
-        await updateProfile(input);
-        showSavedToast();
+        updateProfile(input).then(() => showSavedToast());
       });
     },
     [],
@@ -103,12 +102,11 @@ export default function SettingsPage() {
   // Persist preference changes to the server
   const syncPreferences = useCallback(
     (field: string, value: unknown) => {
-      startTransition(async () => {
+      startTransition(() => {
         const input: Record<string, unknown> = {};
         if (field === 'preferredUnits') input.preferredUnits = value;
         if (field === 'preferredLanguage') input.preferredLanguage = value;
-        await updatePreferences(input as any);
-        showSavedToast();
+        updatePreferences(input as any).then(() => showSavedToast());
       });
     },
     [],

@@ -9,7 +9,7 @@ import { InstallPrompt } from '@/components/ui/InstallPrompt';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { DemoBanner } from '@/components/demo/DemoBanner';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: any }) {
   return (
     <AuthProvider>
       <PreferencesProvider>

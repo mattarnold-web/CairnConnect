@@ -61,6 +61,8 @@ export default function CreatePostScreen() {
   const [costPerPerson, setCostPerPerson] = useState('');
   const [hasPermit, setHasPermit] = useState(false);
   const [permitType, setPermitType] = useState('');
+  const [permitSlots, setPermitSlots] = useState('');
+  const [gearRequired, setGearRequired] = useState<string[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 

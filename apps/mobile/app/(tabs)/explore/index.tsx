@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Map as MapIcon, Navigation, Layers, Compass, Bed, Search as SearchIcon, Store } from 'lucide-react-native';
+import { Map as MapIcon, Navigation, Layers, Compass, Bed, Search as SearchIcon, Store, List } from 'lucide-react-native';
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { TrailCard } from '@/components/trail/TrailCard';
@@ -18,10 +18,13 @@ import { BusinessCard } from '@/components/business/BusinessCard';
 import { MapPin } from '@/components/ui/MapPin';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { FilterChip } from '@/components/ui/FilterChip';
+import { FilterSheet, FilterButton } from '@/components/ui/FilterSheet';
+import type { FilterState } from '@/components/ui/FilterSheet';
 import { fetchTrails, fetchBusinesses, autocompleteLocations } from '@/lib/api';
 import type { AutocompleteResult } from '@/lib/api';
 import { exploreRegion } from '@/lib/discovery';
-import { BUSINESS_CATEGORIES } from '@cairn/shared';
+import { ACTIVITY_TYPES, BUSINESS_CATEGORIES } from '@cairn/shared';
 import type { Trail, Business } from '@cairn/shared';
 
 type ViewMode = 'map' | 'list';
@@ -84,6 +87,8 @@ export default function ExploreScreen() {
   const [discoveryMessage, setDiscoveryMessage] = useState<string | null>(null);
   const [autocompleteResults, setAutocompleteResults] = useState<AutocompleteResult[]>([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const regionName = params.regionName ?? 'Moab, Utah';
@@ -236,12 +241,6 @@ export default function ExploreScreen() {
       setRefreshing(false);
     }
   }, [debouncedSearch, filters]);
-
-  const getCategoryInfo = useCallback(
-    (category: string) =>
-      BUSINESS_CATEGORIES.find((c) => c.value === category),
-    [],
-  );
 
   const hasSparseResults =
     !loadingTrails &&
@@ -451,8 +450,7 @@ export default function ExploreScreen() {
               }
             />
           )}
-        </View>
-      )}
+        />
 
       {/* Filter Sheet Modal */}
       <FilterSheet

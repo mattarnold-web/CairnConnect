@@ -21,6 +21,7 @@ export interface NotificationPreferences {
 }
 
 const NOTIFICATION_PREFS_KEY = 'cairn-notification-prefs';
+const PUSH_TOKEN_KEY = 'cairn-push-token';
 
 export const DEFAULT_NOTIFICATION_PREFS: NotificationPreferences = {
   enabled: true,

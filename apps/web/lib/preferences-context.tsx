@@ -99,7 +99,7 @@ function saveToStorage(prefs: UserPreferences): void {
 
 const PreferencesContext = createContext<PreferencesContextValue | null>(null);
 
-export function PreferencesProvider({ children }: { children: React.ReactNode }) {
+export function PreferencesProvider({ children }: { children: any }) {
   const [preferences, dispatch] = useReducer(preferencesReducer, DEFAULT_PREFERENCES);
   const [hydrated, setHydrated] = useState(false);
 

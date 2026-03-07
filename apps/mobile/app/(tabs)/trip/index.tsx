@@ -10,7 +10,10 @@ import {
   Share,
   StyleSheet,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import type { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ChevronRight,
@@ -48,6 +51,8 @@ import {
   SUGGESTION_CATEGORY_LABELS,
 } from '@/lib/trip-suggestions';
 import type { TripStep, TripDayItem } from '@/lib/trip-types';
+import { TrailSearchSheet } from '@/components/trip/TrailSearchSheet';
+import { ShareTripSheet } from '@/components/trip/ShareTripSheet';
 
 const STEPS: { key: TripStep; label: string; number: number }[] = [
   { key: 'region', label: 'Region', number: 1 },

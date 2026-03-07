@@ -178,13 +178,14 @@ export function BoardClient({ posts }: BoardClientProps) {
           }}
           onSubmit={(input) => {
             setFormError(null);
-            startTransition(async () => {
-              const result = await createActivityPost(input);
-              if ('error' in result && result.error) {
-                setFormError(result.error);
-              } else {
-                setShowCreateModal(false);
-              }
+            startTransition(() => {
+              createActivityPost(input).then((result) => {
+                if ('error' in result && result.error) {
+                  setFormError(result.error);
+                } else {
+                  setShowCreateModal(false);
+                }
+              });
             });
           }}
         />

@@ -120,9 +120,10 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
           </button>
           <button
             onClick={() => {
-              startTransition(async () => {
-                const result = await toggleSavedItem('trail', trail.id);
-                if ('saved' in result) setSaved(!!result.saved);
+              startTransition(() => {
+                toggleSavedItem('trail', trail.id).then((result) => {
+                  if ('saved' in result) setSaved(!!result.saved);
+                });
               });
             }}
             disabled={isPending}

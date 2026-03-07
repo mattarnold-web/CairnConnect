@@ -24,6 +24,7 @@ import { BusinessCard } from '@/components/business/BusinessCard';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
 import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton';
 import { ReviewCard } from '@/components/reviews/ReviewCard';
+import { ReviewSummary } from '@/components/reviews/ReviewSummary';
 import { WriteReviewSheet } from '@/components/reviews/WriteReviewSheet';
 import {
   fetchTrailBySlug,
@@ -452,7 +453,7 @@ export default function TrailDetailScreen() {
                 Reviews ({trailReviews.length})
               </Text>
               <Pressable
-                onPress={() => setWriteReviewVisible(true)}
+                onPress={() => setShowWriteReview(true)}
                 className="bg-canopy/15 border border-canopy/30 rounded-lg px-3 py-1.5"
               >
                 <Text className="text-canopy text-xs font-semibold">
