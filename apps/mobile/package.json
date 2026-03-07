@@ -41,6 +41,7 @@
     "expo-web-browser": "~55.0.9",
     "lucide-react-native": "^0.577.0",
     "nativewind": "^4.2.2",
+    "react-native-css-interop": "~0.2.2",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-native": "0.83.2",
