@@ -1,6 +1,4 @@
 import { Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-constants';
 import { saveToStorage, loadFromStorage } from './storage';
 
 // ---------------------------------------------------------------------------
@@ -34,19 +32,38 @@ export const DEFAULT_NOTIFICATION_PREFS: NotificationPreferences = {
 };
 
 // ---------------------------------------------------------------------------
+// Lazy-load expo-notifications (optional dependency)
+// ---------------------------------------------------------------------------
+
+let Notifications: typeof import('expo-notifications') | null = null;
+
+async function getNotificationsModule() {
+  if (Notifications) return Notifications;
+  try {
+    Notifications = await import('expo-notifications');
+    return Notifications;
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Configure notification handling
 // ---------------------------------------------------------------------------
 
 /** Set how foreground notifications are displayed */
 export function configureNotificationHandler() {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-    }),
+  getNotificationsModule().then((mod) => {
+    if (!mod) return;
+    mod.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
   });
 }
 
@@ -58,11 +75,14 @@ export function configureNotificationHandler() {
 export async function requestPushPermissions(): Promise<string | null> {
   if (Platform.OS === 'web') return null;
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  const mod = await getNotificationsModule();
+  if (!mod) return null;
+
+  const { status: existingStatus } = await mod.getPermissionsAsync();
   let finalStatus = existingStatus;
 
   if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
+    const { status } = await mod.requestPermissionsAsync();
     finalStatus = status;
   }
 
@@ -72,17 +92,18 @@ export async function requestPushPermissions(): Promise<string | null> {
 
   // Android notification channel
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
+    await mod.setNotificationChannelAsync('default', {
       name: 'Default',
-      importance: Notifications.AndroidImportance.MAX,
+      importance: mod.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#10B981',
     });
   }
 
   try {
-    const tokenData = await Notifications.getExpoPushTokenAsync({
-      projectId: Device.default.expoConfig?.extra?.eas?.projectId,
+    const Constants = (await import('expo-constants')).default;
+    const tokenData = await mod.getExpoPushTokenAsync({
+      projectId: Constants.expoConfig?.extra?.eas?.projectId,
     });
     const token = tokenData.data;
 
@@ -100,24 +121,6 @@ export async function getSavedPushToken(): Promise<string | null> {
 }
 
 // ---------------------------------------------------------------------------
-// Notification handlers
-// ---------------------------------------------------------------------------
-
-/** Register a handler for when a notification is received while the app is foregrounded */
-export function onNotificationReceived(
-  handler: (notification: Notifications.Notification) => void,
-): Notifications.EventSubscription {
-  return Notifications.addNotificationReceivedListener(handler);
-}
-
-/** Register a handler for when the user taps a notification */
-export function onNotificationResponse(
-  handler: (response: Notifications.NotificationResponse) => void,
-): Notifications.EventSubscription {
-  return Notifications.addNotificationResponseReceivedListener(handler);
-}
-
-// ---------------------------------------------------------------------------
 // Local notifications
 // ---------------------------------------------------------------------------
 
@@ -125,15 +128,18 @@ export function onNotificationResponse(
 export async function scheduleLocalNotification(
   payload: NotificationPayload,
   delaySeconds: number = 0,
-): Promise<string> {
-  const trigger: Notifications.NotificationTriggerInput = delaySeconds > 0
+): Promise<string | null> {
+  const mod = await getNotificationsModule();
+  if (!mod) return null;
+
+  const trigger = delaySeconds > 0
     ? {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        type: mod.SchedulableTriggerInputTypes.TIME_INTERVAL,
         seconds: delaySeconds,
-      }
+      } as const
     : null;
 
-  return Notifications.scheduleNotificationAsync({
+  return mod.scheduleNotificationAsync({
     content: {
       title: payload.title,
       body: payload.body,
@@ -146,12 +152,16 @@ export async function scheduleLocalNotification(
 
 /** Cancel a specific scheduled notification */
 export async function cancelNotification(id: string): Promise<void> {
-  await Notifications.cancelScheduledNotificationAsync(id);
+  const mod = await getNotificationsModule();
+  if (!mod) return;
+  await mod.cancelScheduledNotificationAsync(id);
 }
 
 /** Cancel all scheduled notifications */
 export async function cancelAllNotifications(): Promise<void> {
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  const mod = await getNotificationsModule();
+  if (!mod) return;
+  await mod.cancelAllScheduledNotificationsAsync();
 }
 
 // ---------------------------------------------------------------------------

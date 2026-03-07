@@ -12,7 +12,6 @@ import { useRouter } from 'expo-router';
 import { MapPin, Camera, Bell, Check } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
-import * as Notifications from 'expo-notifications';
 import * as CameraModule from 'expo-camera';
 
 type PermissionStatus = 'undetermined' | 'granted' | 'denied';
@@ -87,8 +86,13 @@ export default function PermissionsScreen() {
       const camPermission = await CameraModule.Camera.getCameraPermissionsAsync();
       setCameraStatus(camPermission.status === 'granted' ? 'granted' : camPermission.status === 'denied' ? 'denied' : 'undetermined');
 
-      const { status: notifStatus } = await Notifications.getPermissionsAsync();
-      setNotificationStatus(notifStatus === 'granted' ? 'granted' : notifStatus === 'denied' ? 'denied' : 'undetermined');
+      try {
+        const Notif = await import('expo-notifications');
+        const { status: notifStatus } = await Notif.getPermissionsAsync();
+        setNotificationStatus(notifStatus === 'granted' ? 'granted' : notifStatus === 'denied' ? 'denied' : 'undetermined');
+      } catch {
+        // expo-notifications not available
+      }
     } catch {
       // Permissions check failed — leave as undetermined
     }
@@ -118,12 +122,17 @@ export default function PermissionsScreen() {
           break;
         }
         case 'notifications': {
-          const { status } = await Notifications.requestPermissionsAsync();
-          if (status === 'granted') {
-            setNotificationStatus('granted');
-          } else {
+          try {
+            const Notif = await import('expo-notifications');
+            const { status } = await Notif.requestPermissionsAsync();
+            if (status === 'granted') {
+              setNotificationStatus('granted');
+            } else {
+              setNotificationStatus('denied');
+              showSettingsAlert('Notifications');
+            }
+          } catch {
             setNotificationStatus('denied');
-            showSettingsAlert('Notifications');
           }
           break;
         }
