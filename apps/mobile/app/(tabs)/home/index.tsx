@@ -18,6 +18,7 @@ import {
   CircleDot,
   Route,
   Calendar,
+  Link2,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { TrailCard } from '@/components/trail/TrailCard';
@@ -169,31 +170,38 @@ export default function HomeScreen() {
         <View className="flex-row gap-2 mb-4">
           <Pressable
             onPress={() => router.push('/(tabs)/explore')}
-            className="flex-1 bg-canopy/15 border border-canopy/30 rounded-xl px-3 py-3 items-center"
+            className="flex-1 bg-canopy/15 border border-canopy/30 rounded-xl px-2 py-3 items-center"
           >
             <MapPin size={18} color="#10B981" />
-            <Text className="text-canopy text-xs font-semibold mt-1">Explore</Text>
+            <Text className="text-canopy text-[10px] font-semibold mt-1">Explore</Text>
           </Pressable>
           <Pressable
             onPress={() => router.push('/(tabs)/record')}
-            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-3 py-3 items-center"
+            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-2 py-3 items-center"
           >
             <CircleDot size={18} color="#94a3b8" />
-            <Text className="text-slate-300 text-xs font-semibold mt-1">Record</Text>
+            <Text className="text-slate-300 text-[10px] font-semibold mt-1">Record</Text>
           </Pressable>
           <Pressable
             onPress={() => router.push('/(tabs)/trip')}
-            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-3 py-3 items-center"
+            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-2 py-3 items-center"
           >
             <Route size={18} color="#94a3b8" />
-            <Text className="text-slate-300 text-xs font-semibold mt-1">Plan Trip</Text>
+            <Text className="text-slate-300 text-[10px] font-semibold mt-1">Plan Trip</Text>
           </Pressable>
           <Pressable
             onPress={() => router.push('/(tabs)/board')}
-            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-3 py-3 items-center"
+            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-2 py-3 items-center"
           >
             <Calendar size={18} color="#94a3b8" />
-            <Text className="text-slate-300 text-xs font-semibold mt-1">Board</Text>
+            <Text className="text-slate-300 text-[10px] font-semibold mt-1">Board</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/(tabs)/profile/connected-apps')}
+            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-2 py-3 items-center"
+          >
+            <Link2 size={18} color="#94a3b8" />
+            <Text className="text-slate-300 text-[10px] font-semibold mt-1">Connect</Text>
           </Pressable>
         </View>
 

@@ -246,7 +246,8 @@ export async function fetchTrails(
       .eq('is_active', true);
 
     if (options.search) {
-      query = query.ilike('name', `%${options.search}%`);
+      // Search by trail name OR city/region name
+      query = query.or(`name.ilike.%${options.search}%,city.ilike.%${options.search}%`);
     }
 
     if (options.activityTypes && options.activityTypes.length > 0) {
@@ -423,7 +424,7 @@ export async function fetchBusinesses(
       .eq('is_active', true);
 
     if (options.search) {
-      query = query.ilike('name', `%${options.search}%`);
+      query = query.or(`name.ilike.%${options.search}%,city.ilike.%${options.search}%`);
     }
 
     if (options.category) {
