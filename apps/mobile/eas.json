@@ -9,14 +9,30 @@
       "distribution": "internal",
       "ios": {
         "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://jnbgbsprmxfkwgokmgtw.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuYmdic3BybXhma3dnb2ttZ3R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1ODMxMDAsImV4cCI6MjA4ODE1OTEwMH0.cFGOh3Aq_RImNlnSuN4UKkKc1IMcOCh8cat6G2zglxM"
       }
     },
     "development-device": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://jnbgbsprmxfkwgokmgtw.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuYmdic3BybXhma3dnb2ttZ3R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1ODMxMDAsImV4cCI6MjA4ODE1OTEwMH0.cFGOh3Aq_RImNlnSuN4UKkKc1IMcOCh8cat6G2zglxM"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "20.18.0",
+      "pnpm": {
+        "version": "10.30.3"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://jnbgbsprmxfkwgokmgtw.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuYmdic3BybXhma3dnb2ttZ3R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1ODMxMDAsImV4cCI6MjA4ODE1OTEwMH0.cFGOh3Aq_RImNlnSuN4UKkKc1IMcOCh8cat6G2zglxM"
+      }
     },
     "preview-testflight": {
       "distribution": "store",
