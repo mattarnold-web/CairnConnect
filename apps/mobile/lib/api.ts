@@ -705,6 +705,62 @@ export async function fetchActivityPostById(
 }
 
 // ---------------------------------------------------------------------------
+// Activity Board — Create
+// ---------------------------------------------------------------------------
+
+export interface CreateActivityPostPayload {
+  post_type: string;
+  activity_type: string;
+  title: string;
+  description?: string;
+  location_name: string;
+  activity_date?: string;
+  skill_level: string;
+  max_participants?: number;
+  gear_required?: string[];
+  cost_per_person?: number;
+  has_permit?: boolean;
+  permit_type?: string;
+  permit_slots?: number;
+}
+
+export async function createActivityPost(
+  payload: CreateActivityPostPayload,
+): Promise<ActivityPost> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('You must be signed in to create a post.');
+
+  const { data, error } = await sb
+    .from('activity_posts')
+    .insert({
+      organizer_id: user.id,
+      post_type: payload.post_type,
+      activity_type: payload.activity_type,
+      title: payload.title,
+      description: payload.description || null,
+      location_name: payload.location_name,
+      activity_date: payload.activity_date || null,
+      skill_level: payload.skill_level,
+      max_participants: payload.max_participants || null,
+      gear_required: payload.gear_required || [],
+      cost_per_person: payload.cost_per_person || null,
+      has_permit: payload.has_permit || false,
+      permit_type: payload.permit_type || null,
+      permit_slots: payload.permit_slots || null,
+      status: 'active',
+      is_public: true,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as ActivityPost;
+}
+
+// ---------------------------------------------------------------------------
 // User Activities
 // ---------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { View, Text, FlatList, Pressable, Dimensions, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Map as MapIcon, Navigation, Layers, Compass, Bed, Search as SearchIcon } from 'lucide-react-native';
+import { Map as MapIcon, Navigation, Layers, Compass, Bed, Search as SearchIcon, Store } from 'lucide-react-native';
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { FilterChip } from '@/components/ui/FilterChip';
@@ -11,6 +11,7 @@ import { BusinessCard } from '@/components/business/BusinessCard';
 import { AccommodationLinks } from '@/components/ui/AccommodationLinks';
 import { MapPin } from '@/components/ui/MapPin';
 import { SkeletonCard } from '@/components/ui/Skeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { fetchTrails, fetchBusinesses, autocompleteLocations } from '@/lib/api';
 import type { AutocompleteResult } from '@/lib/api';
 import { exploreRegion } from '@/lib/discovery';
@@ -264,13 +265,27 @@ export default function ExploreScreen() {
           );
         }}
         ListEmptyComponent={
-          <Text className="text-slate-500 text-center mt-8">
-            No {activeTab} found
-          </Text>
+          activeTab === 'trails' ? (
+            <EmptyState
+              icon={MapIcon}
+              title="No trails found"
+              description="Try adjusting your search or filters to discover trails in this area."
+              actionLabel={selectedActivity || debouncedSearch ? 'Clear Filters' : undefined}
+              onAction={selectedActivity || debouncedSearch ? () => { setSelectedActivity(null); setSearch(''); } : undefined}
+            />
+          ) : (
+            <EmptyState
+              icon={Store}
+              title="No businesses found"
+              description="Try expanding your search area to find local outdoor businesses."
+              actionLabel={selectedActivity || debouncedSearch ? 'Clear Filters' : undefined}
+              onAction={selectedActivity || debouncedSearch ? () => { setSelectedActivity(null); setSearch(''); } : undefined}
+            />
+          )
         }
       />
     );
-  }, [activeTab, trails, businesses, isLoading, handleTrailPress, handleBusinessPress]);
+  }, [activeTab, trails, businesses, isLoading, handleTrailPress, handleBusinessPress, selectedActivity, debouncedSearch]);
 
   return (
     <SafeAreaView className="flex-1 bg-cairn-bg" edges={['top']}>

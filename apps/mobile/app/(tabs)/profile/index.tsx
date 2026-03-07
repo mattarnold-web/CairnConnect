@@ -26,11 +26,13 @@ import {
   Award,
   Activity,
   Shield,
+  Footprints,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ActivityIcon } from '@/components/ui/ActivityIcon';
 import { SkeletonCard } from '@/components/ui/Skeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useAuth } from '@/lib/auth-context';
 import { useActivityContext } from '@/lib/activity-context';
 import { usePreferences } from '@/lib/preferences-context';
@@ -512,9 +514,13 @@ export default function ProfileScreen() {
               <SkeletonCard className="mb-3" />
             </View>
           ) : (
-            <Text className="text-slate-500 text-center mt-4">
-              No activities recorded yet. Hit the Record tab to get started!
-            </Text>
+            <EmptyState
+              icon={Footprints}
+              title="No activities yet"
+              description="Start recording your outdoor adventures! Head to the Record tab to begin."
+              actionLabel="Start Recording"
+              onAction={() => router.push('/(tabs)/record')}
+            />
           )
         }
       />

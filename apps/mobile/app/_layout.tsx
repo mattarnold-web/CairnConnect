@@ -31,6 +31,11 @@ export default function RootLayout() {
                     animation: 'slide_from_right',
                   }}
                 >
+                  <Stack.Screen name="index" />
+                  <Stack.Screen
+                    name="(onboarding)"
+                    options={{ presentation: 'modal', animation: 'fade' }}
+                  />
                   <Stack.Screen name="(tabs)" />
                   <Stack.Screen
                     name="(auth)/login"
