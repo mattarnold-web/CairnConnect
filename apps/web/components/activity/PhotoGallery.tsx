@@ -94,7 +94,7 @@ export function PhotoGallery({ filterActivityId, filterTripId }: PhotoGalleryPro
           <button
             key={photo.id}
             onClick={() => setSelectedId(photo.id)}
-            className="aspect-square rounded-xl overflow-hidden bg-cairn-elevated border border-cairn-border hover:border-canopy/40 transition-colors relative group"
+            className="aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200 hover:border-canopy/40 transition-colors relative group"
           >
             {imageData[photo.id] ? (
               <img
@@ -103,7 +103,7 @@ export function PhotoGallery({ filterActivityId, filterTripId }: PhotoGalleryPro
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="h-full w-full flex items-center justify-center text-slate-600">
+              <div className="h-full w-full flex items-center justify-center text-gray-300">
                 Loading...
               </div>
             )}
@@ -159,7 +159,7 @@ export function PhotoGallery({ filterActivityId, filterTripId }: PhotoGalleryPro
           </div>
 
           {/* Info bar */}
-          <div className="p-4 flex items-center gap-4 text-xs text-slate-400">
+          <div className="p-4 flex items-center gap-4 text-xs text-gray-500">
             <span className="flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" />
               {new Date(selectedPhoto.capturedAt).toLocaleString()}

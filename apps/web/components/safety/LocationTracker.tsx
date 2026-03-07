@@ -83,7 +83,7 @@ export default function LocationTracker() {
     return (
       <button
         onClick={startTracking}
-        className="rounded-xl bg-cairn-card border border-cairn-border px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-cairn-card-hover hover:text-white transition-colors inline-flex items-center gap-2"
+        className="rounded-xl bg-white border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-white transition-colors inline-flex items-center gap-2"
       >
         <Navigation size={16} />
         <span>Start Tracking</span>
@@ -109,11 +109,11 @@ export default function LocationTracker() {
             {error ? (
               <span className="text-xs text-red-400">{error}</span>
             ) : lat !== null && lng !== null ? (
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-gray-500 font-mono">
                 {lat.toFixed(4)}, {lng.toFixed(4)}
               </span>
             ) : (
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-gray-500">
                 Acquiring signal...
               </span>
             )}
@@ -123,7 +123,7 @@ export default function LocationTracker() {
             <button
               onClick={handleCopyLink}
               disabled={lat === null || lng === null}
-              className="rounded-lg bg-cairn-card border border-cairn-border px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-cairn-card-hover hover:text-white transition-colors inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-lg bg-white border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-white transition-colors inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Copy size={12} />
               Copy Link

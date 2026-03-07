@@ -111,7 +111,7 @@ export function QuizResultCard({ result }: QuizResultCardProps) {
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-display text-base font-semibold text-slate-100 line-clamp-1">
+            <h3 className="font-display text-base font-semibold text-gray-900 line-clamp-1">
               {trail.name}
             </h3>
 
@@ -123,7 +123,7 @@ export function QuizResultCard({ result }: QuizResultCardProps) {
             </div>
 
             {/* Stats */}
-            <div className="mt-2.5 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+            <div className="mt-2.5 flex flex-wrap items-center gap-3 text-xs text-gray-500">
               <span className="inline-flex items-center gap-1">
                 <Ruler className="h-3 w-3" />
                 {fmt.distance(trail.distance_meters)}
@@ -144,7 +144,7 @@ export function QuizResultCard({ result }: QuizResultCardProps) {
                 {matchReasons.map((reason, idx) => (
                   <span
                     key={idx}
-                    className="rounded-full bg-cairn-elevated/50 px-2 py-0.5 text-[10px] text-slate-400"
+                    className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500"
                   >
                     {reason}
                   </span>
@@ -174,12 +174,12 @@ export function QuizResultCard({ result }: QuizResultCardProps) {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-xl border border-cairn-border bg-cairn-card shadow-xl shadow-black/30 overflow-hidden">
-              <div className="flex items-center justify-between px-3 py-2 border-b border-cairn-border">
-                <span className="text-xs font-semibold text-slate-300">Select day</span>
+            <div className="absolute left-0 right-0 top-full mt-1 z-20 rounded-xl border border-gray-200 bg-white shadow-xl shadow-black/30 overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200">
+                <span className="text-xs font-semibold text-gray-700">Select day</span>
                 <button
                   onClick={() => setDropdownOpen(false)}
-                  className="text-slate-500 hover:text-slate-300"
+                  className="text-gray-400 hover:text-gray-700"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -190,19 +190,19 @@ export function QuizResultCard({ result }: QuizResultCardProps) {
                     <button
                       key={day.id}
                       onClick={() => handleAddToDay(day.id, day.dayNumber)}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-cairn-elevated hover:text-white transition-colors text-left"
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 hover:text-white transition-colors text-left"
                     >
                       <CalendarPlus className="h-3.5 w-3.5 text-canopy shrink-0" />
                       Day {day.dayNumber}
                       {day.label ? ` \u2014 ${day.label}` : ''}
-                      <span className="ml-auto text-xs text-slate-500">
+                      <span className="ml-auto text-xs text-gray-400">
                         {day.items.length} item{day.items.length !== 1 ? 's' : ''}
                       </span>
                     </button>
                   ))}
                 </div>
               ) : (
-                <p className="px-3 py-4 text-sm text-slate-500 text-center">
+                <p className="px-3 py-4 text-sm text-gray-400 text-center">
                   No trip days yet. Start a trip first.
                 </p>
               )}

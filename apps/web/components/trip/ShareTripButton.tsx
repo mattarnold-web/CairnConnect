@@ -37,7 +37,7 @@ export function ShareTripButton({ state }: ShareTripButtonProps) {
     <>
       <button
         onClick={handleShare}
-        className="flex items-center gap-2 rounded-xl bg-cairn-card border border-cairn-border px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-cairn-card-hover hover:text-white transition-colors"
+        className="flex items-center gap-2 rounded-xl bg-white border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-white transition-colors"
       >
         <Share2 className="h-4 w-4" />
         Share Trip

@@ -69,7 +69,7 @@ function renderStars(rating: number) {
   return Array.from({ length: 5 }, (_, i) => (
     <Star
       key={i}
-      className={`h-4 w-4 ${i < Math.round(rating) ? 'text-amber-400 fill-amber-400' : 'text-slate-600'}`}
+      className={`h-4 w-4 ${i < Math.round(rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`}
     />
   ));
 }
@@ -107,11 +107,11 @@ export function BusinessDetailClient({ business, reviews, nearbyTrails, isSaved:
   ].filter((item) => item.href);
 
   return (
-    <div className="min-h-screen bg-cairn-bg pb-24">
+    <div className="min-h-screen bg-white pb-24">
       <Navbar />
 
       {/* Cover area */}
-      <div className="relative h-[300px] bg-gradient-to-br from-cairn-elevated via-cairn-card to-cairn-bg">
+      <div className="relative h-[300px] bg-gradient-to-br from-gray-50 via-cairn-card to-white">
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-8xl opacity-20 select-none">{categoryIcon}</span>
         </div>
@@ -119,7 +119,7 @@ export function BusinessDetailClient({ business, reviews, nearbyTrails, isSaved:
         <div className="absolute top-20 left-4 sm:left-6">
           <Link
             href="/explore"
-            className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-cairn-bg/60 backdrop-blur-sm border border-cairn-border text-slate-300 hover:bg-cairn-card hover:text-white transition-colors"
+            className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-white/60 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-white hover:text-white transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -137,7 +137,7 @@ export function BusinessDetailClient({ business, reviews, nearbyTrails, isSaved:
               });
             }}
             disabled={isPending}
-            className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-cairn-bg/60 backdrop-blur-sm border border-cairn-border text-slate-300 hover:text-red-400 transition-colors disabled:opacity-50"
+            className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-white/60 backdrop-blur-sm border border-gray-200 text-gray-700 hover:text-red-400 transition-colors disabled:opacity-50"
           >
             <Heart className={`h-5 w-5 ${isSaved ? 'fill-red-400 text-red-400' : ''}`} />
           </button>
@@ -146,31 +146,31 @@ export function BusinessDetailClient({ business, reviews, nearbyTrails, isSaved:
 
       {/* Content */}
       <div className="mx-auto max-w-3xl px-4 sm:px-6 -mt-8 relative z-10">
-        <h1 className="font-display text-2xl font-bold text-slate-100">{business.name}</h1>
-        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+        <h1 className="font-display text-2xl font-bold text-gray-900">{business.name}</h1>
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-500">
           <span className="inline-flex items-center gap-1.5">
             <span>{categoryIcon}</span>
             {categoryLabel}
           </span>
-          <span className="text-cairn-border">|</span>
+          <span className="text-gray-300">|</span>
           {business.rating > 0 && (
             <span className="inline-flex items-center gap-1 text-amber-400">
               <Star className="h-4 w-4 fill-current" />
               {business.rating.toFixed(1)}
-              <span className="text-slate-500">({business.review_count} reviews)</span>
+              <span className="text-gray-400">({business.review_count} reviews)</span>
             </span>
           )}
         </div>
         <div className="mt-2 flex items-center gap-2 text-sm">
           <Clock className="h-4 w-4 text-canopy" />
           {todayHours ? (
-            <span className="text-slate-300">
+            <span className="text-gray-700">
               <span className="font-semibold text-canopy">Open</span>
               {' \u00B7 '}
               {todayHours}
             </span>
           ) : (
-            <span className="text-slate-500">Hours unavailable</span>
+            <span className="text-gray-400">Hours unavailable</span>
           )}
         </div>
 
@@ -191,7 +191,7 @@ export function BusinessDetailClient({ business, reviews, nearbyTrails, isSaved:
                 href={item.href!}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-cairn-card border border-cairn-border px-4 py-3 min-w-[80px] text-xs text-slate-300 hover:bg-cairn-card-hover hover:text-white transition-colors shrink-0"
+                className="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-white border border-gray-200 px-4 py-3 min-w-[80px] text-xs text-gray-700 hover:bg-gray-50 hover:text-white transition-colors shrink-0"
               >
                 <Icon className="h-5 w-5" />
                 {item.label}
@@ -202,19 +202,19 @@ export function BusinessDetailClient({ business, reviews, nearbyTrails, isSaved:
 
         {/* About */}
         <section className="mt-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">About</h2>
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">About</h2>
           {business.description ? (
-            <p className="text-sm leading-relaxed text-slate-400">{business.description}</p>
+            <p className="text-sm leading-relaxed text-gray-500">{business.description}</p>
           ) : (
-            <p className="text-sm text-slate-500 italic">No description available.</p>
+            <p className="text-sm text-gray-400 italic">No description available.</p>
           )}
         </section>
 
         {/* Location */}
         {(business.address || business.city) && (
           <section className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Location</h2>
-            <div className="flex items-start gap-2 text-sm text-slate-400">
+            <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Location</h2>
+            <div className="flex items-start gap-2 text-sm text-gray-500">
               <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-canopy" />
               <span>
                 {business.address}
@@ -227,7 +227,7 @@ export function BusinessDetailClient({ business, reviews, nearbyTrails, isSaved:
 
         {/* Trails Nearby */}
         <section className="mt-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Trails Nearby</h2>
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Trails Nearby</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {nearbyTrails.map((trail) => (
               <TrailCard key={trail.id} trail={trail as any} compact />
@@ -237,33 +237,33 @@ export function BusinessDetailClient({ business, reviews, nearbyTrails, isSaved:
 
         {/* Reviews */}
         <section className="mt-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Reviews</h2>
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Reviews</h2>
           {reviews.length > 0 ? (
             <div className="space-y-4">
               {reviews.map((review) => (
-                <div key={review.id} className="rounded-2xl border border-cairn-border bg-cairn-card p-4">
+                <div key={review.id} className="rounded-2xl border border-gray-200 bg-white p-4">
                   <div className="flex items-center gap-1">{renderStars(review.rating)}</div>
-                  <h3 className="mt-2 font-display text-sm font-semibold text-slate-100">{review.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{review.body}</p>
-                  <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                    <span className="font-medium text-slate-300">{review.author_name ?? 'Anonymous'}</span>
+                  <h3 className="mt-2 font-display text-sm font-semibold text-gray-900">{review.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-gray-500">{review.body}</p>
+                  <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
+                    <span className="font-medium text-gray-700">{review.author_name ?? 'Anonymous'}</span>
                     <span>{new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500 italic">No reviews yet. Be the first to share your experience!</p>
+            <p className="text-sm text-gray-400 italic">No reviews yet. Be the first to share your experience!</p>
           )}
         </section>
 
         {/* Tags */}
         {business.tags.length > 0 && (
           <section className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Tags</h2>
+            <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Tags</h2>
             <div className="flex flex-wrap gap-2">
               {business.tags.map((tag: string) => (
-                <span key={tag} className="rounded-full bg-cairn-elevated/50 border border-cairn-border px-3 py-1 text-xs text-slate-400">
+                <span key={tag} className="rounded-full bg-gray-100 border border-gray-200 px-3 py-1 text-xs text-gray-500">
                   {tag}
                 </span>
               ))}

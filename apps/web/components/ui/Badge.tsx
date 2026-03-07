@@ -14,17 +14,16 @@ export function Badge({ children, variant = 'default', color, className }: Badge
     <span
       className={clsx(
         'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide',
-        variant === 'default' && 'bg-cairn-elevated text-slate-300',
-        variant === 'spotlight' && 'bg-spotlight-gold/20 text-spotlight-gold border border-spotlight-gold/30',
-        variant === 'condition' && 'border',
-        variant === 'difficulty' && 'border',
-        variant === 'postType' && 'uppercase tracking-wider',
+        variant === 'default' && 'bg-gray-100 text-gray-600',
+        variant === 'spotlight' && 'bg-spotlight-gold-bg text-spotlight-gold',
+        variant === 'condition' && 'border border-gray-200',
+        variant === 'difficulty' && 'border border-gray-200',
+        variant === 'postType' && 'uppercase tracking-wider text-[11px]',
         className
       )}
       style={color ? {
-        backgroundColor: `${color}15`,
+        backgroundColor: `${color}10`,
         color: color,
-        borderColor: `${color}30`,
       } : undefined}
     >
       {children}

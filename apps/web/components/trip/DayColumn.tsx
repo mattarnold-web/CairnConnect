@@ -29,15 +29,15 @@ export function DayColumn({ day, dispatch, onAddClick, totalDays }: DayColumnPro
   }
 
   return (
-    <div className="rounded-2xl bg-cairn-card border border-cairn-border p-4">
+    <div className="rounded-2xl bg-white border border-gray-200 p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="font-display text-lg font-semibold text-slate-100">
+          <h3 className="font-display text-lg font-semibold text-gray-900">
             Day {day.dayNumber}
           </h3>
           {day.date && (
-            <p className="text-xs text-slate-500">{formatDate(day.date)}</p>
+            <p className="text-xs text-gray-400">{formatDate(day.date)}</p>
           )}
         </div>
 
@@ -65,7 +65,7 @@ export function DayColumn({ day, dispatch, onAddClick, totalDays }: DayColumnPro
           })
         }
         placeholder="e.g. MTB Day, Rest Day..."
-        className="w-full h-8 bg-cairn-bg border border-cairn-border rounded-lg px-3 text-xs text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-canopy/50 transition-colors mb-3"
+        className="w-full h-8 bg-white border border-gray-200 rounded-lg px-3 text-xs text-gray-700 placeholder:text-gray-300 focus:outline-none focus:border-canopy/50 transition-colors mb-3"
       />
 
       {/* Items list */}
@@ -188,9 +188,9 @@ export function DayColumn({ day, dispatch, onAddClick, totalDays }: DayColumnPro
           })}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-cairn-border rounded-xl">
-          <Plus className="h-6 w-6 text-slate-600 mb-2" />
-          <p className="text-xs text-slate-500">
+        <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
+          <Plus className="h-6 w-6 text-gray-300 mb-2" />
+          <p className="text-xs text-gray-400">
             Drag trails here or click Add
           </p>
         </div>

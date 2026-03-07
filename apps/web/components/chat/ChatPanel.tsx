@@ -40,22 +40,22 @@ export function ChatPanel() {
 
       {/* Chat panel */}
       {isOpen && (
-        <div className="fixed bottom-44 right-4 md:bottom-24 md:right-8 z-[60] w-[calc(100vw-2rem)] max-w-[360px] max-h-[500px] flex flex-col rounded-2xl border border-cairn-border bg-cairn-card shadow-2xl shadow-black/30 overflow-hidden">
+        <div className="fixed bottom-44 right-4 md:bottom-24 md:right-8 z-[60] w-[calc(100vw-2rem)] max-w-[360px] max-h-[500px] flex flex-col rounded-2xl border border-gray-200 bg-white shadow-2xl shadow-black/30 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-cairn-border bg-cairn-elevated/50">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-100">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-canopy/15 flex items-center justify-center">
                 <Mountain className="h-4 w-4 text-canopy" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-200">Cairn Assistant</h3>
-                <p className="text-[10px] text-slate-500">Powered by Claude</p>
+                <h3 className="text-sm font-semibold text-gray-800">Cairn Assistant</h3>
+                <p className="text-[10px] text-gray-400">Powered by Claude</p>
               </div>
             </div>
             {messages.length > 0 && (
               <button
                 onClick={clearMessages}
-                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-cairn-elevated transition-colors"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
                 aria-label="Clear chat"
               >
                 <Trash2 className="h-4 w-4" />
@@ -67,7 +67,7 @@ export function ChatPanel() {
           <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px] max-h-[340px]">
             {messages.length === 0 ? (
               <div className="space-y-3">
-                <p className="text-sm text-slate-400 text-center">
+                <p className="text-sm text-gray-500 text-center">
                   Ask me about trails, trip planning, gear, or safety tips!
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -75,7 +75,7 @@ export function ChatPanel() {
                     <button
                       key={topic.label}
                       onClick={() => sendMessage(topic.prompt)}
-                      className="rounded-lg border border-cairn-border bg-cairn-elevated/30 p-2 text-xs text-slate-400 hover:text-slate-200 hover:border-canopy/30 transition-colors text-left"
+                      className="rounded-lg border border-gray-200 bg-gray-100/30 p-2 text-xs text-gray-500 hover:text-gray-800 hover:border-canopy/30 transition-colors text-left"
                     >
                       {topic.label}
                     </button>
@@ -91,15 +91,15 @@ export function ChatPanel() {
                   <div
                     className={`max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed ${
                       msg.role === 'user'
-                        ? 'bg-canopy/15 text-slate-200 border border-canopy/20'
-                        : 'bg-cairn-elevated text-slate-300 border border-cairn-border'
+                        ? 'bg-canopy/15 text-gray-800 border border-canopy/20'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     {msg.content || (
                       <span className="inline-flex gap-1">
-                        <span className="h-1.5 w-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="h-1.5 w-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="h-1.5 w-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                       </span>
                     )}
                   </div>
@@ -115,7 +115,7 @@ export function ChatPanel() {
               e.preventDefault();
               sendMessage();
             }}
-            className="flex items-center gap-2 px-3 py-2.5 border-t border-cairn-border bg-cairn-elevated/30"
+            className="flex items-center gap-2 px-3 py-2.5 border-t border-gray-200 bg-gray-100/30"
           >
             <input
               ref={inputRef}
@@ -123,7 +123,7 @@ export function ChatPanel() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about trails, gear, safety..."
-              className="flex-1 bg-transparent text-sm text-slate-200 placeholder:text-slate-600 outline-none"
+              className="flex-1 bg-transparent text-sm text-gray-800 placeholder:text-gray-300 outline-none"
               disabled={isStreaming}
             />
             <button

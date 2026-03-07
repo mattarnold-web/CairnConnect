@@ -113,25 +113,25 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-cairn-bg pb-24">
+    <div className="min-h-screen bg-white pb-24">
       <Navbar />
       <div className="mx-auto max-w-2xl px-4 pt-20">
         <div className="flex items-center gap-3 mb-8">
           <Settings className="h-6 w-6 text-canopy" />
-          <h1 className="font-display text-2xl font-bold text-slate-100">Settings</h1>
+          <h1 className="font-display text-2xl font-bold text-gray-900">Settings</h1>
         </div>
 
         {/* Profile Section */}
         <section className="mb-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <User className="h-5 w-5 text-canopy" />
             Profile
           </h2>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5 space-y-5">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-5">
             {/* Profile Picture */}
             <div className="flex items-center gap-5">
               <div className="relative">
-                <div className="h-20 w-20 rounded-full bg-cairn-elevated border-2 border-cairn-border flex items-center justify-center overflow-hidden">
+                <div className="h-20 w-20 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center overflow-hidden">
                   {preferences.profilePicture ? (
                     <img
                       src={preferences.profilePicture}
@@ -139,7 +139,7 @@ export default function SettingsPage() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <User className="h-8 w-8 text-slate-500" />
+                    <User className="h-8 w-8 text-gray-400" />
                   )}
                 </div>
                 <button
@@ -157,7 +157,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex-1 space-y-3">
                 <div>
-                  <label className="block text-xs text-slate-500 mb-1">Display Name</label>
+                  <label className="block text-xs text-gray-400 mb-1">Display Name</label>
                   <input
                     type="text"
                     value={preferences.displayName}
@@ -166,11 +166,11 @@ export default function SettingsPage() {
                     }}
                     onBlur={(e) => syncProfile('displayName', e.target.value)}
                     placeholder="Your trail name"
-                    className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none"
+                    className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:border-canopy focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-500 mb-1">Bio</label>
+                  <label className="block text-xs text-gray-400 mb-1">Bio</label>
                   <textarea
                     value={preferences.bio}
                     onChange={(e) => {
@@ -179,7 +179,7 @@ export default function SettingsPage() {
                     onBlur={(e) => syncProfile('bio', e.target.value)}
                     placeholder="Tell others about your outdoor interests..."
                     rows={2}
-                    className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none resize-none"
+                    className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:border-canopy focus:outline-none resize-none"
                   />
                 </div>
               </div>
@@ -189,18 +189,18 @@ export default function SettingsPage() {
 
         {/* Language Section */}
         <section className="mb-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Globe className="h-5 w-5 text-canopy" />
             Language
           </h2>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <select
               value={preferences.language}
               onChange={(e) => {
                 dispatch({ type: 'SET_LANGUAGE', language: e.target.value });
                 syncPreferences('preferredLanguage', e.target.value);
               }}
-              className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2.5 text-sm text-slate-100 focus:border-canopy focus:outline-none appearance-none cursor-pointer"
+              className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-canopy focus:outline-none appearance-none cursor-pointer"
             >
               {LANGUAGES.map((lang) => (
                 <option key={lang.code} value={lang.code}>
@@ -213,18 +213,18 @@ export default function SettingsPage() {
 
         {/* Timezone Section */}
         <section className="mb-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Clock className="h-5 w-5 text-canopy" />
             Time Zone
           </h2>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <select
               value={preferences.timezone}
               onChange={(e) => {
                 dispatch({ type: 'SET_TIMEZONE', timezone: e.target.value });
                 showSavedToast();
               }}
-              className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2.5 text-sm text-slate-100 focus:border-canopy focus:outline-none appearance-none cursor-pointer"
+              className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-canopy focus:outline-none appearance-none cursor-pointer"
             >
               {TIMEZONES.map((tz) => (
                 <option key={tz} value={tz}>
@@ -237,10 +237,10 @@ export default function SettingsPage() {
 
         {/* Units Section */}
         <section className="mb-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-4">
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-4">
             Units
           </h2>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <div className="flex gap-3">
               <button
                 onClick={() => {
@@ -251,7 +251,7 @@ export default function SettingsPage() {
                   'flex-1 rounded-xl border py-3 text-sm font-medium transition-colors',
                   preferences.units === 'imperial'
                     ? 'bg-canopy/15 border-canopy/40 text-canopy'
-                    : 'bg-cairn-elevated border-cairn-border text-slate-400 hover:text-slate-200'
+                    : 'bg-gray-100 border-gray-200 text-gray-500 hover:text-gray-800'
                 )}
               >
                 Imperial (mi, ft)
@@ -265,7 +265,7 @@ export default function SettingsPage() {
                   'flex-1 rounded-xl border py-3 text-sm font-medium transition-colors',
                   preferences.units === 'metric'
                     ? 'bg-canopy/15 border-canopy/40 text-canopy'
-                    : 'bg-cairn-elevated border-cairn-border text-slate-400 hover:text-slate-200'
+                    : 'bg-gray-100 border-gray-200 text-gray-500 hover:text-gray-800'
                 )}
               >
                 Metric (km, m)
@@ -276,14 +276,14 @@ export default function SettingsPage() {
 
         {/* Equipment Section */}
         <section className="mb-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Wrench className="h-5 w-5 text-canopy" />
             My Equipment
           </h2>
-          <p className="text-sm text-slate-400 mb-4">
+          <p className="text-sm text-gray-500 mb-4">
             Add your gear so other users can see what you ride, climb, or paddle with.
           </p>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
             {preferences.equipment.length > 0 ? (
               <div className="space-y-2 mb-4">
                 {preferences.equipment.map((item) => {
@@ -291,18 +291,18 @@ export default function SettingsPage() {
                   return (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between rounded-xl bg-cairn-elevated border border-cairn-border px-4 py-3"
+                      className="flex items-center justify-between rounded-xl bg-gray-100 border border-gray-200 px-4 py-3"
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-lg">{catConfig?.emoji || '\ud83c\udfaf'}</span>
                         <div>
-                          <p className="text-sm font-medium text-slate-100">{item.name}</p>
-                          <p className="text-xs text-slate-500">{catConfig?.label || item.category}</p>
+                          <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                          <p className="text-xs text-gray-400">{catConfig?.label || item.category}</p>
                         </div>
                       </div>
                       <button
                         onClick={() => dispatch({ type: 'REMOVE_EQUIPMENT', id: item.id })}
-                        className="h-7 w-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -311,17 +311,17 @@ export default function SettingsPage() {
                 })}
               </div>
             ) : (
-              <p className="text-sm text-slate-500 mb-4">No equipment added yet.</p>
+              <p className="text-sm text-gray-400 mb-4">No equipment added yet.</p>
             )}
 
             {showAddEquip ? (
-              <div className="space-y-3 rounded-xl bg-cairn-elevated/50 border border-cairn-border p-4">
+              <div className="space-y-3 rounded-xl bg-gray-100 border border-gray-200 p-4">
                 <input
                   type="text"
                   value={newEquipName}
                   onChange={(e) => setNewEquipName(e.target.value)}
                   placeholder="Equipment name (e.g., Santa Cruz Hightower)"
-                  className="w-full rounded-lg bg-cairn-bg border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none"
+                  className="w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:border-canopy focus:outline-none"
                   onKeyDown={(e) => e.key === 'Enter' && handleAddEquipment()}
                   autoFocus
                 />
@@ -334,7 +334,7 @@ export default function SettingsPage() {
                         'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors',
                         newEquipCategory === cat.value
                           ? 'bg-canopy/15 border-canopy/40 text-canopy'
-                          : 'bg-cairn-card border-cairn-border text-slate-400'
+                          : 'bg-white border-gray-200 text-gray-500'
                       )}
                     >
                       <span>{cat.emoji}</span>
@@ -356,7 +356,7 @@ export default function SettingsPage() {
                       setShowAddEquip(false);
                       setNewEquipName('');
                     }}
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors"
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors"
                   >
                     Cancel
                   </button>
@@ -365,7 +365,7 @@ export default function SettingsPage() {
             ) : (
               <button
                 onClick={() => setShowAddEquip(true)}
-                className="flex items-center gap-2 rounded-xl border border-dashed border-cairn-border px-4 py-3 text-sm font-medium text-slate-400 hover:text-canopy hover:border-canopy/40 transition-colors w-full justify-center"
+                className="flex items-center gap-2 rounded-xl border border-dashed border-gray-200 px-4 py-3 text-sm font-medium text-gray-500 hover:text-canopy hover:border-canopy/40 transition-colors w-full justify-center"
               >
                 <Plus className="h-4 w-4" />
                 Add Equipment
@@ -376,26 +376,26 @@ export default function SettingsPage() {
 
         {/* Privacy & Security Info */}
         <section className="mb-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Shield className="h-5 w-5 text-canopy" />
             Privacy & Security
           </h2>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5 space-y-4">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-4">
             <div className="flex items-start gap-3">
               <Shield className="h-5 w-5 text-canopy shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-slate-100">Data Protection</p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-sm font-medium text-gray-900">Data Protection</p>
+                <p className="text-xs text-gray-500 mt-1">
                   Your personal data is encrypted at rest and in transit. We never sell your location
                   data or activity history to third parties.
                 </p>
               </div>
             </div>
-            <div className="border-t border-cairn-border pt-4 space-y-2">
-              <button className="w-full text-left rounded-xl bg-cairn-elevated border border-cairn-border px-4 py-3 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors">
+            <div className="border-t border-gray-200 pt-4 space-y-2">
+              <button className="w-full text-left rounded-xl bg-gray-100 border border-gray-200 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                 Download My Data
               </button>
-              <button className="w-full text-left rounded-xl bg-cairn-elevated border border-cairn-border px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors">
+              <button className="w-full text-left rounded-xl bg-gray-100 border border-gray-200 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors">
                 Delete My Account
               </button>
             </div>

@@ -103,7 +103,7 @@ const FAQ_ITEMS = [
 
 export default function UpgradePage() {
   return (
-    <div className="min-h-screen bg-cairn-bg">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <main className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-24 pb-24">
@@ -117,7 +117,7 @@ export default function UpgradePage() {
             <Sparkles className="inline h-8 w-8 mr-2" />
             Get Spotlight
           </h1>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
             Stand out on the map, rank higher in search, and track how outdoor
             enthusiasts engage with your business.
           </p>
@@ -131,12 +131,12 @@ export default function UpgradePage() {
               className={`relative rounded-2xl border p-6 flex flex-col ${
                 tier.highlighted
                   ? 'border-spotlight-gold bg-spotlight-gold/5 spotlight-glow'
-                  : 'border-cairn-border bg-cairn-card'
+                  : 'border-gray-200 bg-white'
               }`}
             >
               {tier.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="rounded-full bg-spotlight-gold px-3 py-1 text-xs font-bold text-cairn-bg whitespace-nowrap">
+                  <span className="rounded-full bg-spotlight-gold px-3 py-1 text-xs font-bold text-white whitespace-nowrap">
                     {tier.badge}
                   </span>
                 </div>
@@ -144,14 +144,14 @@ export default function UpgradePage() {
 
               {/* Tier header */}
               <div className="text-center mb-6 pt-3">
-                <h3 className="font-display text-xl font-bold text-slate-100">
+                <h3 className="font-display text-xl font-bold text-gray-900">
                   {tier.name}
                 </h3>
                 <div className="mt-2">
-                  <span className="font-display text-4xl font-bold text-slate-100">
+                  <span className="font-display text-4xl font-bold text-gray-900">
                     {tier.price}
                   </span>
-                  <span className="text-slate-500">{tier.period}</span>
+                  <span className="text-gray-400">{tier.period}</span>
                 </div>
               </div>
 
@@ -160,7 +160,7 @@ export default function UpgradePage() {
                 {tier.features.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-start gap-2 text-sm text-slate-400"
+                    className="flex items-start gap-2 text-sm text-gray-500"
                   >
                     <Check className="h-4 w-4 text-canopy shrink-0 mt-0.5" />
                     {feature}
@@ -183,7 +183,7 @@ export default function UpgradePage() {
         {/* FAQ */}
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="font-display text-2xl font-bold text-slate-100">
+            <h2 className="font-display text-2xl font-bold text-gray-900">
               Frequently Asked Questions
             </h2>
           </div>
@@ -192,15 +192,15 @@ export default function UpgradePage() {
             {FAQ_ITEMS.map((item) => (
               <div
                 key={item.question}
-                className="rounded-2xl border border-cairn-border bg-cairn-card p-5"
+                className="rounded-2xl border border-gray-200 bg-white p-5"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-display text-base font-semibold text-slate-100">
+                  <h3 className="font-display text-base font-semibold text-gray-900">
                     {item.question}
                   </h3>
-                  <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
+                  <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
                 </div>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <p className="text-sm text-gray-500 leading-relaxed">
                   {item.answer}
                 </p>
               </div>
@@ -212,7 +212,7 @@ export default function UpgradePage() {
         <div className="text-center mt-12">
           <Link
             href="/dashboard"
-            className="text-sm text-slate-500 hover:text-slate-300 transition-colors"
+            className="text-sm text-gray-400 hover:text-gray-700 transition-colors"
           >
             Back to Dashboard
           </Link>

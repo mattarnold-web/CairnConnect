@@ -152,7 +152,7 @@ export function BaseMap({
   };
 
   return (
-    <div className={`rounded-2xl overflow-hidden border border-cairn-border ${className}`} style={{ height }}>
+    <div className={`rounded-2xl overflow-hidden border border-gray-200 ${className}`} style={{ height }}>
       <MapContainer
         center={center}
         zoom={zoom}

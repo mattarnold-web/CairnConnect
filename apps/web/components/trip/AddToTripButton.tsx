@@ -67,10 +67,10 @@ export function AddToTripButton({
       <div className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-50" ref={popoverRef}>
         {/* Popover */}
         {open && (
-          <div className="absolute bottom-16 right-0 w-64 rounded-2xl border border-cairn-border bg-cairn-card shadow-xl shadow-black/30 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-cairn-border">
-              <span className="text-sm font-semibold text-slate-200">Add to Trip</span>
-              <button onClick={() => setOpen(false)} className="text-slate-500 hover:text-slate-300">
+          <div className="absolute bottom-16 right-0 w-64 rounded-2xl border border-gray-200 bg-white shadow-xl shadow-black/30 overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+              <span className="text-sm font-semibold text-gray-800">Add to Trip</span>
+              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-700">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -81,14 +81,14 @@ export function AddToTripButton({
                   <button
                     key={day.id}
                     onClick={() => handleAddToDay(day.id, day.dayNumber)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-cairn-elevated hover:text-white transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-100 hover:text-white transition-colors text-left"
                   >
                     <CalendarPlus className="h-4 w-4 text-canopy shrink-0" />
                     <span>
                       Day {day.dayNumber}
                       {day.label ? ` — ${day.label}` : ''}
                     </span>
-                    <span className="ml-auto text-xs text-slate-500">
+                    <span className="ml-auto text-xs text-gray-400">
                       {day.items.length} item{day.items.length !== 1 ? 's' : ''}
                     </span>
                   </button>
@@ -96,7 +96,7 @@ export function AddToTripButton({
               </div>
             ) : (
               <div className="p-4 text-center">
-                <p className="text-sm text-slate-400 mb-3">
+                <p className="text-sm text-gray-500 mb-3">
                   No active trip yet.
                 </p>
                 <Link

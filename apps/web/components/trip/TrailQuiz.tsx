@@ -145,10 +145,10 @@ export function TrailQuiz({ onComplete, onBack }: TrailQuizProps) {
           <div className="space-y-4">
             <div className="text-center mb-6">
               <Compass className="h-8 w-8 text-canopy mx-auto mb-3" />
-              <h2 className="font-display text-2xl font-bold text-slate-100">
+              <h2 className="font-display text-2xl font-bold text-gray-900">
                 What&apos;s your vibe?
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Pick the energy level for your adventure</p>
+              <p className="text-sm text-gray-500 mt-1">Pick the energy level for your adventure</p>
             </div>
             <div className="grid gap-3">
               {VIBE_OPTIONS.map((opt) => (
@@ -156,17 +156,17 @@ export function TrailQuiz({ onComplete, onBack }: TrailQuizProps) {
                   key={opt.value}
                   onClick={() => handleVibe(opt.value)}
                   className={clsx(
-                    'rounded-2xl bg-cairn-card border p-5 cursor-pointer transition-colors text-left',
+                    'rounded-2xl bg-white border p-5 cursor-pointer transition-colors text-left',
                     answers.vibe === opt.value
                       ? 'border-canopy bg-canopy/10'
-                      : 'border-cairn-border hover:bg-cairn-card-hover',
+                      : 'border-gray-200 hover:bg-gray-50',
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{opt.emoji}</span>
                     <div>
-                      <p className="font-display font-semibold text-slate-100">{opt.label}</p>
-                      <p className="text-sm text-slate-400">{opt.description}</p>
+                      <p className="font-display font-semibold text-gray-900">{opt.label}</p>
+                      <p className="text-sm text-gray-500">{opt.description}</p>
                     </div>
                   </div>
                 </button>
@@ -179,10 +179,10 @@ export function TrailQuiz({ onComplete, onBack }: TrailQuizProps) {
         return (
           <div className="space-y-4">
             <div className="text-center mb-6">
-              <h2 className="font-display text-2xl font-bold text-slate-100">
+              <h2 className="font-display text-2xl font-bold text-gray-900">
                 How long do you want to ride?
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Choose your ideal duration</p>
+              <p className="text-sm text-gray-500 mt-1">Choose your ideal duration</p>
             </div>
             <div className="grid gap-3">
               {DURATION_OPTIONS.map((opt) => (
@@ -190,14 +190,14 @@ export function TrailQuiz({ onComplete, onBack }: TrailQuizProps) {
                   key={opt.value}
                   onClick={() => handleDuration(opt.value)}
                   className={clsx(
-                    'rounded-2xl bg-cairn-card border p-5 cursor-pointer transition-colors text-left',
+                    'rounded-2xl bg-white border p-5 cursor-pointer transition-colors text-left',
                     answers.duration === opt.value
                       ? 'border-canopy bg-canopy/10'
-                      : 'border-cairn-border hover:bg-cairn-card-hover',
+                      : 'border-gray-200 hover:bg-gray-50',
                   )}
                 >
-                  <p className="font-display font-semibold text-slate-100">{opt.label}</p>
-                  <p className="text-sm text-slate-400">{opt.description}</p>
+                  <p className="font-display font-semibold text-gray-900">{opt.label}</p>
+                  <p className="text-sm text-gray-500">{opt.description}</p>
                 </button>
               ))}
             </div>
@@ -208,10 +208,10 @@ export function TrailQuiz({ onComplete, onBack }: TrailQuizProps) {
         return (
           <div className="space-y-4">
             <div className="text-center mb-6">
-              <h2 className="font-display text-2xl font-bold text-slate-100">
+              <h2 className="font-display text-2xl font-bold text-gray-900">
                 What are you into?
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Select all that apply</p>
+              <p className="text-sm text-gray-500 mt-1">Select all that apply</p>
             </div>
             <div className="flex flex-wrap gap-2 justify-center">
               {ACTIVITY_OPTIONS.map((opt) => (
@@ -231,10 +231,10 @@ export function TrailQuiz({ onComplete, onBack }: TrailQuizProps) {
         return (
           <div className="space-y-4">
             <div className="text-center mb-6">
-              <h2 className="font-display text-2xl font-bold text-slate-100">
+              <h2 className="font-display text-2xl font-bold text-gray-900">
                 What scenery calls to you?
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Optional - select any that appeal to you</p>
+              <p className="text-sm text-gray-500 mt-1">Optional - select any that appeal to you</p>
             </div>
             <div className="flex flex-wrap gap-2 justify-center">
               {SCENERY_OPTIONS.map((opt) => (

@@ -66,8 +66,8 @@ export function BusinessCard({ business, compact }: BusinessCardProps) {
     <Link href={`/business/${business.slug}`}>
       <Card spotlight={business.is_spotlight} className="group">
         {/* Cover image area */}
-        <div className="relative -mx-4 -mt-4 mb-3 h-40 rounded-t-2xl overflow-hidden bg-gradient-to-br from-cairn-elevated to-cairn-bg">
-          <div className="absolute inset-0 bg-gradient-to-br from-canopy/20 via-transparent to-cairn-bg/80" />
+        <div className="relative -mx-4 -mt-4 mb-3 h-40 rounded-t-2xl overflow-hidden bg-gradient-to-br from-gray-50 to-white">
+          <div className="absolute inset-0 bg-gradient-to-br from-canopy/20 via-transparent to-white/80" />
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-5xl opacity-30">
               {CATEGORY_ICONS[business.category] || '📍'}
@@ -86,35 +86,35 @@ export function BusinessCard({ business, compact }: BusinessCardProps) {
         {/* Content */}
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-display text-base font-semibold text-slate-100 group-hover:text-canopy transition-colors line-clamp-1">
+            <h3 className="font-display text-base font-semibold text-gray-900 group-hover:text-canopy transition-colors line-clamp-1">
               {business.name}
             </h3>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-400">
+          <div className="flex items-center gap-2 text-xs text-gray-500">
             <span className="inline-flex items-center gap-1">
               {CATEGORY_ICONS[business.category]}{' '}
               {CATEGORY_LABELS[business.category] || business.category}
             </span>
-            <span className="text-cairn-border">·</span>
+            <span className="text-gray-300">·</span>
             {business.rating > 0 && (
               <span className="inline-flex items-center gap-0.5 text-amber-400">
                 <Star className="h-3 w-3 fill-current" />
                 {business.rating.toFixed(1)}
-                <span className="text-slate-500">({business.review_count})</span>
+                <span className="text-gray-400">({business.review_count})</span>
               </span>
             )}
           </div>
 
           {business.city && (
-            <div className="flex items-center gap-1 text-xs text-slate-500">
+            <div className="flex items-center gap-1 text-xs text-gray-400">
               <MapPin className="h-3 w-3" />
               {business.city}{business.state_province ? `, ${business.state_province}` : ''}
             </div>
           )}
 
           {!compact && business.description && (
-            <p className="text-sm text-slate-400 line-clamp-2">{business.description}</p>
+            <p className="text-sm text-gray-500 line-clamp-2">{business.description}</p>
           )}
 
           {/* Special offer */}
@@ -130,7 +130,7 @@ export function BusinessCard({ business, compact }: BusinessCardProps) {
               {business.tags.slice(0, 4).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-cairn-elevated/50 px-2 py-0.5 text-[10px] text-slate-500"
+                  className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-400"
                 >
                   {tag}
                 </span>

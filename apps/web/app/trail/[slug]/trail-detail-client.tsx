@@ -62,7 +62,7 @@ function renderStars(rating: number) {
   return Array.from({ length: 5 }, (_, i) => (
     <Star
       key={i}
-      className={`h-4 w-4 ${i < Math.round(rating) ? 'text-amber-400 fill-amber-400' : 'text-slate-600'}`}
+      className={`h-4 w-4 ${i < Math.round(rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`}
     />
   ));
 }
@@ -85,11 +85,11 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
   const condition = CONDITION_CONFIG[trail.current_condition] || CONDITION_CONFIG.unknown;
 
   return (
-    <div className="min-h-screen bg-cairn-bg pb-24">
+    <div className="min-h-screen bg-white pb-24">
       <Navbar />
 
       {/* Header area */}
-      <div className="relative h-[220px] sm:h-[260px] bg-gradient-to-br from-canopy/20 via-cairn-elevated to-cairn-bg">
+      <div className="relative h-[220px] sm:h-[260px] bg-gradient-to-br from-canopy/20 via-cairn-elevated to-white">
         <div className="absolute inset-0 overflow-hidden opacity-10">
           <svg viewBox="0 0 800 260" className="absolute bottom-0 w-full h-full" preserveAspectRatio="none">
             <path d="M0 260 L100 180 L200 200 L300 120 L400 160 L500 80 L600 140 L700 100 L800 160 L800 260 Z" fill="currentColor" className="text-canopy" />
@@ -100,7 +100,7 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
         <div className="absolute top-20 left-4 sm:left-6">
           <Link
             href="/explore"
-            className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-cairn-bg/60 backdrop-blur-sm border border-cairn-border text-slate-300 hover:bg-cairn-card hover:text-white transition-colors"
+            className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-white/60 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-white hover:text-white transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -112,7 +112,7 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
             className={`inline-flex items-center justify-center h-10 w-10 rounded-full backdrop-blur-sm border transition-colors ${
               showTopo
                 ? 'bg-violet-500/20 border-violet-500/40 text-violet-400'
-                : 'bg-cairn-bg/60 border-cairn-border text-slate-300 hover:text-white'
+                : 'bg-white/60 border-gray-200 text-gray-700 hover:text-white'
             }`}
             title="Toggle Topo View"
           >
@@ -127,8 +127,8 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
               });
             }}
             disabled={isPending}
-            className={`inline-flex items-center justify-center h-10 w-10 rounded-full bg-cairn-bg/60 backdrop-blur-sm border border-cairn-border transition-colors ${
-              saved ? 'text-red-400' : 'text-slate-300 hover:text-red-400'
+            className={`inline-flex items-center justify-center h-10 w-10 rounded-full bg-white/60 backdrop-blur-sm border border-gray-200 transition-colors ${
+              saved ? 'text-red-400' : 'text-gray-700 hover:text-red-400'
             }`}
           >
             <Heart className={`h-5 w-5 ${saved ? 'fill-current' : ''}`} />
@@ -140,9 +140,9 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
             <Badge variant="difficulty" color={diffColor}>{diffLabel}</Badge>
             <Badge variant="condition" color={condition.color}>{condition.dot} {condition.label}</Badge>
           </div>
-          <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-slate-100">{trail.name}</h1>
+          <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{trail.name}</h1>
           {trail.city && (
-            <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-400">
+            <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
               <MapPin className="h-3.5 w-3.5" />
               {trail.city}{trail.state_province ? `, ${trail.state_province}` : ''}
             </div>
@@ -154,52 +154,52 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
       <div className="mx-auto max-w-3xl px-4 sm:px-6 mt-6">
         {/* Stats grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4 flex flex-col items-center gap-1.5 text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 flex flex-col items-center gap-1.5 text-center">
             <Ruler className="h-5 w-5 text-canopy" />
-            <span className="font-display text-lg font-bold text-slate-100">{fmt.distance(trail.distance_meters)}</span>
-            <span className="text-xs text-slate-500">Distance</span>
+            <span className="font-display text-lg font-bold text-gray-900">{fmt.distance(trail.distance_meters)}</span>
+            <span className="text-xs text-gray-400">Distance</span>
           </div>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4 flex flex-col items-center gap-1.5 text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 flex flex-col items-center gap-1.5 text-center">
             <Mountain className="h-5 w-5 text-canopy" />
-            <span className="font-display text-lg font-bold text-slate-100">{fmt.elevation(trail.elevation_gain_meters)}</span>
-            <span className="text-xs text-slate-500">Elevation Gain</span>
+            <span className="font-display text-lg font-bold text-gray-900">{fmt.elevation(trail.elevation_gain_meters)}</span>
+            <span className="text-xs text-gray-400">Elevation Gain</span>
           </div>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4 flex flex-col items-center gap-1.5 text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 flex flex-col items-center gap-1.5 text-center">
             <TrendingDown className="h-5 w-5 text-canopy" />
-            <span className="font-display text-lg font-bold text-slate-100">{fmt.elevation(trail.elevation_loss_meters)}</span>
-            <span className="text-xs text-slate-500">Descent</span>
+            <span className="font-display text-lg font-bold text-gray-900">{fmt.elevation(trail.elevation_loss_meters)}</span>
+            <span className="text-xs text-gray-400">Descent</span>
           </div>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4 flex flex-col items-center gap-1.5 text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 flex flex-col items-center gap-1.5 text-center">
             <Clock className="h-5 w-5 text-canopy" />
-            <span className="font-display text-lg font-bold text-slate-100">{fmt.duration(trail.estimated_duration_minutes ?? 0)}</span>
-            <span className="text-xs text-slate-500">Est. Time</span>
+            <span className="font-display text-lg font-bold text-gray-900">{fmt.duration(trail.estimated_duration_minutes ?? 0)}</span>
+            <span className="text-xs text-gray-400">Est. Time</span>
           </div>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4 flex flex-col items-center gap-1.5 text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 flex flex-col items-center gap-1.5 text-center">
             <ArrowUpDown className="h-5 w-5 text-canopy" />
-            <span className="font-display text-lg font-bold text-slate-100 capitalize">{trail.trail_type.replace(/_/g, ' ')}</span>
-            <span className="text-xs text-slate-500">Trail Type</span>
+            <span className="font-display text-lg font-bold text-gray-900 capitalize">{trail.trail_type.replace(/_/g, ' ')}</span>
+            <span className="text-xs text-gray-400">Trail Type</span>
           </div>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4 flex flex-col items-center gap-1.5 text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 flex flex-col items-center gap-1.5 text-center">
             <Star className="h-5 w-5 text-amber-400 fill-amber-400" />
-            <span className="font-display text-lg font-bold text-slate-100">{trail.rating.toFixed(1)}</span>
-            <span className="text-xs text-slate-500">{trail.review_count.toLocaleString()} reviews</span>
+            <span className="font-display text-lg font-bold text-gray-900">{trail.rating.toFixed(1)}</span>
+            <span className="text-xs text-gray-400">{trail.review_count.toLocaleString()} reviews</span>
           </div>
         </div>
 
         {/* Description */}
         <section className="mt-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Description</h2>
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Description</h2>
           {trail.description ? (
-            <p className="text-sm leading-relaxed text-slate-400">{trail.description}</p>
+            <p className="text-sm leading-relaxed text-gray-500">{trail.description}</p>
           ) : (
-            <p className="text-sm text-slate-500 italic">No description available.</p>
+            <p className="text-sm text-gray-400 italic">No description available.</p>
           )}
         </section>
 
         {/* Topo / Elevation Profile */}
         <section className="mt-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-display text-lg font-semibold text-slate-100">
+            <h2 className="font-display text-lg font-semibold text-gray-900">
               {showTopo ? 'Topographic View' : 'Elevation Profile'}
             </h2>
             <button
@@ -210,7 +210,7 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
               {showTopo ? 'Show Profile' : 'Show Topo'}
             </button>
           </div>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4 overflow-hidden">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 overflow-hidden">
             {showTopo ? (
               <DynamicMap
                 center={[trail.lat, trail.lng]}
@@ -234,7 +234,7 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
               <>
                 <svg viewBox="0 0 600 150" className="w-full h-32" preserveAspectRatio="none">
                   {[30, 60, 90, 120].map((y) => (
-                    <line key={y} x1="0" y1={y} x2="600" y2={y} stroke="currentColor" className="text-cairn-border" strokeWidth="0.5" strokeDasharray="4 4" />
+                    <line key={y} x1="0" y1={y} x2="600" y2={y} stroke="currentColor" className="text-gray-300" strokeWidth="0.5" strokeDasharray="4 4" />
                   ))}
                   <path d="M0 140 C30 130, 60 110, 100 95 C140 80, 160 85, 200 70 C240 55, 260 40, 300 35 C340 30, 360 45, 400 55 C440 65, 460 50, 500 45 C540 40, 570 60, 600 80 L600 150 L0 150 Z" fill="url(#elevGradient)" />
                   <path d="M0 140 C30 130, 60 110, 100 95 C140 80, 160 85, 200 70 C240 55, 260 40, 300 35 C340 30, 360 45, 400 55 C440 65, 460 50, 500 45 C540 40, 570 60, 600 80" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" />
@@ -245,7 +245,7 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
                     </linearGradient>
                   </defs>
                 </svg>
-                <div className="flex items-center justify-between mt-2 text-[10px] text-slate-500">
+                <div className="flex items-center justify-between mt-2 text-[10px] text-gray-400">
                   <span>Start</span>
                   <span>
                     {trail.min_elevation_meters != null && trail.max_elevation_meters != null &&
@@ -260,8 +260,8 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
 
         {/* Trail Conditions with Hazard Report */}
         <section className="mt-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Trail Conditions</h2>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4">
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Trail Conditions</h2>
+          <div className="rounded-2xl border border-gray-200 bg-white p-4">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{condition.dot}</span>
@@ -283,11 +283,11 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
         {/* Recommended Seasons */}
         {trail.best_seasons.length > 0 && (
           <section className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-slate-100 mb-3 flex items-center gap-2">
+            <h2 className="font-display text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Calendar className="h-5 w-5 text-canopy" />
               Recommended Seasons
             </h2>
-            <div className="rounded-2xl border border-cairn-border bg-cairn-card p-4">
+            <div className="rounded-2xl border border-gray-200 bg-white p-4">
               <div className="grid grid-cols-4 gap-2">
                 {['spring', 'summer', 'fall', 'winter'].map((season) => {
                   const isRecommended = trail.best_seasons.includes(season);
@@ -297,18 +297,18 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
                       className={`rounded-xl border p-3 text-center transition-colors ${
                         isRecommended
                           ? 'bg-canopy/10 border-canopy/30'
-                          : 'bg-cairn-elevated/30 border-cairn-border opacity-40'
+                          : 'bg-gray-100/30 border-gray-200 opacity-40'
                       }`}
                     >
                       <span className="text-xl block mb-1">{SEASON_EMOJIS[season] || ''}</span>
-                      <span className={`text-xs font-medium capitalize ${isRecommended ? 'text-canopy' : 'text-slate-500'}`}>
+                      <span className={`text-xs font-medium capitalize ${isRecommended ? 'text-canopy' : 'text-gray-400'}`}>
                         {season}
                       </span>
                     </div>
                   );
                 })}
               </div>
-              <p className="text-xs text-slate-500 mt-3">
+              <p className="text-xs text-gray-400 mt-3">
                 Based on typical weather, trail conditions, and activity suitability for this region.
               </p>
             </div>
@@ -318,15 +318,15 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
         {/* Reviews */}
         {reviews.length > 0 && (
           <section className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Reviews</h2>
+            <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Reviews</h2>
             <div className="space-y-4">
               {reviews.map((review) => (
-                <div key={review.id} className="rounded-2xl border border-cairn-border bg-cairn-card p-4">
+                <div key={review.id} className="rounded-2xl border border-gray-200 bg-white p-4">
                   <div className="flex items-center gap-1">{renderStars(review.rating)}</div>
-                  <h3 className="mt-2 font-display text-sm font-semibold text-slate-100">{review.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{review.body}</p>
-                  <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                    <span className="font-medium text-slate-300">{review.author_name ?? 'Anonymous'}</span>
+                  <h3 className="mt-2 font-display text-sm font-semibold text-gray-900">{review.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-gray-500">{review.body}</p>
+                  <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
+                    <span className="font-medium text-gray-700">{review.author_name ?? 'Anonymous'}</span>
                     <span>{new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   </div>
                 </div>
@@ -337,7 +337,7 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
 
         {/* Nearby Businesses */}
         <section className="mt-8">
-          <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Nearby Businesses</h2>
+          <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Nearby Businesses</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {nearbyBusinesses.map((biz) => (
               <BusinessCard key={biz.id} business={biz as any} compact />
@@ -348,13 +348,13 @@ export function TrailDetailClient({ trail, reviews, nearbyBusinesses }: TrailDet
         {/* Activity types */}
         {trail.activity_types.length > 0 && (
           <section className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-slate-100 mb-3">Activities</h2>
+            <h2 className="font-display text-lg font-semibold text-gray-900 mb-3">Activities</h2>
             <div className="flex flex-wrap gap-2">
               {trail.activity_types.map((at: string) => (
                 <Link
                   key={at}
                   href={`/explore?activity=${at}`}
-                  className="rounded-full bg-cairn-elevated/50 border border-cairn-border px-3 py-1 text-xs text-slate-400 capitalize hover:bg-canopy/10 hover:text-canopy hover:border-canopy/30 transition-colors"
+                  className="rounded-full bg-gray-100 border border-gray-200 px-3 py-1 text-xs text-gray-500 capitalize hover:bg-canopy/10 hover:text-canopy hover:border-canopy/30 transition-colors"
                 >
                   {at.replace(/_/g, ' ')}
                 </Link>

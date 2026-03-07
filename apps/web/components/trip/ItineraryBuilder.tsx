@@ -52,14 +52,14 @@ export function ItineraryBuilder({ state, dispatch }: ItineraryBuilderProps) {
     <div>
       {/* Header row */}
       <div className="mb-6">
-        <h2 className="font-display text-2xl font-bold text-slate-100 mb-4">
+        <h2 className="font-display text-2xl font-bold text-gray-900 mb-4">
           Plan Your {regionName} Trip
         </h2>
 
         {/* Trip name + date inputs */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
-            <label className="block text-xs text-slate-500 mb-1">
+            <label className="block text-xs text-gray-400 mb-1">
               Trip Name
             </label>
             <input
@@ -69,11 +69,11 @@ export function ItineraryBuilder({ state, dispatch }: ItineraryBuilderProps) {
                 dispatch({ type: 'SET_TRIP_NAME', name: e.target.value })
               }
               placeholder={`My ${regionName} Trip`}
-              className="w-full h-10 bg-cairn-bg border border-cairn-border rounded-xl px-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-canopy/50 transition-colors"
+              className="w-full h-10 bg-white border border-gray-200 rounded-xl px-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-canopy/50 transition-colors"
             />
           </div>
           <div className="sm:w-48">
-            <label className="block text-xs text-slate-500 mb-1">
+            <label className="block text-xs text-gray-400 mb-1">
               Start Date
             </label>
             <input
@@ -82,7 +82,7 @@ export function ItineraryBuilder({ state, dispatch }: ItineraryBuilderProps) {
               onChange={(e) =>
                 dispatch({ type: 'SET_START_DATE', date: e.target.value })
               }
-              className="w-full h-10 bg-cairn-bg border border-cairn-border rounded-xl px-3 text-sm text-slate-100 focus:outline-none focus:border-canopy/50 transition-colors [color-scheme:dark]"
+              className="w-full h-10 bg-white border border-gray-200 rounded-xl px-3 text-sm text-gray-900 focus:outline-none focus:border-canopy/50 transition-colors [color-scheme:dark]"
             />
           </div>
         </div>
@@ -122,7 +122,7 @@ export function ItineraryBuilder({ state, dispatch }: ItineraryBuilderProps) {
       </div>
 
       {/* Bottom navigation bar */}
-      <div className="flex items-center justify-between mt-8 pt-6 border-t border-cairn-border">
+      <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
         <Button
           variant="ghost"
           onClick={() => dispatch({ type: 'SET_STEP', step: 'activities' })}

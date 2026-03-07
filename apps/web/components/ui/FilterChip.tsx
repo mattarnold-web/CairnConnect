@@ -19,7 +19,7 @@ export function FilterChip({ label, emoji, icon, active, onClick }: FilterChipPr
         'transition-all duration-200 border',
         active
           ? 'bg-canopy/15 border-canopy text-canopy'
-          : 'bg-cairn-card border-cairn-border text-slate-400 hover:text-slate-200 hover:border-slate-500'
+          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-800 hover:border-gray-400'
       )}
     >
       {icon || (emoji && <span className="text-base">{emoji}</span>)}

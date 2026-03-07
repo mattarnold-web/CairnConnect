@@ -80,15 +80,15 @@ export function AddTrailModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-cairn-card border border-cairn-border rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+      <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-cairn-border">
-          <h3 className="font-display text-lg font-semibold text-slate-100">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h3 className="font-display text-lg font-semibold text-gray-900">
             Add to Day
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-cairn-elevated text-slate-400 hover:text-slate-200 transition-colors"
+            className="p-1 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -96,13 +96,13 @@ export function AddTrailModal({
         </div>
 
         {/* Tab switcher */}
-        <div className="flex border-b border-cairn-border">
+        <div className="flex border-b border-gray-200">
           <button
             onClick={() => setActiveTab('trails')}
             className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
               activeTab === 'trails'
                 ? 'text-canopy border-b-2 border-canopy'
-                : 'text-slate-500 hover:text-slate-300'
+                : 'text-gray-400 hover:text-gray-700'
             }`}
           >
             Trails
@@ -112,7 +112,7 @@ export function AddTrailModal({
             className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
               activeTab === 'custom'
                 ? 'text-canopy border-b-2 border-canopy'
-                : 'text-slate-500 hover:text-slate-300'
+                : 'text-gray-400 hover:text-gray-700'
             }`}
           >
             Custom Activity
@@ -131,14 +131,14 @@ export function AddTrailModal({
 
               <div className="space-y-2 mt-3">
                 {filteredTrails.length === 0 ? (
-                  <p className="text-sm text-slate-500 text-center py-6">
+                  <p className="text-sm text-gray-400 text-center py-6">
                     No trails found matching your search
                   </p>
                 ) : (
                   filteredTrails.map((trail) => (
                     <div
                       key={trail.id}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-cairn-bg border border-cairn-border hover:border-cairn-elevated transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-200 hover:border-cairn-elevated transition-colors"
                     >
                       {/* Difficulty dot */}
                       <span
@@ -151,10 +151,10 @@ export function AddTrailModal({
 
                       {/* Trail info */}
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-100 truncate">
+                        <p className="text-sm font-medium text-gray-900 truncate">
                           {trail.name}
                         </p>
-                        <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                        <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
                           <span>{fmt.distance(trail.distance_meters)}</span>
                           <span>&middot;</span>
                           <span>{fmt.elevation(trail.elevation_gain_meters)} gain</span>
@@ -178,7 +178,7 @@ export function AddTrailModal({
             <div className="space-y-4">
               {/* Custom activity name */}
               <div>
-                <label className="block text-sm text-slate-400 mb-1.5">
+                <label className="block text-sm text-gray-500 mb-1.5">
                   Activity Name
                 </label>
                 <input
@@ -186,13 +186,13 @@ export function AddTrailModal({
                   value={customTitle}
                   onChange={(e) => setCustomTitle(e.target.value)}
                   placeholder="e.g. Sunrise photography, Rest day, Resupply..."
-                  className="w-full h-10 bg-cairn-bg border border-cairn-border rounded-xl px-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-canopy/50 transition-colors"
+                  className="w-full h-10 bg-white border border-gray-200 rounded-xl px-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-canopy/50 transition-colors"
                 />
               </div>
 
               {/* Activity type selector */}
               <div>
-                <label className="block text-sm text-slate-400 mb-1.5">
+                <label className="block text-sm text-gray-500 mb-1.5">
                   Activity Type
                 </label>
                 <div className="flex flex-wrap gap-2">

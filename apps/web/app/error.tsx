@@ -15,15 +15,15 @@ export default function RootError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-cairn-bg flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-md text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 mb-4">
           <AlertTriangle className="h-7 w-7 text-red-400" />
         </div>
-        <h2 className="font-display text-xl font-bold text-slate-100 mb-2">
+        <h2 className="font-display text-xl font-bold text-gray-900 mb-2">
           Something went wrong
         </h2>
-        <p className="text-sm text-slate-400 mb-6">
+        <p className="text-sm text-gray-500 mb-6">
           {error.message || 'An unexpected error occurred. Please try again.'}
         </p>
         <button

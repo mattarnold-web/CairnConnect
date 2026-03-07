@@ -73,7 +73,7 @@ export function TrailCard({ trail, compact }: TrailCardProps) {
                 {condition.dot} {condition.label}
               </Badge>
             </div>
-            <h3 className="font-display text-base font-semibold text-slate-100 group-hover:text-canopy transition-colors line-clamp-1">
+            <h3 className="font-display text-base font-semibold text-gray-900 group-hover:text-canopy transition-colors line-clamp-1">
               {trail.name}
             </h3>
           </div>
@@ -86,7 +86,7 @@ export function TrailCard({ trail, compact }: TrailCardProps) {
         </div>
 
         {/* Stats row */}
-        <div className="mt-3 flex items-center gap-4 text-xs text-slate-400">
+        <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
           <span className="inline-flex items-center gap-1">
             <Ruler className="h-3 w-3" />
             {fmt.distance(trail.distance_meters)}
@@ -104,14 +104,14 @@ export function TrailCard({ trail, compact }: TrailCardProps) {
               {fmt.duration(trail.estimated_duration_minutes)}
             </span>
           )}
-          <span className="capitalize text-slate-500">
+          <span className="capitalize text-gray-400">
             {trail.trail_type.replace(/_/g, ' ')}
           </span>
         </div>
 
         {/* Location */}
         {trail.city && (
-          <div className="mt-2 flex items-center gap-1 text-xs text-slate-500">
+          <div className="mt-2 flex items-center gap-1 text-xs text-gray-400">
             <MapPin className="h-3 w-3" />
             {trail.city}{trail.state_province ? `, ${trail.state_province}` : ''}
           </div>
@@ -119,7 +119,7 @@ export function TrailCard({ trail, compact }: TrailCardProps) {
 
         {/* Description */}
         {!compact && trail.description && (
-          <p className="mt-2 text-sm text-slate-400 line-clamp-2">{trail.description}</p>
+          <p className="mt-2 text-sm text-gray-500 line-clamp-2">{trail.description}</p>
         )}
 
         {/* Activity tags */}
@@ -128,7 +128,7 @@ export function TrailCard({ trail, compact }: TrailCardProps) {
             {trail.activity_types.map((at) => (
               <span
                 key={at}
-                className="rounded-full bg-cairn-elevated/50 px-2 py-0.5 text-[10px] text-slate-500 capitalize"
+                className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-400 capitalize"
               >
                 {at.replace(/_/g, ' ')}
               </span>

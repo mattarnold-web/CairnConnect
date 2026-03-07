@@ -3,17 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --cairn-bg: #0B1A2B;
-  --cairn-card: #122338;
-  --cairn-card-hover: #1A3350;
-  --cairn-elevated: #1E3A5F;
-  --cairn-border: #1E3A5F;
+  --cairn-bg: #FFFFFF;
+  --cairn-bg-secondary: #F7F7F8;
+  --cairn-card: #FFFFFF;
+  --cairn-card-hover: #F7F7F8;
+  --cairn-elevated: #F0F0F2;
+  --cairn-border: #E5E5EA;
+  --cairn-border-light: #F0F0F2;
   --canopy: #10B981;
   --canopy-dark: #059669;
   --spotlight-gold: #F4A261;
-  --text-primary: #F1F5F9;
-  --text-secondary: #94A3B8;
-  --text-tertiary: #64748B;
+  --text-primary: #242428;
+  --text-secondary: #6B6B76;
+  --text-tertiary: #9B9BA5;
 }
 
 * {
@@ -42,29 +44,39 @@ a {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--cairn-bg);
+  background: var(--cairn-bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--cairn-elevated);
+  background: var(--cairn-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--canopy);
+  background: var(--text-tertiary);
 }
 
-/* Glassmorphism utility */
+/* Glass utility - light frosted glass */
 .glass {
-  background: rgba(18, 35, 56, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 /* Spotlight glow effect */
 .spotlight-glow {
-  box-shadow: 0 0 20px rgba(244, 162, 97, 0.15),
-    0 0 40px rgba(244, 162, 97, 0.05);
+  box-shadow: 0 0 20px rgba(244, 162, 97, 0.12),
+    0 0 40px rgba(244, 162, 97, 0.04);
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
 }
 
 /* Card press animation */
@@ -73,7 +85,7 @@ a {
 }
 
 .card-press:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 /* Smooth transitions */
@@ -96,8 +108,8 @@ a {
 .gradient-overlay {
   background: linear-gradient(
     to top,
-    rgba(11, 26, 43, 0.95) 0%,
-    rgba(11, 26, 43, 0.5) 50%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
     transparent 100%
   );
 }
@@ -128,6 +140,18 @@ a {
   animation: slide-up 0.25s ease-out;
 }
 
+/* Stat number styling - Strava-inspired large metrics */
+.stat-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Divider line */
+.divider {
+  height: 1px;
+  background: var(--cairn-border);
+}
+
 /* Safe area for mobile bottom nav (notch devices) */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -156,8 +180,8 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* Form select styling for dark mode */
+/* Form select styling */
 select option {
-  background-color: #122338;
-  color: #F1F5F9;
+  background-color: #FFFFFF;
+  color: #242428;
 }

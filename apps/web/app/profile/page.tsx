@@ -59,11 +59,11 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-cairn-bg pb-24">
+    <div className="min-h-screen bg-white pb-24">
       <Navbar />
       <div className="mx-auto max-w-2xl px-4 pt-20">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="font-display text-2xl font-bold text-slate-100">
+          <h1 className="font-display text-2xl font-bold text-gray-900">
             Activity History
           </h1>
           <button
@@ -77,19 +77,19 @@ export default function ProfilePage() {
 
         {/* Strava info modal */}
         {stravaModalOpen && (
-          <div className="mb-6 rounded-2xl bg-cairn-card border border-cairn-border p-5">
+          <div className="mb-6 rounded-2xl bg-white border border-gray-200 p-5">
             <div className="flex items-start gap-3">
               <Info className="h-5 w-5 text-[#FC4C02] shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-display text-sm font-semibold text-slate-100 mb-2">
+                <h3 className="font-display text-sm font-semibold text-gray-900 mb-2">
                   Strava Integration
                 </h3>
-                <p className="text-sm text-slate-400 leading-relaxed mb-3">
+                <p className="text-sm text-gray-500 leading-relaxed mb-3">
                   Full Strava sync requires a backend server (coming soon).
                   In the meantime, you can export any activity as a GPX file
                   and upload it directly to Strava.
                 </p>
-                <ol className="text-sm text-slate-400 space-y-1.5 mb-3 list-decimal list-inside">
+                <ol className="text-sm text-gray-500 space-y-1.5 mb-3 list-decimal list-inside">
                   <li>Click "Export GPX" on any activity below</li>
                   <li>Go to strava.com and click the + button</li>
                   <li>Choose "Upload activity" and select the GPX file</li>
@@ -107,11 +107,11 @@ export default function ProfilePage() {
 
         {completed.length === 0 ? (
           <div className="text-center py-16">
-            <Mountain className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-            <h2 className="font-display text-lg font-semibold text-slate-300 mb-2">
+            <Mountain className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <h2 className="font-display text-lg font-semibold text-gray-700 mb-2">
               No activities yet
             </h2>
-            <p className="text-sm text-slate-500 mb-4">
+            <p className="text-sm text-gray-400 mb-4">
               Record your first activity to see it here.
             </p>
             <a
@@ -141,8 +141,8 @@ export default function ProfilePage() {
 
         {/* Summary stats */}
         {completed.length > 0 && (
-          <div className="mt-8 rounded-2xl bg-cairn-card border border-cairn-border p-5">
-            <h3 className="font-display text-sm font-semibold text-slate-100 mb-4">
+          <div className="mt-8 rounded-2xl bg-white border border-gray-200 p-5">
+            <h3 className="font-display text-sm font-semibold text-gray-900 mb-4">
               All-Time Stats
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -150,7 +150,7 @@ export default function ProfilePage() {
                 <p className="font-display text-xl font-bold text-canopy">
                   {completed.length}
                 </p>
-                <p className="text-xs text-slate-500">Activities</p>
+                <p className="text-xs text-gray-400">Activities</p>
               </div>
               <div>
                 <p className="font-display text-xl font-bold text-canopy">
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                     completed.reduce((sum, a) => sum + a.distanceMeters, 0),
                   )}
                 </p>
-                <p className="text-xs text-slate-500">Total Distance</p>
+                <p className="text-xs text-gray-400">Total Distance</p>
               </div>
               <div>
                 <p className="font-display text-xl font-bold text-canopy">
@@ -166,7 +166,7 @@ export default function ProfilePage() {
                     completed.reduce((sum, a) => sum + a.elevationGainMeters, 0),
                   )}
                 </p>
-                <p className="text-xs text-slate-500">Total Elevation</p>
+                <p className="text-xs text-gray-400">Total Elevation</p>
               </div>
               <div>
                 <p className="font-display text-xl font-bold text-canopy">
@@ -174,7 +174,7 @@ export default function ProfilePage() {
                     completed.reduce((sum, a) => sum + a.durationSeconds, 0),
                   )}
                 </p>
-                <p className="text-xs text-slate-500">Total Time</p>
+                <p className="text-xs text-gray-400">Total Time</p>
               </div>
             </div>
           </div>
@@ -200,76 +200,76 @@ function ActivityCard({
   fmt: ReturnType<typeof useFormat>;
 }) {
   return (
-    <div className="rounded-2xl bg-cairn-card border border-cairn-border overflow-hidden">
+    <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
       {/* Header row */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-cairn-card-hover transition-colors"
+        className="w-full flex items-center gap-3 p-4 text-left hover:bg-gray-50 transition-colors"
       >
         <ActivityIcon activity={activity.activityType} size="md" className="shrink-0" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-slate-100 truncate">
+          <p className="text-sm font-medium text-gray-900 truncate">
             {activity.title}
           </p>
-          <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
+          <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
             <span>{formatDate(activity.startedAt)}</span>
             <span>{fmt.distance(activity.distanceMeters)}</span>
             <span>{formatElapsed(activity.durationSeconds)}</span>
           </div>
         </div>
         {expanded ? (
-          <ChevronUp className="h-4 w-4 text-slate-500 shrink-0" />
+          <ChevronUp className="h-4 w-4 text-gray-400 shrink-0" />
         ) : (
-          <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
+          <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
         )}
       </button>
 
       {/* Expanded detail */}
       {expanded && (
-        <div className="border-t border-cairn-border p-4 space-y-4">
+        <div className="border-t border-gray-200 p-4 space-y-4">
           {/* Stats grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="flex items-center gap-2 text-sm">
               <MapPin className="h-4 w-4 text-canopy" />
               <div>
-                <p className="text-slate-100 font-medium">
+                <p className="text-gray-900 font-medium">
                   {fmt.distance(activity.distanceMeters)}
                 </p>
-                <p className="text-xs text-slate-500">Distance</p>
+                <p className="text-xs text-gray-400">Distance</p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Timer className="h-4 w-4 text-canopy" />
               <div>
-                <p className="text-slate-100 font-medium">
+                <p className="text-gray-900 font-medium">
                   {formatElapsed(activity.durationSeconds)}
                 </p>
-                <p className="text-xs text-slate-500">Duration</p>
+                <p className="text-xs text-gray-400">Duration</p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <TrendingUp className="h-4 w-4 text-canopy" />
               <div>
-                <p className="text-slate-100 font-medium">
+                <p className="text-gray-900 font-medium">
                   {fmt.elevation(activity.elevationGainMeters)}
                 </p>
-                <p className="text-xs text-slate-500">Elev Gain</p>
+                <p className="text-xs text-gray-400">Elev Gain</p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <TrendingDown className="h-4 w-4 text-canopy" />
               <div>
-                <p className="text-slate-100 font-medium">
+                <p className="text-gray-900 font-medium">
                   {fmt.elevation(activity.elevationLossMeters)}
                 </p>
-                <p className="text-xs text-slate-500">Elev Loss</p>
+                <p className="text-xs text-gray-400">Elev Loss</p>
               </div>
             </div>
           </div>
 
           {/* GPS track info */}
           {activity.gpsTrack.length > 0 && (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-gray-400">
               {activity.gpsTrack.length} GPS points recorded
             </p>
           )}
@@ -279,7 +279,7 @@ function ActivityCard({
             <button
               onClick={onExport}
               disabled={activity.gpsTrack.length === 0}
-              className="flex items-center gap-1.5 rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-xs font-medium text-slate-300 hover:bg-cairn-card-hover hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Download className="h-3.5 w-3.5" />
               Export GPX

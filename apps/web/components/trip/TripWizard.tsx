@@ -42,7 +42,7 @@ export function TripWizard() {
                       ? 'bg-canopy text-white'
                       : isCompleted
                         ? 'bg-canopy/20 text-canopy'
-                        : 'bg-cairn-elevated text-slate-500'
+                        : 'bg-gray-100 text-gray-400'
                   }`}
                 >
                   {index + 1}
@@ -53,7 +53,7 @@ export function TripWizard() {
                       ? 'text-canopy'
                       : isCompleted
                         ? 'text-canopy/70'
-                        : 'text-slate-500'
+                        : 'text-gray-400'
                   }`}
                 >
                   {step.label}

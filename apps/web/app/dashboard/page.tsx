@@ -74,16 +74,16 @@ export default function DashboardPage() {
   const maxChartValue = Math.max(...CHART_DATA.map((d) => d.views));
 
   return (
-    <div className="min-h-screen bg-cairn-bg">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-24">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold text-slate-100">
+          <h1 className="font-display text-2xl font-bold text-gray-900">
             Business Dashboard
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-gray-500 mt-1">
             Manage your listing and track performance
           </p>
         </div>
@@ -100,18 +100,18 @@ export default function DashboardPage() {
             return (
               <div
                 key={stat.label}
-                className="rounded-2xl border border-cairn-border bg-cairn-card p-4"
+                className="rounded-2xl border border-gray-200 bg-white p-4"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <div className="h-8 w-8 rounded-lg bg-canopy/10 flex items-center justify-center">
                     <Icon className="h-4 w-4 text-canopy" />
                   </div>
                 </div>
-                <div className="font-display text-2xl font-bold text-slate-100">
+                <div className="font-display text-2xl font-bold text-gray-900">
                   {stat.value}
                 </div>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-slate-500">{stat.label}</span>
+                  <span className="text-xs text-gray-400">{stat.label}</span>
                   <span className="text-xs font-medium text-emerald-400">
                     {stat.change}
                   </span>
@@ -122,11 +122,11 @@ export default function DashboardPage() {
         </div>
 
         {/* Analytics chart */}
-        <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5 mb-8">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-canopy" />
-              <h2 className="font-display text-lg font-semibold text-slate-100">
+              <h2 className="font-display text-lg font-semibold text-gray-900">
                 30-Day Performance
               </h2>
             </div>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
           </div>
 
           {/* X-axis labels */}
-          <div className="flex justify-between mt-2 text-[10px] text-slate-600">
+          <div className="flex justify-between mt-2 text-[10px] text-gray-300">
             <span>Day 1</span>
             <span>Day 10</span>
             <span>Day 20</span>
@@ -172,8 +172,8 @@ export default function DashboardPage() {
         {/* Two-column section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Quick Actions */}
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5">
-            <h2 className="font-display text-lg font-semibold text-slate-100 mb-4">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="font-display text-lg font-semibold text-gray-900 mb-4">
               Quick Actions
             </h2>
             <div className="space-y-2">
@@ -197,18 +197,18 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent Reviews */}
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-5">
-            <h2 className="font-display text-lg font-semibold text-slate-100 mb-4">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="font-display text-lg font-semibold text-gray-900 mb-4">
               Recent Reviews
             </h2>
             <div className="space-y-4">
               {MOCK_REVIEWS.map((review) => (
-                <div key={review.id} className="border-b border-cairn-border pb-4 last:border-b-0 last:pb-0">
+                <div key={review.id} className="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium text-slate-200">
+                    <span className="text-sm font-medium text-gray-800">
                       {review.author}
                     </span>
-                    <span className="text-[10px] text-slate-500">{review.date}</span>
+                    <span className="text-[10px] text-gray-400">{review.date}</span>
                   </div>
                   <div className="flex items-center gap-0.5 mb-1.5">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -217,12 +217,12 @@ export default function DashboardPage() {
                         className={`h-3.5 w-3.5 ${
                           i < review.stars
                             ? 'text-spotlight-gold fill-spotlight-gold'
-                            : 'text-slate-600'
+                            : 'text-gray-300'
                         }`}
                       />
                     ))}
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-gray-500 leading-relaxed">
                     {review.text}
                   </p>
                 </div>
@@ -241,7 +241,7 @@ export default function DashboardPage() {
               <h2 className="font-display text-xl font-bold text-spotlight-gold mb-1">
                 Upgrade to Spotlight
               </h2>
-              <p className="text-sm text-slate-400 mb-4">
+              <p className="text-sm text-gray-500 mb-4">
                 Get premium visibility and attract more outdoor enthusiasts to your business.
               </p>
               <ul className="space-y-2 mb-5">
@@ -254,7 +254,7 @@ export default function DashboardPage() {
                 ].map((benefit) => (
                   <li
                     key={benefit}
-                    className="flex items-center gap-2 text-sm text-slate-300"
+                    className="flex items-center gap-2 text-sm text-gray-700"
                   >
                     <Star className="h-3.5 w-3.5 text-spotlight-gold shrink-0" />
                     {benefit}

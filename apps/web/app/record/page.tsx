@@ -198,24 +198,24 @@ export default function RecordPage() {
       : 0;
 
   const gpsIndicator = {
-    off: { color: 'text-slate-500', label: 'GPS Off' },
+    off: { color: 'text-gray-400', label: 'GPS Off' },
     acquiring: { color: 'text-amber-400', label: 'Acquiring...' },
     active: { color: 'text-canopy', label: 'GPS Active' },
     error: { color: 'text-red-400', label: 'GPS Error' },
   }[gpsStatus];
 
   return (
-    <div className="min-h-screen bg-cairn-bg pb-24">
+    <div className="min-h-screen bg-white pb-24">
       <Navbar />
       <div className="mx-auto max-w-lg px-4 pt-20">
-        <h1 className="font-display text-2xl font-bold text-slate-100 mb-6">
+        <h1 className="font-display text-2xl font-bold text-gray-900 mb-6">
           Record Activity
         </h1>
 
         {/* Activity type selector */}
         {!isActive && (
           <div className="mb-8">
-            <p className="text-sm text-slate-400 mb-3">Choose activity type</p>
+            <p className="text-sm text-gray-500 mb-3">Choose activity type</p>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
               {PRIMARY_ACTIVITIES.map((type) => (
                 <button
@@ -225,7 +225,7 @@ export default function RecordPage() {
                     'flex flex-col items-center gap-1.5 rounded-xl border px-3 py-3 text-xs font-medium transition-colors',
                     selectedType === type.slug
                       ? 'bg-canopy/15 border-canopy/40 text-canopy'
-                      : 'bg-cairn-card border-cairn-border text-slate-400 hover:bg-cairn-card-hover hover:text-slate-200',
+                      : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-800',
                   )}
                 >
                   <ActivityIcon activity={type.slug} size="sm" />
@@ -237,7 +237,7 @@ export default function RecordPage() {
             {/* More activities toggle */}
             <button
               onClick={() => setShowMoreActivities(!showMoreActivities)}
-              className="mt-3 text-xs font-medium text-slate-500 hover:text-canopy transition-colors"
+              className="mt-3 text-xs font-medium text-gray-400 hover:text-canopy transition-colors"
             >
               {showMoreActivities ? '− Show less' : `+ More activities (${MORE_ACTIVITIES.length})`}
             </button>
@@ -252,7 +252,7 @@ export default function RecordPage() {
                       'flex flex-col items-center gap-1.5 rounded-xl border px-3 py-3 text-xs font-medium transition-colors',
                       selectedType === type.slug
                         ? 'bg-canopy/15 border-canopy/40 text-canopy'
-                        : 'bg-cairn-card border-cairn-border text-slate-400 hover:bg-cairn-card-hover hover:text-slate-200',
+                        : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-800',
                     )}
                   >
                     <ActivityIcon activity={type.slug} size="sm" />
@@ -278,14 +278,14 @@ export default function RecordPage() {
                 {isRecording ? 'Recording' : 'Paused'}
               </span>
             </div>
-            <p className="text-xs text-slate-500">{activeActivity.title}</p>
+            <p className="text-xs text-gray-400">{activeActivity.title}</p>
           </div>
         )}
 
         {/* Large elapsed time display */}
         {isActive && (
           <div className="text-center mb-8">
-            <p className="font-mono text-6xl font-bold text-slate-100 tracking-tight">
+            <p className="font-mono text-6xl font-bold text-gray-900 tracking-tight">
               {formatElapsed(elapsed)}
             </p>
           </div>
@@ -294,39 +294,39 @@ export default function RecordPage() {
         {/* Live stats grid */}
         {isActive && activeActivity && (
           <div className="grid grid-cols-2 gap-3 mb-8">
-            <div className="rounded-xl bg-cairn-card border border-cairn-border p-4">
-              <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
+            <div className="rounded-xl bg-white border border-gray-200 p-4">
+              <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                 <MapPin className="h-3.5 w-3.5" />
                 Distance
               </div>
-              <p className="font-display text-xl font-bold text-slate-100">
+              <p className="font-display text-xl font-bold text-gray-900">
                 {fmt.distance(activeActivity.distanceMeters)}
               </p>
             </div>
-            <div className="rounded-xl bg-cairn-card border border-cairn-border p-4">
-              <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
+            <div className="rounded-xl bg-white border border-gray-200 p-4">
+              <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                 <Gauge className="h-3.5 w-3.5" />
                 Avg Speed
               </div>
-              <p className="font-display text-xl font-bold text-slate-100">
+              <p className="font-display text-xl font-bold text-gray-900">
                 {fmt.speed(currentSpeed)}
               </p>
             </div>
-            <div className="rounded-xl bg-cairn-card border border-cairn-border p-4">
-              <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
+            <div className="rounded-xl bg-white border border-gray-200 p-4">
+              <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                 <TrendingUp className="h-3.5 w-3.5" />
                 Elev Gain
               </div>
-              <p className="font-display text-xl font-bold text-slate-100">
+              <p className="font-display text-xl font-bold text-gray-900">
                 {fmt.elevation(activeActivity.elevationGainMeters)}
               </p>
             </div>
-            <div className="rounded-xl bg-cairn-card border border-cairn-border p-4">
-              <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
+            <div className="rounded-xl bg-white border border-gray-200 p-4">
+              <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                 <TrendingDown className="h-3.5 w-3.5" />
                 Elev Loss
               </div>
-              <p className="font-display text-xl font-bold text-slate-100">
+              <p className="font-display text-xl font-bold text-gray-900">
                 {fmt.elevation(activeActivity.elevationLossMeters)}
               </p>
             </div>
@@ -341,7 +341,7 @@ export default function RecordPage() {
               {gpsIndicator.label}
             </span>
             {activeActivity && activeActivity.gpsTrack.length > 0 && (
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-gray-400">
                 ({activeActivity.gpsTrack.length} points)
               </span>
             )}
@@ -404,12 +404,12 @@ export default function RecordPage() {
           <div className="flex justify-center mt-6">
             <button
               onClick={() => setCameraOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-cairn-card border border-cairn-border px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-cairn-card-hover hover:text-white transition-colors"
+              className="flex items-center gap-2 rounded-xl bg-white border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-white transition-colors"
             >
               <Camera className="h-4 w-4" />
               Take Photo
               {activeActivity.photos.length > 0 && (
-                <span className="text-xs text-slate-500">({activeActivity.photos.length})</span>
+                <span className="text-xs text-gray-400">({activeActivity.photos.length})</span>
               )}
             </button>
           </div>
@@ -418,7 +418,7 @@ export default function RecordPage() {
         {/* Activity photos */}
         {isActive && activeActivity && activeActivity.photos.length > 0 && (
           <div className="mt-6">
-            <h3 className="text-sm font-medium text-slate-400 mb-3">Activity Photos</h3>
+            <h3 className="text-sm font-medium text-gray-500 mb-3">Activity Photos</h3>
             <PhotoGallery filterActivityId={activeActivity.id} />
           </div>
         )}
@@ -440,7 +440,7 @@ export default function RecordPage() {
         {/* Completed activity notice */}
         {!isActive && state.activities.filter((a) => a.status === 'completed').length > 0 && (
           <div className="mt-10 text-center">
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-gray-500">
               You have {state.activities.filter((a) => a.status === 'completed').length} recorded
               {state.activities.filter((a) => a.status === 'completed').length === 1
                 ? ' activity'

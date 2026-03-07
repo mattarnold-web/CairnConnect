@@ -56,63 +56,64 @@ export function ActivityBoardCard({ post }: ActivityPostProps) {
 
   return (
     <Card className="space-y-3">
-      {/* Post type badge + user */}
+      {/* Header: user + post type */}
       <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          {post.user_display_name && (
+            <>
+              <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">
+                {post.user_display_name.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div>
+                <span className="text-sm font-semibold text-gray-900">{post.user_display_name}</span>
+                <div className="text-xs text-gray-400">{formatDate(post.activity_date)}</div>
+              </div>
+            </>
+          )}
+        </div>
         <Badge variant="postType" color={config.color}>
-          {config.icon} {config.label}
+          {config.label}
         </Badge>
-        {post.user_display_name && (
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-full bg-cairn-elevated flex items-center justify-center text-[10px] font-bold text-slate-400">
-              {post.user_display_name.split(' ').map(n => n[0]).join('')}
-            </div>
-            <span className="text-xs text-slate-400">{post.user_display_name}</span>
-          </div>
-        )}
       </div>
 
       {/* Title */}
-      <h3 className="font-display text-base font-semibold text-slate-100">
+      <h3 className="font-display text-base font-semibold text-gray-900">
         {post.title}
       </h3>
 
-      {/* Info row */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+      {/* Stats row - Strava-style inline metrics */}
+      <div className="flex items-center gap-4 py-2 border-t border-b border-gray-100 text-xs text-gray-500">
         {post.location_name && (
           <span className="inline-flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {post.location_name}
+            <MapPin className="h-3.5 w-3.5 text-gray-400" />
+            <span className="font-medium text-gray-700">{post.location_name}</span>
             {post.distance_km != null && (
-              <span className="text-slate-500">· {post.distance_km.toFixed(0)}km</span>
+              <span className="text-gray-400">· {post.distance_km.toFixed(0)}km</span>
             )}
           </span>
         )}
         <span className="inline-flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          {formatDate(post.activity_date)}
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <Zap className="h-3 w-3" style={{ color: SKILL_COLORS[post.skill_level] }} />
-          <span className="capitalize">{post.skill_level}</span>
+          <Zap className="h-3.5 w-3.5" style={{ color: SKILL_COLORS[post.skill_level] }} />
+          <span className="capitalize font-medium">{post.skill_level}</span>
         </span>
       </div>
 
       {/* Bottom row */}
-      <div className="flex items-center justify-between pt-1">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 text-xs">
-          <span className={`inline-flex items-center gap-1 ${isFull ? 'text-red-400' : 'text-canopy'}`}>
-            <Users className="h-3 w-3" />
+          <span className={`inline-flex items-center gap-1 font-medium ${isFull ? 'text-red-500' : 'text-canopy'}`}>
+            <Users className="h-3.5 w-3.5" />
             {isFull ? 'Full' : `${spotsLeft} spot${spotsLeft !== 1 ? 's' : ''} left`}
           </span>
           {post.cost_share != null && post.cost_share > 0 && (
-            <span className="inline-flex items-center gap-1 text-slate-400">
-              <DollarSign className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1 text-gray-500">
+              <DollarSign className="h-3.5 w-3.5" />
               ${post.cost_share}
             </span>
           )}
           {post.permit_required && (
-            <span className="inline-flex items-center gap-1 text-spotlight-gold">
-              <Ticket className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1 text-spotlight-gold font-medium">
+              <Ticket className="h-3.5 w-3.5" />
               Permit included
             </span>
           )}

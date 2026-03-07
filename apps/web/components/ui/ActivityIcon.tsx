@@ -239,12 +239,12 @@ export function ActivityIcon({ activity, size = 'md', className }: ActivityIconP
     return (
       <div
         className={clsx(
-          'inline-flex items-center justify-center bg-slate-500/15 ring-1 ring-slate-500/25',
+          'inline-flex items-center justify-center bg-gray-400/15 ring-1 ring-gray-400/25',
           sizeConfig.container,
           className,
         )}
       >
-        <Target className={clsx('text-slate-400', sizeConfig.icon)} />
+        <Target className={clsx('text-gray-500', sizeConfig.icon)} />
       </div>
     );
   }

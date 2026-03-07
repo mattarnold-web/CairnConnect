@@ -224,16 +224,16 @@ export default function ClimbingPage() {
   }, [selectedType, selectedGrade]);
 
   return (
-    <div className="min-h-screen bg-cairn-bg pb-24">
+    <div className="min-h-screen bg-white pb-24">
       <Navbar />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20">
         <div className="flex items-center gap-3 mb-2">
           <Mountain className="h-7 w-7 text-violet-400" />
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-slate-100">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-gray-900">
             Climbing Routes
           </h1>
         </div>
-        <p className="text-sm text-slate-400 mb-6">
+        <p className="text-sm text-gray-500 mb-6">
           Explore routes, crags, and topo maps for climbing areas worldwide
         </p>
 
@@ -249,7 +249,7 @@ export default function ClimbingPage() {
               onClick={() => setView(key as typeof view)}
               className={clsx(
                 'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors',
-                view === key ? 'bg-violet-500/15 text-violet-400' : 'text-slate-400 hover:text-slate-200'
+                view === key ? 'bg-violet-500/15 text-violet-400' : 'text-gray-500 hover:text-gray-800'
               )}
             >
               <Icon className="h-4 w-4" />
@@ -264,8 +264,8 @@ export default function ClimbingPage() {
             {/* Filters */}
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-slate-500" />
-                <span className="text-xs text-slate-500 uppercase tracking-wider">Type</span>
+                <Filter className="h-4 w-4 text-gray-400" />
+                <span className="text-xs text-gray-400 uppercase tracking-wider">Type</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {ROUTE_TYPE_FILTERS.map((f) => (
@@ -278,8 +278,8 @@ export default function ClimbingPage() {
                 ))}
               </div>
               <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-slate-500" />
-                <span className="text-xs text-slate-500 uppercase tracking-wider">Grade</span>
+                <Filter className="h-4 w-4 text-gray-400" />
+                <span className="text-xs text-gray-400 uppercase tracking-wider">Grade</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {GRADE_FILTERS.map((f) => (
@@ -293,7 +293,7 @@ export default function ClimbingPage() {
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 mb-4">
+            <p className="text-xs text-gray-400 mb-4">
               {filteredRoutes.length} route{filteredRoutes.length !== 1 ? 's' : ''}
             </p>
 
@@ -303,7 +303,7 @@ export default function ClimbingPage() {
                 <button
                   key={route.id}
                   onClick={() => setSelectedRoute(selectedRoute?.id === route.id ? null : route)}
-                  className="w-full text-left rounded-2xl border border-cairn-border bg-cairn-card hover:bg-cairn-card-hover transition-colors overflow-hidden"
+                  className="w-full text-left rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors overflow-hidden"
                 >
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
@@ -317,16 +317,16 @@ export default function ClimbingPage() {
                         >
                           {route.grade}
                         </span>
-                        <h3 className="font-display text-base font-semibold text-slate-100">
+                        <h3 className="font-display text-base font-semibold text-gray-900">
                           {route.name}
                         </h3>
                       </div>
                       <div className="flex items-center gap-1">
                         <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                        <span className="text-xs text-slate-300">{route.rating}</span>
+                        <span className="text-xs text-gray-700">{route.rating}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-slate-500">
+                    <div className="flex items-center gap-4 text-xs text-gray-400">
                       <span className="capitalize">{route.type.replace(/_/g, ' ')}</span>
                       <span>{route.cragName}</span>
                       <span className="flex items-center gap-1">
@@ -339,24 +339,24 @@ export default function ClimbingPage() {
 
                   {/* Expanded detail */}
                   {selectedRoute?.id === route.id && (
-                    <div className="border-t border-cairn-border p-4 space-y-3">
-                      <p className="text-sm text-slate-400">{route.description}</p>
+                    <div className="border-t border-gray-200 p-4 space-y-3">
+                      <p className="text-sm text-gray-500">{route.description}</p>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                         <div>
-                          <span className="text-slate-500 block">Protection</span>
-                          <span className="text-slate-200">{route.protection}</span>
+                          <span className="text-gray-400 block">Protection</span>
+                          <span className="text-gray-800">{route.protection}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500 block">Length</span>
-                          <span className="text-slate-200">{route.lengthMeters}m</span>
+                          <span className="text-gray-400 block">Length</span>
+                          <span className="text-gray-800">{route.lengthMeters}m</span>
                         </div>
                         <div>
-                          <span className="text-slate-500 block">First Ascent</span>
-                          <span className="text-slate-200">{route.firstAscent}</span>
+                          <span className="text-gray-400 block">First Ascent</span>
+                          <span className="text-gray-800">{route.firstAscent}</span>
                         </div>
                         <div>
-                          <span className="text-slate-500 block">Reviews</span>
-                          <span className="text-slate-200">{route.reviewCount}</span>
+                          <span className="text-gray-400 block">Reviews</span>
+                          <span className="text-gray-800">{route.reviewCount}</span>
                         </div>
                       </div>
                       {route.bestSeason.length > 0 && (
@@ -388,32 +388,32 @@ export default function ClimbingPage() {
             {MOCK_CRAGS.map((crag) => (
               <div
                 key={crag.id}
-                className="rounded-2xl border border-cairn-border bg-cairn-card p-5 hover:bg-cairn-card-hover transition-colors"
+                className="rounded-2xl border border-gray-200 bg-white p-5 hover:bg-gray-50 transition-colors"
               >
-                <h3 className="font-display text-lg font-semibold text-slate-100 mb-1">
+                <h3 className="font-display text-lg font-semibold text-gray-900 mb-1">
                   {crag.name}
                 </h3>
-                <p className="text-xs text-slate-500 flex items-center gap-1 mb-3">
+                <p className="text-xs text-gray-400 flex items-center gap-1 mb-3">
                   <MapPin className="h-3 w-3" />
                   {crag.region}
                 </p>
-                <p className="text-sm text-slate-400 mb-4">{crag.description}</p>
+                <p className="text-sm text-gray-500 mb-4">{crag.description}</p>
                 <div className="grid grid-cols-2 gap-3 text-xs mb-4">
                   <div>
-                    <span className="text-slate-500 block">Routes</span>
-                    <span className="text-slate-200 font-medium">{crag.routeCount}</span>
+                    <span className="text-gray-400 block">Routes</span>
+                    <span className="text-gray-800 font-medium">{crag.routeCount}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Grades</span>
-                    <span className="text-slate-200 font-medium">{crag.gradeRange}</span>
+                    <span className="text-gray-400 block">Grades</span>
+                    <span className="text-gray-800 font-medium">{crag.gradeRange}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Approach</span>
-                    <span className="text-slate-200 font-medium">{crag.approach}</span>
+                    <span className="text-gray-400 block">Approach</span>
+                    <span className="text-gray-800 font-medium">{crag.approach}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Types</span>
-                    <span className="text-slate-200 font-medium capitalize">
+                    <span className="text-gray-400 block">Types</span>
+                    <span className="text-gray-800 font-medium capitalize">
                       {crag.types.join(', ')}
                     </span>
                   </div>
@@ -434,7 +434,7 @@ export default function ClimbingPage() {
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Topo map visualization */}
             <div className="flex-1">
-              <div className="rounded-2xl border border-cairn-border bg-cairn-card overflow-hidden">
+              <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
                 <div className="relative h-[500px] bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
                   {/* Topographic contour lines */}
                   <svg viewBox="0 0 800 500" className="absolute inset-0 w-full h-full opacity-30">
@@ -486,7 +486,7 @@ export default function ClimbingPage() {
                         >
                           {i + 1}
                         </div>
-                        <div className="mt-1 rounded-md bg-cairn-bg/80 px-1.5 py-0.5 text-[9px] text-slate-300 backdrop-blur-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="mt-1 rounded-md bg-white/80 px-1.5 py-0.5 text-[9px] text-gray-700 backdrop-blur-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                           {route.name} ({route.grade})
                         </div>
                       </button>
@@ -494,25 +494,25 @@ export default function ClimbingPage() {
                   })}
 
                   {/* Legend */}
-                  <div className="absolute bottom-4 right-4 rounded-xl bg-cairn-bg/80 backdrop-blur-sm border border-cairn-border p-3 text-[10px] space-y-1.5">
-                    <p className="font-semibold text-slate-300 mb-1">Legend</p>
+                  <div className="absolute bottom-4 right-4 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200 p-3 text-[10px] space-y-1.5">
+                    <p className="font-semibold text-gray-700 mb-1">Legend</p>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-[#3B82F6]" />
-                      <span className="text-slate-400">Sport</span>
+                      <span className="text-gray-500">Sport</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-[#F59E0B]" />
-                      <span className="text-slate-400">Trad</span>
+                      <span className="text-gray-500">Trad</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-[#8B5CF6]" />
-                      <span className="text-slate-400">Boulder</span>
+                      <span className="text-gray-500">Boulder</span>
                     </div>
-                    <div className="flex items-center gap-2 text-slate-500">
+                    <div className="flex items-center gap-2 text-gray-400">
                       <span className="w-2 border-t border-dashed border-[#F4A261]" />
                       <span>Ridge</span>
                     </div>
-                    <div className="flex items-center gap-2 text-slate-500">
+                    <div className="flex items-center gap-2 text-gray-400">
                       <span className="w-2 border-t border-[#8B5CF6] opacity-40" />
                       <span>Contour</span>
                     </div>
@@ -520,17 +520,17 @@ export default function ClimbingPage() {
 
                   {/* Map controls */}
                   <div className="absolute top-4 right-4 flex flex-col gap-2">
-                    <button className="h-8 w-8 rounded-lg bg-cairn-bg/80 backdrop-blur-sm border border-cairn-border flex items-center justify-center text-slate-400 hover:text-slate-200 text-lg font-bold">
+                    <button className="h-8 w-8 rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 text-lg font-bold">
                       +
                     </button>
-                    <button className="h-8 w-8 rounded-lg bg-cairn-bg/80 backdrop-blur-sm border border-cairn-border flex items-center justify-center text-slate-400 hover:text-slate-200 text-lg font-bold">
+                    <button className="h-8 w-8 rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 text-lg font-bold">
                       -
                     </button>
                   </div>
 
-                  <div className="absolute top-4 left-4 text-xs text-slate-400 bg-cairn-bg/80 backdrop-blur-sm rounded-lg border border-cairn-border px-3 py-2">
+                  <div className="absolute top-4 left-4 text-xs text-gray-500 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 px-3 py-2">
                     <span className="font-display font-semibold text-violet-400">Topo View</span>
-                    <span className="text-slate-500 ml-2">Wall Street Area</span>
+                    <span className="text-gray-400 ml-2">Wall Street Area</span>
                   </div>
                 </div>
               </div>
@@ -538,7 +538,7 @@ export default function ClimbingPage() {
 
             {/* Route detail sidebar */}
             <div className="lg:w-80 shrink-0 space-y-3">
-              <h3 className="font-display text-sm font-semibold text-slate-300 uppercase tracking-wider">
+              <h3 className="font-display text-sm font-semibold text-gray-700 uppercase tracking-wider">
                 Routes in View
               </h3>
               {MOCK_ROUTES.slice(0, 4).map((route, i) => (
@@ -549,7 +549,7 @@ export default function ClimbingPage() {
                     'w-full text-left rounded-xl border p-3 transition-colors',
                     selectedRoute?.id === route.id
                       ? 'border-violet-500/50 bg-violet-500/10'
-                      : 'border-cairn-border bg-cairn-card hover:bg-cairn-card-hover'
+                      : 'border-gray-200 bg-white hover:bg-gray-50'
                   )}
                 >
                   <div className="flex items-center gap-2 mb-1">
@@ -559,7 +559,7 @@ export default function ClimbingPage() {
                     >
                       {i + 1}
                     </span>
-                    <span className="text-sm font-medium text-slate-100">{route.name}</span>
+                    <span className="text-sm font-medium text-gray-900">{route.name}</span>
                     <span
                       className="ml-auto text-xs font-bold"
                       style={{ color: getRouteTypeColor(route.type) }}
@@ -567,7 +567,7 @@ export default function ClimbingPage() {
                       {route.grade}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 capitalize">
+                  <p className="text-[11px] text-gray-400 capitalize">
                     {route.type.replace(/_/g, ' ')} &middot; {route.lengthMeters}m
                     {route.pitches > 1 ? ` &middot; ${route.pitches}P` : ''}
                   </p>

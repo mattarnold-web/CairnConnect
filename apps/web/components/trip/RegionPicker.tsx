@@ -46,17 +46,17 @@ export function RegionPicker({ dispatch }: RegionPickerProps) {
 
   return (
     <div>
-      <h2 className="font-display text-2xl font-bold text-slate-100 mb-2">
+      <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">
         Where are you headed?
       </h2>
-      <p className="text-sm text-slate-500 mb-6">
+      <p className="text-sm text-gray-400 mb-6">
         Pick a destination to start planning your trip
       </p>
 
       <div className="space-y-8">
         {grouped.map(({ continent, regions }) => (
           <section key={continent}>
-            <h3 className="font-display text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">
+            <h3 className="font-display text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
               {continent}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -72,7 +72,7 @@ export function RegionPicker({ dispatch }: RegionPickerProps) {
                   onClick={() => handleSelect(region)}
                 >
                   {!region.hasData && (
-                    <span className="absolute top-3 right-3 text-xs bg-cairn-elevated text-slate-400 rounded-full px-2 py-0.5">
+                    <span className="absolute top-3 right-3 text-xs bg-gray-100 text-gray-500 rounded-full px-2 py-0.5">
                       Coming Soon
                     </span>
                   )}
@@ -83,13 +83,13 @@ export function RegionPicker({ dispatch }: RegionPickerProps) {
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <p className="font-display font-semibold text-slate-100">
+                      <p className="font-display font-semibold text-gray-900">
                         {region.name}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-gray-400">
                         {region.state_province}, {region.country}
                       </p>
-                      <p className="text-xs text-slate-400 line-clamp-2 mt-1">
+                      <p className="text-xs text-gray-500 line-clamp-2 mt-1">
                         {region.description}
                       </p>
                       {region.hasData && (

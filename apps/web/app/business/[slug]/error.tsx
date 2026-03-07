@@ -17,16 +17,16 @@ export default function BusinessError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-cairn-bg pb-24">
+    <div className="min-h-screen bg-white pb-24">
       <Navbar />
       <div className="mx-auto max-w-2xl px-4 pt-24 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 mb-4">
           <AlertTriangle className="h-7 w-7 text-red-400" />
         </div>
-        <h2 className="font-display text-xl font-bold text-slate-100 mb-2">
+        <h2 className="font-display text-xl font-bold text-gray-900 mb-2">
           Error loading business
         </h2>
-        <p className="text-sm text-slate-400 mb-6">
+        <p className="text-sm text-gray-500 mb-6">
           We couldn&apos;t load this business listing. It may be temporarily unavailable.
         </p>
         <div className="flex items-center justify-center gap-3">
@@ -39,7 +39,7 @@ export default function BusinessError({
           </button>
           <Link
             href="/explore"
-            className="inline-flex items-center gap-2 rounded-xl border border-cairn-border bg-cairn-card px-5 py-2.5 text-sm font-medium text-slate-300 hover:bg-cairn-card-hover transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Explore

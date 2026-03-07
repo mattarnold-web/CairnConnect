@@ -47,12 +47,12 @@ const GDPR_RIGHTS = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-cairn-bg pb-24">
+    <div className="min-h-screen bg-white pb-24">
       <Navbar />
       <div className="mx-auto max-w-3xl px-4 pt-20">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 mb-6 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -60,17 +60,17 @@ export default function PrivacyPage() {
 
         <div className="flex items-center gap-3 mb-2">
           <Shield className="h-7 w-7 text-canopy" />
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-slate-100">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-gray-900">
             Privacy, Security & Licensing
           </h1>
         </div>
-        <p className="text-sm text-slate-400 mb-10">
+        <p className="text-sm text-gray-500 mb-10">
           Last updated: March 2026
         </p>
 
         {/* Security Features */}
         <section className="mb-12">
-          <h2 className="font-display text-xl font-semibold text-slate-100 mb-6">
+          <h2 className="font-display text-xl font-semibold text-gray-900 mb-6">
             How We Protect Your Data
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -79,15 +79,15 @@ export default function PrivacyPage() {
               return (
                 <div
                   key={feat.title}
-                  className="rounded-2xl border border-cairn-border bg-cairn-card p-5"
+                  className="rounded-2xl border border-gray-200 bg-white p-5"
                 >
                   <div className="h-10 w-10 rounded-xl bg-canopy/10 flex items-center justify-center mb-3">
                     <Icon className="h-5 w-5 text-canopy" />
                   </div>
-                  <h3 className="font-display text-sm font-semibold text-slate-100 mb-2">
+                  <h3 className="font-display text-sm font-semibold text-gray-900 mb-2">
                     {feat.title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">{feat.description}</p>
+                  <p className="text-xs text-gray-500 leading-relaxed">{feat.description}</p>
                 </div>
               );
             })}
@@ -96,33 +96,33 @@ export default function PrivacyPage() {
 
         {/* Data Collection Table */}
         <section className="mb-12">
-          <h2 className="font-display text-xl font-semibold text-slate-100 mb-6">
+          <h2 className="font-display text-xl font-semibold text-gray-900 mb-6">
             What We Collect & Why
           </h2>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card overflow-hidden">
+          <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-cairn-border">
-                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       Data
                     </th>
-                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       Purpose
                     </th>
-                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       Retention
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {DATA_WE_COLLECT.map((row) => (
-                    <tr key={row.data} className="border-b border-cairn-border/50 last:border-0">
-                      <td className="px-5 py-3 text-slate-100 font-medium whitespace-nowrap">
+                    <tr key={row.data} className="border-b border-gray-100 last:border-0">
+                      <td className="px-5 py-3 text-gray-900 font-medium whitespace-nowrap">
                         {row.data}
                       </td>
-                      <td className="px-5 py-3 text-slate-400">{row.purpose}</td>
-                      <td className="px-5 py-3 text-slate-500 whitespace-nowrap">{row.retention}</td>
+                      <td className="px-5 py-3 text-gray-500">{row.purpose}</td>
+                      <td className="px-5 py-3 text-gray-400 whitespace-nowrap">{row.retention}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -133,7 +133,7 @@ export default function PrivacyPage() {
 
         {/* User PII Rights */}
         <section className="mb-12">
-          <h2 className="font-display text-xl font-semibold text-slate-100 mb-6 flex items-center gap-2">
+          <h2 className="font-display text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
             <Globe className="h-6 w-6 text-canopy" />
             Your Rights (GDPR / CCPA)
           </h2>
@@ -141,12 +141,12 @@ export default function PrivacyPage() {
             {GDPR_RIGHTS.map((r) => (
               <div
                 key={r.right}
-                className="flex items-start gap-4 rounded-xl border border-cairn-border bg-cairn-card px-5 py-4"
+                className="flex items-start gap-4 rounded-xl border border-gray-200 bg-white px-5 py-4"
               >
                 <span className="inline-flex items-center justify-center rounded-lg bg-canopy/10 px-3 py-1 text-xs font-bold text-canopy shrink-0 mt-0.5">
                   {r.right}
                 </span>
-                <p className="text-sm text-slate-400">{r.description}</p>
+                <p className="text-sm text-gray-500">{r.description}</p>
               </div>
             ))}
           </div>
@@ -154,38 +154,38 @@ export default function PrivacyPage() {
 
         {/* Licensing */}
         <section className="mb-12">
-          <h2 className="font-display text-xl font-semibold text-slate-100 mb-6 flex items-center gap-2">
+          <h2 className="font-display text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
             <FileText className="h-6 w-6 text-canopy" />
             Platform Licensing
           </h2>
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-6 space-y-4">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 space-y-4">
             <div>
-              <h3 className="text-sm font-semibold text-slate-100 mb-2">User Content</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">User Content</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
                 You retain full ownership of all content you create — GPS tracks, photos, reviews,
                 and trail reports. By posting content, you grant Cairn Connect a non-exclusive
                 license to display it within the platform. You can delete your content at any time.
               </p>
             </div>
-            <div className="border-t border-cairn-border pt-4">
-              <h3 className="text-sm font-semibold text-slate-100 mb-2">Trail & Map Data</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+            <div className="border-t border-gray-200 pt-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Trail & Map Data</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
                 Trail data is sourced from public land agencies, OpenStreetMap contributors (ODbL
                 license), and community submissions. Map tiles use OpenTopoMap and Mapbox. Satellite
                 imagery is subject to third-party licensing terms.
               </p>
             </div>
-            <div className="border-t border-cairn-border pt-4">
-              <h3 className="text-sm font-semibold text-slate-100 mb-2">Business Listings</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+            <div className="border-t border-gray-200 pt-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Business Listings</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
                 Business information is provided by listing owners. Cairn Connect does not guarantee
                 accuracy of business hours, pricing, or availability. Spotlight listing agreements
                 are governed by separate commercial terms.
               </p>
             </div>
-            <div className="border-t border-cairn-border pt-4">
-              <h3 className="text-sm font-semibold text-slate-100 mb-2">Open Source</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+            <div className="border-t border-gray-200 pt-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Open Source</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
                 Cairn Connect uses open-source libraries governed by their respective licenses (MIT,
                 Apache 2.0, BSD). A full list of dependencies and their licenses is available in the
                 application&apos;s package manifest.
@@ -197,10 +197,10 @@ export default function PrivacyPage() {
         {/* Contact */}
         <section className="mb-12">
           <div className="rounded-2xl border border-canopy/20 bg-canopy/5 p-6 text-center">
-            <h3 className="font-display text-lg font-semibold text-slate-100 mb-2">
+            <h3 className="font-display text-lg font-semibold text-gray-900 mb-2">
               Questions about your data?
             </h3>
-            <p className="text-sm text-slate-400 mb-4">
+            <p className="text-sm text-gray-500 mb-4">
               Contact our Data Protection Officer at{' '}
               <span className="text-canopy">privacy@cairnconnect.app</span>
             </p>

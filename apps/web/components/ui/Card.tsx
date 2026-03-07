@@ -15,11 +15,12 @@ export function Card({ children, spotlight, hover = true, className, onClick }: 
     <div
       onClick={onClick}
       className={clsx(
-        'rounded-2xl border bg-cairn-card p-4',
+        'rounded-xl bg-white border p-4',
         spotlight
-          ? 'border-l-[3px] border-l-spotlight-gold border-cairn-border spotlight-glow'
-          : 'border-cairn-border',
-        hover && 'transition-colors duration-150 hover:bg-cairn-card-hover cursor-pointer card-press',
+          ? 'border-l-[3px] border-l-spotlight-gold border-gray-200 spotlight-glow'
+          : 'border-gray-200',
+        hover && 'transition-all duration-200 hover:shadow-card-hover cursor-pointer',
+        'shadow-card',
         className
       )}
     >

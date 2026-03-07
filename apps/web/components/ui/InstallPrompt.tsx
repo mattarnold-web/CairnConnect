@@ -38,13 +38,13 @@ export function InstallPrompt() {
 
   return (
     <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm">
-      <div className="bg-cairn-card border border-cairn-border rounded-2xl shadow-xl p-4">
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-xl p-4">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 mt-0.5">
             <Download className="h-5 w-5 text-canopy" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-slate-200">
+            <p className="text-sm text-gray-800">
               Add Cairn Connect to your home screen for quick access
             </p>
             <div className="flex items-center gap-2 mt-3">
@@ -56,7 +56,7 @@ export function InstallPrompt() {
               </button>
               <button
                 onClick={handleDismiss}
-                className="inline-flex items-center justify-center rounded-xl text-sm text-slate-400 hover:text-slate-200 px-3 h-9 transition-colors"
+                className="inline-flex items-center justify-center rounded-xl text-sm text-gray-500 hover:text-gray-800 px-3 h-9 transition-colors"
               >
                 Not now
               </button>
@@ -64,7 +64,7 @@ export function InstallPrompt() {
           </div>
           <button
             onClick={handleDismiss}
-            className="flex-shrink-0 text-slate-500 hover:text-slate-300 transition-colors"
+            className="flex-shrink-0 text-gray-400 hover:text-gray-700 transition-colors"
             aria-label="Dismiss install prompt"
           >
             <X className="h-4 w-4" />

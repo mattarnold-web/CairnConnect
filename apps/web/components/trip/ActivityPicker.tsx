@@ -21,10 +21,10 @@ export function ActivityPicker({ state, dispatch }: ActivityPickerProps) {
 
   return (
     <div>
-      <h2 className="font-display text-2xl font-bold text-slate-100 mb-2">
+      <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">
         What do you want to do in {regionName}?
       </h2>
-      <p className="text-sm text-slate-500 mb-6">
+      <p className="text-sm text-gray-400 mb-6">
         Select the activities you&apos;re planning
       </p>
 
@@ -32,7 +32,7 @@ export function ActivityPicker({ state, dispatch }: ActivityPickerProps) {
       <div className="space-y-6">
         {ACTIVITY_GROUPS.map((group) => (
           <section key={group.label}>
-            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
               {group.label}
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -56,22 +56,22 @@ export function ActivityPicker({ state, dispatch }: ActivityPickerProps) {
       </div>
 
       {/* Popular in region callout */}
-      <div className="mt-8 rounded-xl bg-cairn-elevated/30 border border-cairn-border p-4">
-        <h3 className="text-sm font-semibold text-slate-300 mb-3">
+      <div className="mt-8 rounded-xl bg-gray-100/30 border border-gray-200 p-4">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">
           Popular in {regionName}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {MOCK_REGION_HIGHLIGHTS.slice(0, 4).map((h) => (
             <div
               key={h.activity_slug}
-              className="flex items-center gap-2 text-sm text-slate-400"
+              className="flex items-center gap-2 text-sm text-gray-500"
             >
               <ActivityIcon activity={h.activity_slug} size="sm" />
               <div className="min-w-0">
-                <p className="text-slate-300 text-xs font-medium truncate">
+                <p className="text-gray-700 text-xs font-medium truncate">
                   {h.activity_label}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-gray-400">
                   {h.trail_count} trails &middot; {h.business_count} businesses
                 </p>
               </div>

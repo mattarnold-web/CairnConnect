@@ -29,12 +29,12 @@ export default function SharedTripPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-cairn-bg">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <main className="pt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-24">
         {error ? (
           <div className="text-center py-20">
-            <p className="text-lg text-slate-400">
+            <p className="text-lg text-gray-500">
               Unable to load shared trip. The link may be invalid or expired.
             </p>
           </div>

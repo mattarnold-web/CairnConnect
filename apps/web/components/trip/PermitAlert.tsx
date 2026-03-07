@@ -18,7 +18,7 @@ export function PermitAlert({ trailNames, reason }: PermitAlertProps) {
           <p className="text-xs text-spotlight-gold/80 mt-0.5">
             {trailNames.join(', ')}
           </p>
-          <p className="text-xs text-slate-400 mt-1">{reason}</p>
+          <p className="text-xs text-gray-500 mt-1">{reason}</p>
           <Link
             href="/board"
             className="inline-block mt-2 text-canopy text-xs hover:underline"

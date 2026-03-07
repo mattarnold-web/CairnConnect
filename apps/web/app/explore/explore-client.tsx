@@ -91,7 +91,7 @@ export function ExploreClient({ businesses, trails, regionHighlights }: ExploreC
   }, [filteredTrails, filteredBusinesses]);
 
   return (
-    <div className="min-h-screen bg-cairn-bg">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <div className="pt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -125,7 +125,7 @@ export function ExploreClient({ businesses, trails, regionHighlights }: ExploreC
                   'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
                   activeTab === 'businesses'
                     ? 'bg-canopy/15 text-canopy'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-gray-500 hover:text-gray-800'
                 )}
               >
                 <Layers className="h-4 w-4" />
@@ -137,7 +137,7 @@ export function ExploreClient({ businesses, trails, regionHighlights }: ExploreC
                   'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
                   activeTab === 'trails'
                     ? 'bg-canopy/15 text-canopy'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-gray-500 hover:text-gray-800'
                 )}
               >
                 <Mountain className="h-4 w-4" />
@@ -153,8 +153,8 @@ export function ExploreClient({ businesses, trails, regionHighlights }: ExploreC
                   ))
                 ) : (
                   <div className="col-span-full text-center py-16">
-                    <Search className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-400 text-sm">No businesses match your filters.</p>
+                    <Search className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm">No businesses match your filters.</p>
                     <button
                       onClick={() => { setSearchText(''); setSelectedActivity(null); }}
                       className="mt-2 text-canopy text-sm hover:underline"
@@ -172,8 +172,8 @@ export function ExploreClient({ businesses, trails, regionHighlights }: ExploreC
                   ))
                 ) : (
                   <div className="text-center py-16">
-                    <Search className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-400 text-sm">No trails match your filters.</p>
+                    <Search className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm">No trails match your filters.</p>
                     <button
                       onClick={() => { setSearchText(''); setSelectedActivity(null); }}
                       className="mt-2 text-canopy text-sm hover:underline"
@@ -202,7 +202,7 @@ export function ExploreClient({ businesses, trails, regionHighlights }: ExploreC
                           ? style === 'topo' ? 'bg-violet-500/20 border-violet-500/40 text-violet-400'
                             : style === 'satellite' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
                             : 'bg-canopy/20 border-canopy/40 text-canopy'
-                          : 'bg-cairn-bg/80 backdrop-blur-sm border-cairn-border text-slate-400 hover:text-slate-200'
+                          : 'bg-white/80 backdrop-blur-sm border-gray-200 text-gray-500 hover:text-gray-800'
                       )}
                       title={`${style.charAt(0).toUpperCase() + style.slice(1)} Map`}
                     >

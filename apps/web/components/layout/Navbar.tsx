@@ -36,85 +36,73 @@ export function Navbar() {
   const isMetric = preferences.units === 'metric';
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-cairn-border" suppressHydrationWarning>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200" suppressHydrationWarning>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-14 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-canopy to-canopy-dark flex items-center justify-center shadow-lg shadow-canopy/20">
-              <Mountain className="h-5 w-5 text-white" />
+            <div className="relative h-8 w-8 rounded-lg bg-canopy flex items-center justify-center">
+              <Mountain className="h-4 w-4 text-white" />
             </div>
-            <div className="hidden sm:flex flex-col">
-              <span className="font-display text-lg font-bold text-slate-100 leading-tight group-hover:text-canopy transition-colors">
-                Cairn Connect
-              </span>
-              <span className="text-[9px] text-slate-500 tracking-[0.2em] uppercase -mt-0.5">
-                Find your trail
-              </span>
-            </div>
+            <span className="hidden sm:block font-display text-lg font-bold text-gray-900 group-hover:text-canopy transition-colors">
+              Cairn Connect
+            </span>
           </Link>
 
-          {/* Nav links */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Nav links - clean horizontal tabs */}
+          <div className="hidden md:flex items-center gap-0.5">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-              const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={clsx(
-                    'flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200',
+                    'relative px-3 py-2 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-canopy/15 text-canopy'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-cairn-card'
+                      ? 'text-canopy'
+                      : 'text-gray-500 hover:text-gray-900'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
                   {item.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-canopy rounded-full" />
+                  )}
                 </Link>
               );
             })}
           </div>
 
           {/* Right side */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2">
             {/* Units toggle */}
             <button
               onClick={() =>
                 dispatch({ type: 'SET_UNITS', units: isMetric ? 'imperial' : 'metric' })
               }
-              className="hidden sm:flex items-center rounded-lg bg-cairn-card border border-cairn-border text-xs font-medium overflow-hidden"
+              className="hidden sm:flex items-center rounded-full bg-gray-100 text-xs font-medium overflow-hidden"
               aria-label={`Switch to ${isMetric ? 'imperial' : 'metric'} units`}
             >
               <span
                 className={clsx(
-                  'px-2 py-1.5 transition-colors',
-                  !isMetric ? 'bg-canopy/20 text-canopy' : 'text-slate-500',
+                  'px-2.5 py-1.5 transition-colors rounded-full',
+                  !isMetric ? 'bg-canopy text-white' : 'text-gray-500',
                 )}
               >
                 mi
               </span>
               <span
                 className={clsx(
-                  'px-2 py-1.5 transition-colors',
-                  isMetric ? 'bg-canopy/20 text-canopy' : 'text-slate-500',
+                  'px-2.5 py-1.5 transition-colors rounded-full',
+                  isMetric ? 'bg-canopy text-white' : 'text-gray-500',
                 )}
               >
                 km
               </span>
             </button>
-            {/* Settings */}
-            <Link
-              href="/settings"
-              className="hidden sm:flex items-center justify-center h-9 w-9 rounded-xl bg-cairn-card border border-cairn-border text-slate-400 hover:text-slate-200 hover:bg-cairn-card-hover transition-colors"
-              aria-label="Settings"
-            >
-              <Settings className="h-4 w-4" />
-            </Link>
             <Link
               href="/dashboard/upgrade"
-              className="hidden lg:flex items-center gap-1.5 rounded-xl bg-spotlight-gold/10 border border-spotlight-gold/30 px-3 py-1.5 text-xs font-semibold text-spotlight-gold hover:bg-spotlight-gold/20 transition-colors"
+              className="hidden lg:flex items-center gap-1.5 rounded-full bg-spotlight-gold-bg px-3 py-1.5 text-xs font-semibold text-spotlight-gold hover:bg-orange-100 transition-colors"
             >
               <Sparkles className="h-3.5 w-3.5" />
               Spotlight
@@ -123,29 +111,31 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 rounded-xl bg-cairn-card border border-cairn-border px-3.5 py-2 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                  className="flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   {user.user_metadata?.avatar_url ? (
                     <img
                       src={user.user_metadata.avatar_url}
                       alt=""
-                      className="h-5 w-5 rounded-full"
+                      className="h-6 w-6 rounded-full"
                     />
                   ) : (
-                    <User className="h-4 w-4" />
+                    <div className="h-6 w-6 rounded-full bg-canopy/10 flex items-center justify-center">
+                      <User className="h-3.5 w-3.5 text-canopy" />
+                    </div>
                   )}
-                  <span className="hidden sm:inline max-w-[100px] truncate">
+                  <span className="hidden sm:inline max-w-[100px] truncate font-medium">
                     {user.user_metadata?.display_name || user.email?.split('@')[0] || 'Account'}
                   </span>
                 </button>
                 {showUserMenu && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                    <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-cairn-card border border-cairn-border shadow-xl z-50 py-1">
+                    <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-white border border-gray-200 shadow-elevated z-50 py-1">
                       <Link
                         href="/profile"
                         onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       >
                         <User className="h-4 w-4" />
                         Profile
@@ -153,12 +143,12 @@ export function Navbar() {
                       <Link
                         href="/settings"
                         onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       >
                         <Settings className="h-4 w-4" />
                         Settings
                       </Link>
-                      <div className="h-px bg-cairn-border my-1" />
+                      <div className="h-px bg-gray-100 my-1" />
                       <button
                         onClick={async () => {
                           setShowUserMenu(false);
@@ -166,7 +156,7 @@ export function Navbar() {
                           router.push('/');
                           router.refresh();
                         }}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-cairn-card-hover transition-colors w-full text-left"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors w-full text-left"
                       >
                         <LogOut className="h-4 w-4" />
                         Sign Out
@@ -178,19 +168,18 @@ export function Navbar() {
             ) : (
               <Link
                 href="/auth/login"
-                className="flex items-center gap-2 rounded-xl bg-cairn-card border border-cairn-border px-3.5 py-2 text-sm text-slate-300 hover:bg-cairn-card-hover transition-colors"
+                className="flex items-center gap-2 rounded-full bg-canopy px-4 py-2 text-sm font-semibold text-white hover:bg-canopy-dark transition-colors"
               >
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Sign In</span>
+                Sign In
               </Link>
             )}
           </div>
         </div>
       </div>
 
-      {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-cairn-border safe-area-bottom">
-        <div className="flex items-center justify-around py-2 pb-safe">
+      {/* Mobile bottom nav - clean with active indicator */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-bottom">
+        <div className="flex items-center justify-around py-1.5 pb-safe">
           {MOBILE_NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             const Icon = item.icon;
@@ -200,10 +189,10 @@ export function Navbar() {
                 href={item.href}
                 className={clsx(
                   'flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg text-[10px] font-medium min-w-[3rem]',
-                  isActive ? 'text-canopy' : 'text-slate-500'
+                  isActive ? 'text-canopy' : 'text-gray-400'
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className={clsx('h-5 w-5', isActive && 'stroke-[2.5]')} />
                 {item.label}
               </Link>
             );

@@ -39,10 +39,10 @@ export function RecommendationPanel() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-display text-xl font-bold text-slate-100">
+              <h2 className="font-display text-xl font-bold text-gray-900">
                 Your Trail Matches
               </h2>
-              <p className="text-sm text-slate-400 mt-0.5">
+              <p className="text-sm text-gray-500 mt-0.5">
                 {results.length} trail{results.length !== 1 ? 's' : ''} matched your
                 preferences
               </p>
@@ -61,8 +61,8 @@ export function RecommendationPanel() {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-cairn-border bg-cairn-card p-8 text-center">
-              <p className="text-slate-400">
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+              <p className="text-gray-500">
                 No trails matched your criteria. Try different preferences!
               </p>
               <Button variant="primary" className="mt-4" onClick={handleRetake}>
@@ -80,7 +80,7 @@ export function RecommendationPanel() {
               <h3 className="font-display font-semibold text-spotlight-gold">
                 AI Chat Coming Soon
               </h3>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-gray-500 mt-1">
                 Want personalized AI recommendations? Upgrade to Pro for conversational
                 trail discovery powered by your riding history.
               </p>

@@ -18,18 +18,18 @@ export function Button({
   return (
     <button
       className={clsx(
-        'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150',
+        'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-150',
         'disabled:opacity-50 disabled:cursor-not-allowed',
-        'active:scale-[0.97]',
+        'active:scale-[0.98]',
         // Variants
-        variant === 'primary' && 'bg-canopy text-white hover:bg-canopy-dark',
-        variant === 'secondary' && 'bg-transparent border border-canopy text-canopy hover:bg-canopy/10',
-        variant === 'ghost' && 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-cairn-card',
-        variant === 'destructive' && 'bg-red-500 text-white hover:bg-red-600',
-        variant === 'spotlight' && 'bg-spotlight-gold text-cairn-bg hover:bg-spotlight-gold-dark font-bold',
+        variant === 'primary' && 'bg-canopy text-white hover:bg-canopy-dark shadow-sm',
+        variant === 'secondary' && 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm',
+        variant === 'ghost' && 'bg-transparent text-gray-500 hover:text-gray-900 hover:bg-gray-100',
+        variant === 'destructive' && 'bg-red-500 text-white hover:bg-red-600 shadow-sm',
+        variant === 'spotlight' && 'bg-spotlight-gold text-white hover:bg-spotlight-gold-dark font-bold shadow-sm',
         // Sizes
-        size === 'sm' && 'h-8 px-3 text-sm',
-        size === 'md' && 'h-10 px-4 text-sm',
+        size === 'sm' && 'h-8 px-3.5 text-sm',
+        size === 'md' && 'h-10 px-5 text-sm',
         size === 'lg' && 'h-12 px-6 text-base',
         className
       )}

@@ -36,20 +36,20 @@ export function SuggestionCard({ suggestion }: SuggestionCardProps) {
         {/* Text content */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-100 truncate">
+            <span className="font-semibold text-gray-900 truncate">
               {suggestion.title}
             </span>
             {suggestion.isSpotlight && <SpotlightBadge size="sm" />}
           </div>
-          <p className="text-xs text-slate-500 truncate">{suggestion.subtitle}</p>
-          <p className="text-xs text-slate-400 italic mt-1">{suggestion.reason}</p>
+          <p className="text-xs text-gray-400 truncate">{suggestion.subtitle}</p>
+          <p className="text-xs text-gray-500 italic mt-1">{suggestion.reason}</p>
 
           {/* Price + Book row */}
           {priceRange && (
             <div className="flex items-center gap-2 mt-1.5">
               <span className="text-xs font-medium text-canopy">
                 ${priceRange.min}–${priceRange.max}
-                <span className="text-slate-500">{UNIT_LABELS[priceRange.unit] || ''}</span>
+                <span className="text-gray-400">{UNIT_LABELS[priceRange.unit] || ''}</span>
               </span>
               {business?.booking_url && (
                 <button

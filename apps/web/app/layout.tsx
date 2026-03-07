@@ -28,10 +28,10 @@ export const metadata: Metadata = {
     'outdoor businesses',
   ],
   manifest: '/manifest.json',
-  themeColor: '#0B1A2B',
+  themeColor: '#FFFFFF',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'Cairn Connect',
   },
 };
@@ -48,7 +48,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className="font-body bg-cairn-bg text-slate-100 antialiased">
+      <body className="font-body bg-white text-gray-900 antialiased">
         <Providers>{children}</Providers>
         <script
           dangerouslySetInnerHTML={{

@@ -64,7 +64,7 @@ export function BoardClient({ posts }: BoardClientProps) {
   }, [posts, selectedPostType, selectedActivity, selectedSkill]);
 
   return (
-    <div className="min-h-screen bg-cairn-bg">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <main className="mx-auto max-w-2xl px-4 pt-24 pb-24">
@@ -73,11 +73,11 @@ export function BoardClient({ posts }: BoardClientProps) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Users className="h-6 w-6 text-canopy" />
-              <h1 className="font-display text-2xl font-bold text-slate-100">
+              <h1 className="font-display text-2xl font-bold text-gray-900">
                 Activity Board
               </h1>
             </div>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-gray-500">
               Find adventure partners, share permits, and join activities near you
             </p>
           </div>
@@ -110,8 +110,8 @@ export function BoardClient({ posts }: BoardClientProps) {
                       }
                     : {
                         backgroundColor: 'transparent',
-                        borderColor: 'rgb(30, 58, 95)',
-                        color: 'rgb(148, 163, 184)',
+                        borderColor: 'rgb(229, 229, 234)',
+                        color: 'rgb(107, 107, 118)',
                       }
                 }
               >
@@ -144,7 +144,7 @@ export function BoardClient({ posts }: BoardClientProps) {
           </div>
         </div>
 
-        <p className="text-xs text-slate-500 mb-4">
+        <p className="text-xs text-gray-400 mb-4">
           Showing {filteredPosts.length} activit{filteredPosts.length === 1 ? 'y' : 'ies'}
         </p>
 
@@ -155,12 +155,12 @@ export function BoardClient({ posts }: BoardClientProps) {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-cairn-border bg-cairn-card p-12 text-center">
-            <Users className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="font-display text-lg font-semibold text-slate-300 mb-1">
+          <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
+            <Users className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+            <h3 className="font-display text-lg font-semibold text-gray-700 mb-1">
               No activities match your filters
             </h3>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-gray-400">
               Try adjusting your filters to see more results
             </p>
           </div>
@@ -231,10 +231,10 @@ function CreatePostModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl bg-cairn-card border border-cairn-border p-6 max-h-[85vh] overflow-y-auto">
+      <div className="w-full max-w-lg rounded-2xl bg-white border border-gray-200 p-6 max-h-[85vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-display text-lg font-bold text-slate-100">Create Activity Post</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors">
+          <h2 className="font-display text-lg font-bold text-gray-900">Create Activity Post</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -242,7 +242,7 @@ function CreatePostModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Post Type */}
           <div>
-            <label className="block text-xs text-slate-500 mb-1.5">Post Type</label>
+            <label className="block text-xs text-gray-400 mb-1.5">Post Type</label>
             <div className="flex gap-2">
               {([
                 { value: 'im_going', label: "I'm Going", color: '#10B981' },
@@ -257,7 +257,7 @@ function CreatePostModal({
                   style={
                     postType === pt.value
                       ? { backgroundColor: `${pt.color}15`, borderColor: `${pt.color}50`, color: pt.color }
-                      : { backgroundColor: 'transparent', borderColor: 'rgb(30, 58, 95)', color: 'rgb(148, 163, 184)' }
+                      : { backgroundColor: 'transparent', borderColor: 'rgb(229, 229, 234)', color: 'rgb(107, 107, 118)' }
                   }
                 >
                   {pt.label}
@@ -268,11 +268,11 @@ function CreatePostModal({
 
           {/* Activity Type */}
           <div>
-            <label className="block text-xs text-slate-500 mb-1.5">Activity</label>
+            <label className="block text-xs text-gray-400 mb-1.5">Activity</label>
             <select
               value={activityType}
               onChange={(e) => setActivityType(e.target.value)}
-              className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 focus:border-canopy focus:outline-none"
+              className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-canopy focus:outline-none"
             >
               <option value="mtb">Mountain Biking</option>
               <option value="hiking">Hiking</option>
@@ -286,49 +286,49 @@ function CreatePostModal({
 
           {/* Title */}
           <div>
-            <label className="block text-xs text-slate-500 mb-1.5">Title *</label>
+            <label className="block text-xs text-gray-400 mb-1.5">Title *</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Morning ride on Whole Enchilada"
               required
-              className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none"
+              className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:border-canopy focus:outline-none"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs text-slate-500 mb-1.5">Description</label>
+            <label className="block text-xs text-gray-400 mb-1.5">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tell people about the plan..."
               rows={3}
-              className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none resize-none"
+              className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:border-canopy focus:outline-none resize-none"
             />
           </div>
 
           {/* Location & Date row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-slate-500 mb-1.5">Location</label>
+              <label className="block text-xs text-gray-400 mb-1.5">Location</label>
               <input
                 type="text"
                 value={locationName}
                 onChange={(e) => setLocationName(e.target.value)}
                 placeholder="e.g., Moab, UT"
-                className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none"
+                className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:border-canopy focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1.5">Date *</label>
+              <label className="block text-xs text-gray-400 mb-1.5">Date *</label>
               <input
                 type="date"
                 value={activityDate}
                 onChange={(e) => setActivityDate(e.target.value)}
                 required
-                className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 focus:border-canopy focus:outline-none"
+                className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-canopy focus:outline-none"
               />
             </div>
           </div>
@@ -336,11 +336,11 @@ function CreatePostModal({
           {/* Skill & Participants row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-slate-500 mb-1.5">Skill Level</label>
+              <label className="block text-xs text-gray-400 mb-1.5">Skill Level</label>
               <select
                 value={skillLevel}
                 onChange={(e) => setSkillLevel(e.target.value as any)}
-                className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 focus:border-canopy focus:outline-none"
+                className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-canopy focus:outline-none"
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
@@ -349,14 +349,14 @@ function CreatePostModal({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1.5">Max Participants</label>
+              <label className="block text-xs text-gray-400 mb-1.5">Max Participants</label>
               <input
                 type="number"
                 value={maxParticipants}
                 onChange={(e) => setMaxParticipants(e.target.value)}
                 placeholder="No limit"
                 min="2"
-                className="w-full rounded-lg bg-cairn-elevated border border-cairn-border px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-canopy focus:outline-none"
+                className="w-full rounded-lg bg-gray-100 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:border-canopy focus:outline-none"
               />
             </div>
           </div>
@@ -378,7 +378,7 @@ function CreatePostModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-5 py-2.5 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors"
+              className="rounded-xl px-5 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors"
             >
               Cancel
             </button>
