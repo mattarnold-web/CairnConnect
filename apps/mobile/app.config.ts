@@ -18,9 +18,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.cairnconnect.app',
-    entitlements: {
-      'aps-environment': 'development',
-    },
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
       NSLocationWhenInUseUsageDescription:
@@ -65,13 +62,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'Cairn Connect uses the camera to capture photos during your outdoor activities.',
       },
     ],
-    [
-      'expo-notifications',
-      {
-        icon: './assets/icon.png',
-        color: '#10B981',
-      },
-    ],
+    // Note: expo-notifications plugin removed until APNs key is configured
+    // in Apple Developer portal. The app still requests permission at runtime.
   ],
   updates: {
     url: 'https://u.expo.dev/51e09a5a-06f0-4b35-877d-493cd4ed6d1e',
