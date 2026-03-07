@@ -276,79 +276,26 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
 
-            {/* Navigation cards — Board, Trips, Safety, Challenges */}
-            <View className="gap-2 mb-4">
-              <Pressable
-                onPress={() => router.push('/(tabs)/board')}
-                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
-              >
-                <View className="w-8 h-8 rounded-lg bg-indigo-500/20 items-center justify-center mr-3">
-                  <MessageSquare size={16} color="#818cf8" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-slate-100 font-medium text-sm">
-                    Activity Board
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    Find adventure partners
-                  </Text>
-                </View>
-                <ChevronRight size={16} color="#64748b" />
-              </Pressable>
-
-              <Pressable
-                onPress={() => router.push('/(tabs)/trip')}
-                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
-              >
-                <View className="w-8 h-8 rounded-lg bg-canopy/20 items-center justify-center mr-3">
-                  <Route size={16} color="#10B981" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-slate-100 font-medium text-sm">
-                    My Trips
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    Plan and manage trips
-                  </Text>
-                </View>
-                <ChevronRight size={16} color="#64748b" />
-              </Pressable>
-
-              <Pressable
-                onPress={() => router.push('/(tabs)/profile/safety')}
-                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
-              >
-                <View className="w-8 h-8 rounded-lg bg-red-500/20 items-center justify-center mr-3">
-                  <Shield size={16} color="#ef4444" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-slate-100 font-medium text-sm">
-                    Safety Center
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    SOS, contacts, location
-                  </Text>
-                </View>
-                <ChevronRight size={16} color="#64748b" />
-              </Pressable>
-
-              <Pressable
-                onPress={() => router.push('/(tabs)/profile/challenges')}
-                className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-4 py-3 active:bg-cairn-card-hover"
-              >
-                <View className="w-8 h-8 rounded-lg bg-amber-500/20 items-center justify-center mr-3">
-                  <Trophy size={16} color="#f59e0b" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-slate-100 font-medium text-sm">
-                    Challenges
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    Leaderboards and badges
-                  </Text>
-                </View>
-                <ChevronRight size={16} color="#64748b" />
-              </Pressable>
+            {/* Quick Links */}
+            <View className="flex-row flex-wrap gap-2 mb-4">
+              {[
+                { label: 'Board', icon: MessageSquare, color: '#818cf8', bg: 'bg-indigo-500/20', route: '/(tabs)/board' },
+                { label: 'Trips', icon: Route, color: '#10B981', bg: 'bg-canopy/20', route: '/(tabs)/trip' },
+                { label: 'Safety', icon: Shield, color: '#ef4444', bg: 'bg-red-500/20', route: '/(tabs)/profile/safety' },
+                { label: 'Challenges', icon: Trophy, color: '#f59e0b', bg: 'bg-amber-500/20', route: '/(tabs)/profile/challenges' },
+              ].map((item) => (
+                <Pressable
+                  key={item.label}
+                  onPress={() => router.push(item.route as any)}
+                  className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-3 py-2.5 active:bg-cairn-card-hover"
+                  style={{ width: '48%' }}
+                >
+                  <View className={`w-7 h-7 rounded-lg ${item.bg} items-center justify-center mr-2`}>
+                    <item.icon size={14} color={item.color} />
+                  </View>
+                  <Text className="text-slate-200 text-xs font-medium">{item.label}</Text>
+                </Pressable>
+              ))}
             </View>
 
             {/* Stats overview - enhanced with 4 cards */}

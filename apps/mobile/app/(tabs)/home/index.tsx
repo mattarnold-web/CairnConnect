@@ -10,8 +10,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import {
-  Sun,
-  Cloud,
   ChevronRight,
   MapPin,
   Star,
@@ -20,10 +18,6 @@ import {
   CircleDot,
   Route,
   Calendar,
-  Flame,
-  Ticket,
-  Award,
-  GripVertical,
 } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { TrailCard } from '@/components/trail/TrailCard';
@@ -35,29 +29,11 @@ import { useActivityContext } from '@/lib/activity-context';
 import { useTripContext } from '@/lib/trip-context';
 import { useFormat } from '@/lib/use-format';
 import { fetchTrails, fetchActivityPosts } from '@/lib/api';
+import { fetchWeather, type CurrentWeather } from '@/lib/weather';
 import { formatDuration } from '@cairn/shared';
 import type { Trail, ActivityPost } from '@cairn/shared';
 
-// Gradient color pairs for trail card cover placeholders
-const GRADIENT_COLORS = [
-  ['#065f46', '#0d9488'], // emerald to teal
-  ['#1e3a5f', '#3b82f6'], // blue-dark to blue
-  ['#7c2d12', '#f59e0b'], // brown to amber
-  ['#4c1d95', '#8b5cf6'], // violet-dark to violet
-  ['#134e4a', '#10B981'], // teal-dark to green
-];
-
-function getGradientColors(index: number): string[] {
-  return GRADIENT_COLORS[index % GRADIENT_COLORS.length];
-}
-
-// Mock permit costs for display
-function getTrailCost(trail: Trail): string {
-  if (trail.difficulty === 'green' || trail.difficulty === 'blue') return 'Free';
-  if (trail.difficulty === 'black') return '$10 permit';
-  if (trail.difficulty === 'double_black') return '$15 permit';
-  return 'Free';
-}
+const CARD_COLORS = ['#065f46', '#1e3a5f', '#7c2d12', '#4c1d95', '#134e4a'];
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -86,19 +62,29 @@ function SectionHeader({
       onPress={onAction}
       className="flex-row items-center justify-between mb-3"
     >
+      <Text className="text-slate-100 font-bold text-lg">{title}</Text>
       <View className="flex-row items-center">
-        <GripVertical size={16} color="#475569" style={{ marginRight: 6 }} />
-        <Text className="text-slate-100 font-bold text-lg">
-          {title}
-        </Text>
-      </View>
-      <View className="flex-row items-center">
-        <Text className="text-canopy text-sm font-semibold mr-1">
-          {actionLabel}
-        </Text>
+        <Text className="text-canopy text-sm font-medium mr-1">{actionLabel}</Text>
         <ChevronRight size={14} color="#10B981" />
       </View>
     </Pressable>
+  );
+}
+
+const DIFF_COLORS: Record<string, { bg: string; text: string; label: string }> = {
+  green: { bg: 'rgba(16,185,129,0.15)', text: '#10B981', label: 'Easy' },
+  blue: { bg: 'rgba(59,130,246,0.15)', text: '#3b82f6', label: 'Moderate' },
+  black: { bg: 'rgba(100,116,139,0.25)', text: '#94a3b8', label: 'Hard' },
+  double_black: { bg: 'rgba(239,68,68,0.15)', text: '#ef4444', label: 'Expert' },
+  proline: { bg: 'rgba(168,85,247,0.15)', text: '#a855f7', label: 'Pro' },
+};
+
+function DifficultyBadge({ difficulty }: { difficulty: string }) {
+  const d = DIFF_COLORS[difficulty] ?? DIFF_COLORS.blue;
+  return (
+    <View className="px-1.5 py-0.5 rounded" style={{ backgroundColor: d.bg }}>
+      <Text className="text-[10px] font-semibold" style={{ color: d.text }}>{d.label}</Text>
+    </View>
   );
 }
 
@@ -110,6 +96,7 @@ export default function HomeScreen() {
 
   const [trails, setTrails] = useState<Trail[]>([]);
   const [posts, setPosts] = useState<ActivityPost[]>([]);
+  const [weather, setWeather] = useState<CurrentWeather | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -121,6 +108,8 @@ export default function HomeScreen() {
       ]);
       setTrails(trailData);
       setPosts(postData);
+      // Fetch weather in background (non-blocking)
+      fetchWeather(38.5733, -109.5498).then((w) => setWeather(w.current)).catch(() => {});
     } catch {
       // Data will be empty — sections show empty states
     } finally {
@@ -176,12 +165,14 @@ export default function HomeScreen() {
               Ready for your next adventure?
             </Text>
           </View>
-          <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-3 py-2">
-            <Sun size={16} color="#F4A261" />
-            <Text className="text-slate-300 text-sm font-medium ml-1.5">
-              72°
-            </Text>
-          </View>
+          {weather && (
+            <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-3 py-2">
+              <Text className="text-sm mr-1">{weather.icon}</Text>
+              <Text className="text-slate-300 text-sm font-medium">
+                {weather.temp_f}°F
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* ── Quick Picks: Nearby Trails ── */}
@@ -215,38 +206,11 @@ export default function HomeScreen() {
                   }
                   className="w-64 bg-cairn-card border border-cairn-border rounded-2xl overflow-hidden active:bg-cairn-card-hover"
                 >
-                  {/* Cover photo placeholder with gradient */}
+                  {/* Cover gradient */}
                   <View
-                    className="h-28 items-center justify-center relative"
-                    style={{
-                      backgroundColor: getGradientColors(index)[0],
-                    }}
+                    className="h-24 items-center justify-center"
+                    style={{ backgroundColor: CARD_COLORS[index % CARD_COLORS.length] }}
                   >
-                    {/* Trending badge on first item */}
-                    {index === 0 && (
-                      <View
-                        className="absolute top-2.5 left-2.5 flex-row items-center rounded-full px-2 py-1"
-                        style={{ backgroundColor: 'rgba(245, 158, 11, 0.9)' }}
-                      >
-                        <Flame size={10} color="white" />
-                        <Text className="text-white text-[10px] font-bold ml-0.5">
-                          Trending
-                        </Text>
-                      </View>
-                    )}
-                    {/* Featured badge on second item */}
-                    {index === 1 && (
-                      <View
-                        className="absolute top-2.5 left-2.5 flex-row items-center rounded-full px-2 py-1"
-                        style={{ backgroundColor: 'rgba(16, 185, 129, 0.9)' }}
-                      >
-                        <Award size={10} color="white" />
-                        <Text className="text-white text-[10px] font-bold ml-0.5">
-                          Featured
-                        </Text>
-                      </View>
-                    )}
-                    {/* Trail icon overlay */}
                     <View className="w-10 h-10 rounded-full bg-white/10 items-center justify-center">
                       <MapPin size={20} color="white" />
                     </View>
@@ -269,67 +233,29 @@ export default function HomeScreen() {
                       </View>
                     )}
 
-                    {/* Rating + review count row */}
-                    <View className="flex-row items-center mb-2">
-                      <Star size={12} color="#F4A261" fill="#F4A261" />
-                      <Text className="text-slate-200 text-xs font-semibold ml-1">
-                        {item.rating.toFixed(1)}
-                      </Text>
-                      <Text className="text-slate-600 text-xs ml-1">
-                        ({Math.floor(item.rating * 100 + 50)} reviews)
-                      </Text>
-                    </View>
-
-                    {/* Distance + difficulty + cost row */}
-                    <View className="flex-row items-center justify-between">
-                      <View className="flex-row items-center gap-2">
+                    {/* Stats row */}
+                    <View className="flex-row items-center gap-3">
+                      {item.rating != null && item.rating > 0 && (
+                        <View className="flex-row items-center">
+                          <Star size={11} color="#F4A261" fill="#F4A261" />
+                          <Text className="text-slate-300 text-xs font-medium ml-1">
+                            {item.rating.toFixed(1)}
+                          </Text>
+                          {item.review_count > 0 && (
+                            <Text className="text-slate-600 text-xs ml-0.5">
+                              ({item.review_count})
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                      {item.distance_meters != null && (
                         <Text className="text-slate-400 text-xs">
                           {fmt.distance(item.distance_meters)}
                         </Text>
-                        <View
-                          className="px-1.5 py-0.5 rounded"
-                          style={{
-                            backgroundColor:
-                              item.difficulty === 'green'
-                                ? 'rgba(16, 185, 129, 0.15)'
-                                : item.difficulty === 'blue'
-                                  ? 'rgba(59, 130, 246, 0.15)'
-                                  : item.difficulty === 'black'
-                                    ? 'rgba(100, 116, 139, 0.25)'
-                                    : 'rgba(239, 68, 68, 0.15)',
-                          }}
-                        >
-                          <Text
-                            className="text-[10px] font-semibold"
-                            style={{
-                              color:
-                                item.difficulty === 'green'
-                                  ? '#10B981'
-                                  : item.difficulty === 'blue'
-                                    ? '#3b82f6'
-                                    : item.difficulty === 'black'
-                                      ? '#94a3b8'
-                                      : '#ef4444',
-                            }}
-                          >
-                            {item.difficulty === 'green'
-                              ? 'Easy'
-                              : item.difficulty === 'blue'
-                                ? 'Moderate'
-                                : item.difficulty === 'black'
-                                  ? 'Hard'
-                                  : item.difficulty === 'double_black'
-                                    ? 'Expert'
-                                    : item.difficulty}
-                          </Text>
-                        </View>
-                      </View>
-                      <View className="flex-row items-center">
-                        <Ticket size={10} color="#64748b" />
-                        <Text className="text-slate-500 text-[10px] ml-1 font-medium">
-                          {getTrailCost(item)}
-                        </Text>
-                      </View>
+                      )}
+                      {item.difficulty && (
+                        <DifficultyBadge difficulty={item.difficulty} />
+                      )}
                     </View>
                   </View>
                 </Pressable>

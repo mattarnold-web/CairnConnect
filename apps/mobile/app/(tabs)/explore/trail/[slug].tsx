@@ -35,6 +35,7 @@ import type { Review } from '@/lib/api';
 import type { Trail, Business } from '@cairn/shared';
 import { useFormat, formatDurationMinutes } from '@/lib/use-format';
 import { useTripContext } from '@/lib/trip-context';
+import { fetchWeather, type WeatherData } from '@/lib/weather';
 
 const TRAIL_EMOJI_MAP: Record<string, string> = {
   mtb: '\u{1F6B5}',
@@ -61,6 +62,7 @@ export default function TrailDetailScreen() {
   const [trailReviews, setTrailReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [showWriteReview, setShowWriteReview] = useState(false);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,6 +85,12 @@ export default function TrailDetailScreen() {
           if (cancelled) return;
           setTrailReviews(reviews);
           setNearbyBusinesses(businesses);
+          // Fetch weather in background
+          if (trailData?.lat && trailData?.lng) {
+            fetchWeather(trailData.lat, trailData.lng).then((w) => {
+              if (!cancelled) setWeather(w);
+            }).catch(() => {});
+          }
         }
       } catch {
         // Errors are handled by the api layer fallback
@@ -308,6 +316,55 @@ export default function TrailDetailScreen() {
               </View>
             </View>
           </Card>
+
+          {/* Real-time Weather */}
+          {weather && (
+            <Card className="mb-4">
+              <View className="flex-row items-center justify-between mb-2">
+                <Text className="text-slate-100 font-semibold text-sm">Current Weather</Text>
+                <Text className="text-slate-500 text-xs">Live</Text>
+              </View>
+              <View className="flex-row items-center mb-3">
+                <Text style={{ fontSize: 32 }}>{weather.current.icon}</Text>
+                <View className="ml-3">
+                  <Text className="text-slate-100 text-2xl font-bold">
+                    {weather.current.temp_f}°F
+                  </Text>
+                  <Text className="text-slate-400 text-xs">
+                    {weather.current.conditions} · Feels like {weather.current.feels_like_f}°F
+                  </Text>
+                </View>
+              </View>
+              <View className="flex-row justify-between">
+                <View className="items-center flex-1">
+                  <Text className="text-slate-500 text-[10px]">Wind</Text>
+                  <Text className="text-slate-300 text-xs font-medium">{weather.current.wind_speed_kmh} km/h</Text>
+                </View>
+                <View className="items-center flex-1">
+                  <Text className="text-slate-500 text-[10px]">Humidity</Text>
+                  <Text className="text-slate-300 text-xs font-medium">{weather.current.humidity}%</Text>
+                </View>
+                <View className="items-center flex-1">
+                  <Text className="text-slate-500 text-[10px]">UV Index</Text>
+                  <Text className="text-slate-300 text-xs font-medium">{weather.current.uv_index}</Text>
+                </View>
+              </View>
+              {weather.daily.length > 0 && (
+                <View className="flex-row mt-3 pt-3 border-t border-cairn-border/30 justify-between">
+                  {weather.daily.slice(0, 5).map((day) => (
+                    <View key={day.date} className="items-center flex-1">
+                      <Text className="text-slate-600 text-[10px]">
+                        {new Date(day.date + 'T12:00').toLocaleDateString('en', { weekday: 'short' })}
+                      </Text>
+                      <Text className="text-sm my-0.5">{day.icon}</Text>
+                      <Text className="text-slate-300 text-[10px] font-medium">{day.high_f}°</Text>
+                      <Text className="text-slate-600 text-[10px]">{day.low_f}°</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </Card>
+          )}
 
           {/* Condition details */}
           {trail.current_condition === 'caution' && (
