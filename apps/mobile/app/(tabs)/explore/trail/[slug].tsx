@@ -148,6 +148,7 @@ export default function TrailDetailScreen() {
         id: `item-${Date.now()}`,
         type: 'trail',
         trailId: trail.id,
+        trailName: trail.name,
         customTitle: null,
         customActivityType: null,
         notes: '',

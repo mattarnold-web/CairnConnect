@@ -27,6 +27,7 @@ export interface TripDayItem {
   id: string;
   type: 'trail' | 'custom';
   trailId: string | null;
+  trailName: string | null;
   customTitle: string | null;
   customActivityType: string | null;
   notes: string;

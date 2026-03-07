@@ -19,8 +19,7 @@ import {
 } from 'lucide-react-native';
 import { Badge } from '@/components/ui/Badge';
 import { FilterChip } from '@/components/ui/FilterChip';
-import { searchTrailsNear, type TripTrailResult } from '@/lib/api';
-import { MOCK_TRAILS } from '@/lib/mock-data';
+import { searchTrailsNear, searchTrailsForTrip, type TripTrailResult } from '@/lib/api';
 import type { Trail } from '@cairn/shared';
 import type { TripDayItem } from '@/lib/trip-types';
 
@@ -45,6 +44,8 @@ interface TrailSearchSheetProps {
   onClose: () => void;
   onSelectTrail: (item: TripDayItem) => void;
   regionName: string | null;
+  regionLat?: number | null;
+  regionLng?: number | null;
   selectedActivities: string[];
 }
 
@@ -63,6 +64,8 @@ export function TrailSearchSheet({
   onClose,
   onSelectTrail,
   regionName,
+  regionLat,
+  regionLng,
   selectedActivities,
 }: TrailSearchSheetProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -71,7 +74,6 @@ export function TrailSearchSheet({
   const [activeFilters, setActiveFilters] = useState<string[]>(selectedActivities);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Initialize with region trails on open
   useEffect(() => {
     if (visible) {
       setActiveFilters(selectedActivities);
@@ -82,94 +84,40 @@ export function TrailSearchSheet({
   const loadInitialTrails = useCallback(async () => {
     setLoading(true);
     try {
-      // Try API first, fall back to mock data
-      const data = await searchTrailsNear({
+      const data = await searchTrailsForTrip({
         query: '',
+        lat: regionLat ?? undefined,
+        lng: regionLng ?? undefined,
+        radiusKm: 50,
         activityTypes: selectedActivities.length > 0 ? selectedActivities : undefined,
         limit: 30,
       });
-
-      if (data.length > 0) {
-        setResults(data);
-      } else {
-        // Fallback to mock data filtered by region
-        let trails = MOCK_TRAILS as unknown as Trail[];
-        if (regionName) {
-          const regionLower = regionName.toLowerCase();
-          trails = trails.filter(
-            (t) => t.city?.toLowerCase() === regionLower,
-          );
-        }
-        if (selectedActivities.length > 0) {
-          trails = trails.filter((t) =>
-            t.activity_types.some((a) => selectedActivities.includes(a)),
-          );
-        }
-        setResults(trails);
-      }
+      setResults(data);
     } catch {
-      // Fallback to mock data
-      let trails = MOCK_TRAILS as unknown as Trail[];
-      if (regionName) {
-        const regionLower = regionName.toLowerCase();
-        trails = trails.filter(
-          (t) => t.city?.toLowerCase() === regionLower,
-        );
-      }
-      setResults(trails);
+      setResults([]);
     } finally {
       setLoading(false);
     }
-  }, [regionName, selectedActivities]);
+  }, [regionName, regionLat, regionLng, selectedActivities]);
 
-  // Debounced search
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
-
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-
-    debounceTimer.current = setTimeout(() => {
-      performSearch(text, activeFilters);
-    }, 300);
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => performSearch(text, activeFilters), 300);
   };
 
   const performSearch = async (query: string, filters: string[]) => {
     setLoading(true);
     try {
-      const data = await searchTrailsNear({
-        query: query,
+      const data = await searchTrailsForTrip({
+        query,
+        lat: regionLat ?? undefined,
+        lng: regionLng ?? undefined,
+        radiusKm: 50,
         activityTypes: filters.length > 0 ? filters : undefined,
         limit: 30,
       });
-
-      if (data.length > 0) {
-        setResults(data);
-      } else {
-        // Fallback to mock data with search
-        let trails = MOCK_TRAILS as unknown as Trail[];
-        if (regionName) {
-          const regionLower = regionName.toLowerCase();
-          trails = trails.filter(
-            (t) => t.city?.toLowerCase() === regionLower,
-          );
-        }
-        if (query) {
-          const q = query.toLowerCase();
-          trails = trails.filter(
-            (t) =>
-              t.name.toLowerCase().includes(q) ||
-              (t.description && t.description.toLowerCase().includes(q)),
-          );
-        }
-        if (filters.length > 0) {
-          trails = trails.filter((t) =>
-            t.activity_types.some((a) => filters.includes(a)),
-          );
-        }
-        setResults(trails);
-      }
+      setResults(data);
     } catch {
       // Keep current results
     } finally {
@@ -190,6 +138,7 @@ export function TrailSearchSheet({
       id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       type: 'trail',
       trailId: trail.id,
+      trailName: trail.name,
       customTitle: null,
       customActivityType: null,
       notes: '',

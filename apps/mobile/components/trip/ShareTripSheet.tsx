@@ -23,7 +23,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { encodeTripState } from '@/lib/trip-share';
-import { MOCK_TRAILS } from '@/lib/mock-data';
+import { fetchTrailBySlug } from '@/lib/api';
 import { ACTIVITY_TYPES } from '@cairn/shared';
 import type { TripState } from '@/lib/trip-types';
 
@@ -87,14 +87,9 @@ export function ShareTripSheet({
         lines.push('  No activities planned');
       } else {
         for (const item of day.items) {
-          if (item.type === 'trail' && item.trailId) {
-            const trail = (MOCK_TRAILS as any[]).find(
-              (t) => t.id === item.trailId,
-            );
-            if (trail) {
-              const distance = (trail.distance_meters / 1609.34).toFixed(1);
-              lines.push(`  - ${trail.name} (${distance} mi)`);
-            }
+          if (item.type === 'trail') {
+            const trailName = item.trailName ?? item.customTitle ?? 'Trail';
+            lines.push(`  - ${trailName}`);
           } else if (item.type === 'custom' && item.customTitle) {
             lines.push(`  - ${item.customTitle}`);
           }

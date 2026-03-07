@@ -281,6 +281,7 @@ export default function TripScreen() {
       id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       type: 'trail',
       trailId: trail.id,
+      trailName: trail.name,
       customTitle: null,
       customActivityType: null,
       notes: '',
@@ -300,6 +301,7 @@ export default function TripScreen() {
       id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       type: 'custom',
       trailId: null,
+      trailName: null,
       customTitle: customActivityTitle.trim(),
       customActivityType: state.selectedActivities[0] ?? 'hiking',
       notes: '',
@@ -1371,6 +1373,8 @@ export default function TripScreen() {
           setAddingToDayId(null);
         }}
         regionName={state.region?.name ?? null}
+        regionLat={state.region?.lat ?? null}
+        regionLng={state.region?.lng ?? null}
         selectedActivities={state.selectedActivities}
       />
 
