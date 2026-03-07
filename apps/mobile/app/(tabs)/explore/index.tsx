@@ -194,19 +194,19 @@ export default function ExploreScreen() {
         showsHorizontalScrollIndicator={false}
         data={activityFilterData}
         keyExtractor={(item) => item.slug ?? 'all'}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8, gap: 8 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10, gap: 10 }}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => setSelectedActivity(item.slug === selectedActivity ? null : item.slug)}
-            className={`flex-row items-center px-3 py-1.5 rounded-full border ${
+            className={`flex-row items-center px-4 py-2.5 rounded-full border ${
               selectedActivity === item.slug
                 ? 'bg-canopy/20 border-canopy'
                 : 'bg-cairn-card border-cairn-border'
             }`}
           >
-            <Text className="text-xs mr-1">{item.emoji}</Text>
-            <Text className={`text-xs font-medium ${
-              selectedActivity === item.slug ? 'text-canopy' : 'text-slate-400'
+            <Text style={{ fontSize: 16, marginRight: 6 }}>{item.emoji}</Text>
+            <Text className={`text-sm font-medium ${
+              selectedActivity === item.slug ? 'text-canopy' : 'text-slate-300'
             }`}>
               {item.label}
             </Text>
@@ -215,16 +215,16 @@ export default function ExploreScreen() {
       />
 
       {/* ── Tabs ── */}
-      <View className="flex-row mx-4 mb-2 bg-cairn-card rounded-xl p-1">
+      <View className="flex-row mx-4 mb-3 bg-cairn-card rounded-xl p-1">
         {(['trails', 'businesses'] as TabType[]).map((tab) => (
           <Pressable
             key={tab}
             onPress={() => setActiveTab(tab)}
-            className={`flex-1 py-2 rounded-lg items-center ${
+            className={`flex-1 py-2.5 rounded-lg items-center ${
               activeTab === tab ? 'bg-canopy/20' : ''
             }`}
           >
-            <Text className={`text-xs font-semibold ${
+            <Text className={`text-sm font-semibold ${
               activeTab === tab ? 'text-canopy' : 'text-slate-500'
             }`}>
               {tab === 'trails' ? `Trails (${trails.length})` : `Businesses (${businesses.length})`}
@@ -235,12 +235,12 @@ export default function ExploreScreen() {
 
       {/* ── Active Filter Badge ── */}
       {hasActiveFilters && (
-        <Pressable onPress={clearFilters} className="flex-row items-center mx-4 mb-2">
-          <View className="flex-row items-center bg-canopy/10 px-3 py-1.5 rounded-full">
-            <Text className="text-canopy text-xs mr-1">
+        <Pressable onPress={clearFilters} className="flex-row items-center mx-4 mb-3">
+          <View className="flex-row items-center bg-canopy/10 px-4 py-2 rounded-full">
+            <Text className="text-canopy text-sm font-medium mr-2">
               {selectedActivity ? ACTIVITY_TYPES.find((a) => a.slug === selectedActivity)?.label : debouncedSearch}
             </Text>
-            <X size={12} color="#10B981" />
+            <X size={14} color="#10B981" />
           </View>
         </Pressable>
       )}

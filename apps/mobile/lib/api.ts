@@ -1034,9 +1034,14 @@ export async function searchRegions(
       p_limit: limit,
     });
 
-    if (error) throw error;
+    if (error) {
+      console.warn('[searchRegions] RPC error:', error.message);
+      throw error;
+    }
+    console.log('[searchRegions] Found', data?.length ?? 0, 'regions');
     return (data ?? []) as RegionResult[];
-  } catch {
+  } catch (e: any) {
+    console.warn('[searchRegions] Failed:', e?.message ?? e);
     return [];
   }
 }
