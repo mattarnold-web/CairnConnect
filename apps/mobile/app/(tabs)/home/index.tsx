@@ -145,291 +145,183 @@ export default function HomeScreen() {
   return (
     <SafeAreaView className="flex-1 bg-cairn-bg" edges={['top']}>
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 24 }}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#10B981"
-            colors={['#10B981']}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#10B981" />
         }
       >
-        {/* ── Greeting Header ── */}
-        <View className="flex-row items-center justify-between mb-6">
-          <View>
-            <Text className="text-slate-100 font-bold text-2xl">
+        {/* ── Header ── */}
+        <View className="flex-row items-center justify-between mb-4">
+          <View className="flex-1">
+            <Text className="text-slate-100 font-bold text-xl">
               {greeting}, {firstName}
-            </Text>
-            <Text className="text-slate-500 text-sm mt-0.5">
-              Ready for your next adventure?
             </Text>
           </View>
           {weather && (
-            <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-xl px-3 py-2">
-              <Text className="text-sm mr-1">{weather.icon}</Text>
-              <Text className="text-slate-300 text-sm font-medium">
-                {weather.temp_f}°F
-              </Text>
+            <View className="flex-row items-center bg-cairn-card border border-cairn-border rounded-lg px-2.5 py-1.5">
+              <Text className="text-xs mr-1">{weather.icon}</Text>
+              <Text className="text-slate-300 text-xs font-medium">{weather.temp_f}°</Text>
             </View>
           )}
         </View>
 
-        {/* ── Quick Picks: Nearby Trails ── */}
-        <View className="mb-6">
-          <SectionHeader
-            title="Quick Picks"
-            actionLabel="See All"
-            onAction={() => router.push('/(tabs)/explore')}
-          />
+        {/* ── Quick Actions ── */}
+        <View className="flex-row gap-2 mb-4">
+          <Pressable
+            onPress={() => router.push('/(tabs)/explore')}
+            className="flex-1 bg-canopy/15 border border-canopy/30 rounded-xl px-3 py-3 items-center"
+          >
+            <MapPin size={18} color="#10B981" />
+            <Text className="text-canopy text-xs font-semibold mt-1">Explore</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/(tabs)/record')}
+            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-3 py-3 items-center"
+          >
+            <CircleDot size={18} color="#94a3b8" />
+            <Text className="text-slate-300 text-xs font-semibold mt-1">Record</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/(tabs)/trip')}
+            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-3 py-3 items-center"
+          >
+            <Route size={18} color="#94a3b8" />
+            <Text className="text-slate-300 text-xs font-semibold mt-1">Plan Trip</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/(tabs)/board')}
+            className="flex-1 bg-cairn-card border border-cairn-border rounded-xl px-3 py-3 items-center"
+          >
+            <Calendar size={18} color="#94a3b8" />
+            <Text className="text-slate-300 text-xs font-semibold mt-1">Board</Text>
+          </Pressable>
+        </View>
 
+        {/* ── Nearby Trails ── */}
+        <View className="mb-4">
+          <SectionHeader title="Nearby Trails" actionLabel="See All" onAction={() => router.push('/(tabs)/explore')} />
           {loading ? (
-            <View className="flex-row gap-3">
-              <View className="w-64">
-                <SkeletonCard />
-              </View>
-              <View className="w-64">
-                <SkeletonCard />
-              </View>
+            <View className="flex-row gap-2">
+              <View className="flex-1"><SkeletonCard /></View>
+              <View className="flex-1"><SkeletonCard /></View>
             </View>
           ) : trails.length > 0 ? (
             <FlatList
-              data={trails.slice(0, 5)}
+              data={trails.slice(0, 6)}
               horizontal
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item) => item.slug}
-              contentContainerStyle={{ gap: 12 }}
+              contentContainerStyle={{ gap: 10 }}
               renderItem={({ item, index }) => (
                 <Pressable
-                  onPress={() =>
-                    router.push(`/(tabs)/explore/trail/${item.slug}`)
-                  }
-                  className="w-64 bg-cairn-card border border-cairn-border rounded-2xl overflow-hidden active:bg-cairn-card-hover"
+                  onPress={() => router.push(`/(tabs)/explore/trail/${item.slug}`)}
+                  className="w-44 bg-cairn-card border border-cairn-border rounded-xl overflow-hidden"
                 >
-                  {/* Cover gradient */}
                   <View
-                    className="h-24 items-center justify-center"
+                    className="h-16 items-center justify-center"
                     style={{ backgroundColor: CARD_COLORS[index % CARD_COLORS.length] }}
                   >
-                    <View className="w-10 h-10 rounded-full bg-white/10 items-center justify-center">
-                      <MapPin size={20} color="white" />
-                    </View>
+                    <MapPin size={16} color="rgba(255,255,255,0.6)" />
                   </View>
-
-                  {/* Card content */}
-                  <View className="p-3.5">
-                    <Text
-                      className="text-slate-100 font-bold text-base mb-1"
-                      numberOfLines={1}
-                    >
-                      {item.name}
-                    </Text>
+                  <View className="px-2.5 py-2">
+                    <Text className="text-slate-100 font-semibold text-xs" numberOfLines={1}>{item.name}</Text>
                     {item.city && (
-                      <View className="flex-row items-center mb-2">
-                        <MapPin size={11} color="#64748b" />
-                        <Text className="text-slate-500 text-xs ml-1">
-                          {item.city}, {item.state_province}
-                        </Text>
-                      </View>
+                      <Text className="text-slate-500 text-[10px] mt-0.5" numberOfLines={1}>{item.city}</Text>
                     )}
-
-                    {/* Stats row */}
-                    <View className="flex-row items-center gap-3">
+                    <View className="flex-row items-center gap-2 mt-1">
                       {item.rating != null && item.rating > 0 && (
                         <View className="flex-row items-center">
-                          <Star size={11} color="#F4A261" fill="#F4A261" />
-                          <Text className="text-slate-300 text-xs font-medium ml-1">
-                            {item.rating.toFixed(1)}
-                          </Text>
-                          {item.review_count > 0 && (
-                            <Text className="text-slate-600 text-xs ml-0.5">
-                              ({item.review_count})
-                            </Text>
-                          )}
+                          <Star size={9} color="#F4A261" fill="#F4A261" />
+                          <Text className="text-slate-400 text-[10px] ml-0.5">{item.rating.toFixed(1)}</Text>
                         </View>
                       )}
-                      {item.distance_meters != null && (
-                        <Text className="text-slate-400 text-xs">
-                          {fmt.distance(item.distance_meters)}
-                        </Text>
-                      )}
-                      {item.difficulty && (
-                        <DifficultyBadge difficulty={item.difficulty} />
-                      )}
+                      {item.difficulty && <DifficultyBadge difficulty={item.difficulty} />}
                     </View>
                   </View>
                 </Pressable>
               )}
             />
           ) : (
-            <Card>
-              <Text className="text-slate-500 text-sm text-center">
-                No trails found nearby. Try exploring the map!
-              </Text>
-            </Card>
+            <Pressable onPress={() => router.push('/(tabs)/explore')} className="bg-cairn-card border border-cairn-border rounded-xl p-3">
+              <Text className="text-slate-500 text-xs text-center">Tap to explore trails nearby</Text>
+            </Pressable>
           )}
         </View>
 
         {/* ── Recent Activity ── */}
-        <View className="mb-6">
-          <SectionHeader
-            title="Recent Activity"
-            actionLabel="Record"
-            onAction={() => router.push('/(tabs)/record')}
-          />
-
+        <View className="mb-4">
+          <SectionHeader title="Recent Activity" actionLabel="Record" onAction={() => router.push('/(tabs)/record')} />
           {latestActivity ? (
-            <Pressable
-              onPress={() =>
-                router.push(
-                  `/(tabs)/record/activity/${latestActivity.id}`,
-                )
-              }
-            >
+            <Pressable onPress={() => router.push(`/(tabs)/record/activity/${latestActivity.id}`)}>
               <Card>
-                <View className="flex-row items-center mb-2">
-                  <ActivityIcon
-                    activitySlug={latestActivity.activityType}
-                    size="md"
-                  />
+                <View className="flex-row items-center">
+                  <ActivityIcon activitySlug={latestActivity.activityType} size="md" />
                   <View className="ml-2 flex-1">
-                    <Text
-                      className="text-slate-100 font-medium text-sm"
-                      numberOfLines={1}
-                    >
-                      {latestActivity.title}
-                    </Text>
-                    <Text className="text-slate-500 text-xs mt-0.5">
-                      {new Date(latestActivity.startedAt).toLocaleDateString()}
-                    </Text>
+                    <Text className="text-slate-100 font-medium text-sm" numberOfLines={1}>{latestActivity.title}</Text>
+                    <View className="flex-row items-center gap-3 mt-1">
+                      <Text className="text-slate-500 text-[10px]">{fmt.distance(latestActivity.distanceMeters)}</Text>
+                      <Text className="text-slate-500 text-[10px]">{formatDuration(latestActivity.durationSeconds)}</Text>
+                      <Text className="text-canopy text-[10px]">↑{fmt.elevation(latestActivity.elevationGainMeters)}</Text>
+                    </View>
                   </View>
-                  <ChevronRight size={16} color="#64748b" />
-                </View>
-                <View className="flex-row items-center gap-4">
-                  <View className="flex-row items-center gap-1">
-                    <MapPin size={10} color="#94a3b8" />
-                    <Text className="text-slate-400 text-xs">
-                      {fmt.distance(latestActivity.distanceMeters)}
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center gap-1">
-                    <Clock size={10} color="#94a3b8" />
-                    <Text className="text-slate-400 text-xs">
-                      {formatDuration(latestActivity.durationSeconds)}
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center gap-1">
-                    <TrendingUp size={10} color="#10B981" />
-                    <Text className="text-slate-400 text-xs">
-                      {fmt.elevation(latestActivity.elevationGainMeters)}
-                    </Text>
-                  </View>
+                  <ChevronRight size={14} color="#475569" />
                 </View>
               </Card>
             </Pressable>
           ) : (
             <Pressable onPress={() => router.push('/(tabs)/record')}>
               <Card>
-                <View className="items-center py-4">
-                  <CircleDot size={32} color="#10B981" />
-                  <Text className="text-slate-100 font-medium text-sm mt-2">
-                    Record your first activity
-                  </Text>
-                  <Text className="text-slate-500 text-xs mt-1">
-                    Track your hikes, rides, and more
-                  </Text>
+                <View className="flex-row items-center py-1">
+                  <CircleDot size={20} color="#10B981" />
+                  <View className="ml-3">
+                    <Text className="text-slate-200 font-medium text-sm">Record your first activity</Text>
+                    <Text className="text-slate-500 text-[10px]">Track hikes, rides, and more</Text>
+                  </View>
                 </View>
               </Card>
             </Pressable>
           )}
         </View>
 
-        {/* ── Your Trips ── */}
-        <View className="mb-6">
-          <SectionHeader
-            title="Your Trips"
-            actionLabel="Plan"
-            onAction={() => router.push('/(tabs)/trip')}
-          />
-
-          {hasActiveTrip ? (
+        {/* ── Active Trip ── */}
+        {hasActiveTrip && (
+          <View className="mb-4">
+            <SectionHeader title="Active Trip" actionLabel="View" onAction={() => router.push('/(tabs)/trip')} />
             <Pressable onPress={() => router.push('/(tabs)/trip')}>
               <Card>
-                <View className="flex-row items-center mb-2">
+                <View className="flex-row items-center">
                   <Route size={16} color="#10B981" />
                   <View className="flex-1 ml-2">
-                    <Text className="text-slate-100 font-medium text-sm">
-                      {tripState.tripName || 'Upcoming Trip'}
-                    </Text>
+                    <Text className="text-slate-100 font-medium text-sm">{tripState.tripName || 'Upcoming Trip'}</Text>
+                    {tripState.region && (
+                      <Text className="text-slate-500 text-[10px] mt-0.5">{tripState.region.name} · {tripState.days.length} day{tripState.days.length !== 1 ? 's' : ''}</Text>
+                    )}
                   </View>
-                  <ChevronRight size={16} color="#64748b" />
-                </View>
-                {tripState.region && (
-                  <View className="flex-row items-center">
-                    <MapPin size={11} color="#64748b" />
-                    <Text className="text-slate-500 text-xs ml-1">
-                      {tripState.region.name}, {tripState.region.state_province}
-                    </Text>
-                  </View>
-                )}
-                {tripState.days.length > 0 && (
-                  <Text className="text-slate-500 text-xs mt-1">
-                    {tripState.days.length} day{tripState.days.length !== 1 ? 's' : ''} planned
-                  </Text>
-                )}
-              </Card>
-            </Pressable>
-          ) : (
-            <Pressable onPress={() => router.push('/(tabs)/trip')}>
-              <Card>
-                <View className="items-center py-4">
-                  <Route size={32} color="#10B981" />
-                  <Text className="text-slate-100 font-medium text-sm mt-2">
-                    Plan your next trip
-                  </Text>
-                  <Text className="text-slate-500 text-xs mt-1">
-                    Build an itinerary with trails, lodging, and more
-                  </Text>
+                  <ChevronRight size={14} color="#475569" />
                 </View>
               </Card>
             </Pressable>
-          )}
-        </View>
+          </View>
+        )}
 
-        {/* ── Happening Nearby ── */}
-        <View className="mb-6">
-          <SectionHeader
-            title="Happening Nearby"
-            actionLabel="See All"
-            onAction={() => router.push('/(tabs)/board')}
-          />
-
+        {/* ── Community ── */}
+        <View className="mb-4">
+          <SectionHeader title="Community" actionLabel="See All" onAction={() => router.push('/(tabs)/board')} />
           {loading ? (
-            <View>
-              <SkeletonCard className="mb-3" />
-              <SkeletonCard />
-            </View>
+            <SkeletonCard />
           ) : posts.length > 0 ? (
-            posts
-              .slice(0, 3)
-              .map((post) => (
-                <ActivityBoardCard
-                  key={post.id}
-                  post={post}
-                  onPress={() => router.push(`/(tabs)/board/${post.id}`)}
-                />
-              ))
+            posts.slice(0, 2).map((post) => (
+              <ActivityBoardCard key={post.id} post={post} onPress={() => router.push(`/(tabs)/board/${post.id}`)} />
+            ))
           ) : (
             <Pressable onPress={() => router.push('/(tabs)/board/create')}>
               <Card>
-                <View className="items-center py-4">
-                  <Calendar size={32} color="#10B981" />
-                  <Text className="text-slate-100 font-medium text-sm mt-2">
-                    No upcoming activities
-                  </Text>
-                  <Text className="text-slate-500 text-xs mt-1">
-                    Post to the board and find adventure partners
-                  </Text>
+                <View className="flex-row items-center py-1">
+                  <Calendar size={20} color="#10B981" />
+                  <View className="ml-3">
+                    <Text className="text-slate-200 font-medium text-sm">Find adventure partners</Text>
+                    <Text className="text-slate-500 text-[10px]">Post to the community board</Text>
+                  </View>
                 </View>
               </Card>
             </Pressable>
